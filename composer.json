@@ -15,10 +15,10 @@
         "psr-4": { "Ang3\\Component\\OdooApiClient\\": "src/" }
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.0",
         "darkaonline/ripcord": "^0.1.7"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^6.0"
     }
 }
