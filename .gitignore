@@ -1,0 +1,4 @@
+/bin/
+/vendor/
+.php_cs.cache
+test.php

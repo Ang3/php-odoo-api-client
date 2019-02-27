@@ -1,0 +1,5 @@
+parameters:
+  paths:
+    - %currentWorkingDirectory%/src
+  ignoreErrors:
+  	- '#Call to an undefined method Ripcord\\Client\\Client::(.*)#'
