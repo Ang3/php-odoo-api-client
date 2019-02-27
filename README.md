@@ -8,8 +8,8 @@ Odoo External API client. See [documentation](https://www.odoo.com/documentation
 Installation
 ============
 
-Step 1: Download the Bundle
----------------------------
+Step 1: Download sources
+------------------------
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
