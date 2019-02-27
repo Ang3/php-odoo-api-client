@@ -39,5 +39,6 @@ var_dump($client->getUid());
 var_dump($client->search('res.company'));
 var_dump($client->read('res.company', [2]));
 
-
 ```
+
+That's it!
