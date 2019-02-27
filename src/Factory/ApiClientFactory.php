@@ -10,7 +10,7 @@ use Ang3\Component\OdooApiClient\Client\ExternalApiClient;
  *
  * This class helps to create clients for Odoo API.
  */
-class OdooClientFactory
+class ApiClientFactory
 {
 	/**
 	 * Create external API client for Odoo from config array.
