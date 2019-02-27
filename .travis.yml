@@ -10,6 +10,3 @@ before_install:
   - composer install
 
 install: php -d memory_limit=-1 $(phpenv which composer) install --no-suggest --prefer-dist
-
-script:
-  - if [ "$VALIDATE_DOCS" != true ]; then ./vendor/bin/phpunit; fi
