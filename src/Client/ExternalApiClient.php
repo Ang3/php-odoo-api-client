@@ -12,13 +12,13 @@ use Ripcord\Client\Client;
 class ExternalApiClient
 {
     /**
-     * Endpoints
+     * Endpoints.
      */
     const ENDPOINT_COMMON = 'xmlrpc/2/common';
     const ENDPOINT_OBJECT = 'xmlrpc/2/object';
 
     /**
-     * Object methods
+     * Object methods.
      */
     const METHOD_CREATE = 'create';
     const METHOD_READ = 'read';
@@ -33,7 +33,7 @@ class ExternalApiClient
      * API endpoints list.
      *
      * @static
-     * 
+     *
      * @var array
      */
     private static $endpoints = array(
@@ -45,7 +45,7 @@ class ExternalApiClient
      * API object methods list.
      *
      * @static
-     * 
+     *
      * @var array
      */
     private static $objectMethods = array(
@@ -59,243 +59,243 @@ class ExternalApiClient
         self::METHOD_LIST_FIELDS,
     );
 
-	/**
-	 * Client host.
-	 * 
-	 * @var string
-	 */
-	private $host;
+    /**
+     * Client host.
+     *
+     * @var string
+     */
+    private $host;
 
-	/**
-	 * Odoo database name.
-	 * 
-	 * @var string
-	 */
-	private $database;
+    /**
+     * Odoo database name.
+     *
+     * @var string
+     */
+    private $database;
 
-	/**
-	 * Odoo user.
-	 * 
-	 * @var string
-	 */
-	private $user;
+    /**
+     * Odoo user.
+     *
+     * @var string
+     */
+    private $user;
 
-	/**
-	 * Odoo user password.
-	 * 
-	 * @var string
-	 */
-	private $password;
+    /**
+     * Odoo user password.
+     *
+     * @var string
+     */
+    private $password;
 
-	/**
-	 * Client options.
-	 * 
-	 * @var array
-	 */
-	private $options;
+    /**
+     * Client options.
+     *
+     * @var array
+     */
+    private $options;
 
     /**
      * Clients instances.
-     * 
+     *
      * @var array
      */
     private $clients = [];
 
     /**
      * Client uid.
-     * 
+     *
      * @var string
      */
     private $uid;
 
-	/**
-	 * Constructor of the client.
-	 * 
-	 * @param  string  $host
-	 * @param  string  $database
-	 * @param  string  $user
-	 * @param  string  $password
-	 * @param  array   $options
-	 */
-	public function __construct($host, $database, $user, $password, array $options = [])
-	{
-		$this->host = $host;
-		$this->database = $database;
-		$this->user = $user;
-		$this->password = $password;
-		$this->options = $options;
-	}
+    /**
+     * Constructor of the client.
+     *
+     * @param string $host
+     * @param string $database
+     * @param string $user
+     * @param string $password
+     * @param array  $options
+     */
+    public function __construct($host, $database, $user, $password, array $options = [])
+    {
+        $this->host = $host;
+        $this->database = $database;
+        $this->user = $user;
+        $this->password = $password;
+        $this->options = $options;
+    }
 
-    // 
+    //
     // ---------------------------------------------------------------------------------------
     // --- Setters & Getters
     // ---------------------------------------------------------------------------------------
-    // 
- 
+    //
+
     /**
-    * Get endpoints.
-    *
-    * @static
-    *
-    * @return array
-    */
+     * Get endpoints.
+     *
+     * @static
+     *
+     * @return array
+     */
     public static function getEndpoints()
     {
         return self::$endpoints;
     }
- 
+
     /**
-    * Get object methods.
-    *
-    * @static
-    *
-    * @return array
-    */
+     * Get object methods.
+     *
+     * @static
+     *
+     * @return array
+     */
     public static function getObjectMethods()
     {
         return self::$objectMethods;
     }
 
     /**
-    * Set host.
-    *
-    * @param string $host
-    *
-    * @return self
-    */
+     * Set host.
+     *
+     * @param string $host
+     *
+     * @return self
+     */
     public function setHost($host)
     {
         $this->host = $host;
 
         return $this;
     }
- 
+
     /**
-    * Get host.
-    *
-    * @return string
-    */
+     * Get host.
+     *
+     * @return string
+     */
     public function getHost()
     {
         return $this->host;
     }
 
     /**
-    * Set database.
-    *
-    * @param string $database
-    *
-    * @return self
-    */
+     * Set database.
+     *
+     * @param string $database
+     *
+     * @return self
+     */
     public function setDatabase($database)
     {
         $this->database = $database;
 
         return $this;
     }
- 
+
     /**
-    * Get database.
-    *
-    * @return string
-    */
+     * Get database.
+     *
+     * @return string
+     */
     public function getDatabase()
     {
         return $this->database;
     }
 
     /**
-    * Set user.
-    *
-    * @param string $user
-    *
-    * @return self
-    */
+     * Set user.
+     *
+     * @param string $user
+     *
+     * @return self
+     */
     public function setUser($user)
     {
         $this->user = $user;
 
         return $this;
     }
- 
+
     /**
-    * Get user.
-    *
-    * @return string
-    */
+     * Get user.
+     *
+     * @return string
+     */
     public function getUser()
     {
         return $this->user;
     }
 
     /**
-    * Set password.
-    *
-    * @param string $password
-    *
-    * @return self
-    */
+     * Set password.
+     *
+     * @param string $password
+     *
+     * @return self
+     */
     public function setPassword($password)
     {
         $this->password = $password;
 
         return $this;
     }
- 
+
     /**
-    * Get password.
-    *
-    * @return string
-    */
+     * Get password.
+     *
+     * @return string
+     */
     public function getPassword()
     {
         return $this->password;
     }
 
     /**
-    * Set options.
-    *
-    * @param array $options
-    *
-    * @return self
-    */
+     * Set options.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
     public function setOptions(array $options)
     {
         $this->options = $options;
 
         return $this;
     }
- 
+
     /**
-    * Get options.
-    *
-    * @return array
-    */
+     * Get options.
+     *
+     * @return array
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
     /**
-    * Set clients.
-    *
-    * @param array $clients
-    *
-    * @throws InvalidArgumentException When at least one client is not valid.
-    *
-    * @return self
-    */
+     * Set clients.
+     *
+     * @param array $clients
+     *
+     * @throws InvalidArgumentException when at least one client is not valid
+     *
+     * @return self
+     */
     public function setClients(array $clients)
     {
         // Pour chaque client
-        foreach($clients as $client) {
+        foreach ($clients as $client) {
             // Si ce n'est pas un objet
-            if(!is_object($client)) {
+            if (!is_object($client)) {
                 throw new InvalidArgumentException('Expected object, "%s" given.', gettype($client));
             }
 
             // Si ce n'est pas une instance de client XML-RPC
-            if(!($client instanceof Client)) {
+            if (!($client instanceof Client)) {
                 throw new InvalidArgumentException('Expected instance of class "%s", "%s" given.', Client::class, get_class($client));
             }
         }
@@ -307,10 +307,10 @@ class ExternalApiClient
 
     /**
      * Set the common client.
-     * 
+     *
      * @param Client $client
-    *
-    * @return self
+     *
+     * @return self
      */
     public function setCommonClient(Client $client)
     {
@@ -321,10 +321,10 @@ class ExternalApiClient
 
     /**
      * Set the object client.
-     * 
+     *
      * @param Client $client
-    *
-    * @return self
+     *
+     * @return self
      */
     public function setObjectClient(Client $client)
     {
@@ -332,26 +332,26 @@ class ExternalApiClient
 
         return $this;
     }
- 
+
     /**
-    * Get clients.
-    *
-    * @return array
-    */
+     * Get clients.
+     *
+     * @return array
+     */
     public function getClients()
     {
         return $this->clients;
     }
 
-    // 
+    //
     // ---------------------------------------------------------------------------------------
     // --- Client calls
     // ---------------------------------------------------------------------------------------
-    // 
+    //
 
     /**
      * Get used API version.
-     * 
+     *
      * @return string
      */
     public function version()
@@ -364,11 +364,11 @@ class ExternalApiClient
 
     /**
      * Create a record.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function create($modelName, array $parameters = [], array $options = [])
@@ -378,11 +378,11 @@ class ExternalApiClient
 
     /**
      * Read models.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function read($modelName, array $parameters, array $options = [])
@@ -392,11 +392,11 @@ class ExternalApiClient
 
     /**
      * Update a record.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function update($modelName, array $parameters = [], array $options = [])
@@ -406,11 +406,11 @@ class ExternalApiClient
 
     /**
      * Delete models.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function delete($modelName, array $parameters, array $options = [])
@@ -420,11 +420,11 @@ class ExternalApiClient
 
     /**
      * List model fields.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function listFields($modelName, array $parameters = [], array $options = [])
@@ -434,11 +434,11 @@ class ExternalApiClient
 
     /**
      * Search and read models.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function searchAndRead($modelName, array $parameters = [], array $options = [])
@@ -448,11 +448,11 @@ class ExternalApiClient
 
     /**
      * Search models.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function search($modelName, array $parameters = [], array $options = [])
@@ -462,11 +462,11 @@ class ExternalApiClient
 
     /**
      * Count models.
-     * 
-     * @param  string $modelName
-     * @param  array  $parameters
-     * @param  array  $options
-     * 
+     *
+     * @param string $modelName
+     * @param array  $parameters
+     * @param array  $options
+     *
      * @return array
      */
     public function count($modelName, array $parameters = [], array $options = [])
@@ -476,19 +476,19 @@ class ExternalApiClient
 
     /**
      * Call method of Odoo model.
-     * 
-     * @param  string $name         The model name
-     * @param  string $method       The method name
-     * @param  array  $parameters   An array/list of parameters passed by position
-     * @param  array  $options      A mapping/dict of parameters to pass by keyword (optional)
      *
-     * @throws InvalidArgumentException When the API object method is unknown.
-     * 
+     * @param string $name       The model name
+     * @param string $method     The method name
+     * @param array  $parameters An array/list of parameters passed by position
+     * @param array  $options    A mapping/dict of parameters to pass by keyword (optional)
+     *
+     * @throws InvalidArgumentException when the API object method is unknown
+     *
      * @return mixed
      */
     public function call($name, $method, array $parameters = [], array $options = [])
     {
-        if(!$this->checkObjectMethod($method)) {
+        if (!$this->checkObjectMethod($method)) {
             throw new InvalidArgumentException(sprintf('Unknown API object method "%s".', $method));
         }
 
@@ -500,9 +500,9 @@ class ExternalApiClient
 
     /**
      * Get the uid of logged client.
-     * 
-     * @param  bool $forceAuthentication  Force authentication
-     * 
+     *
+     * @param bool $forceAuthentication Force authentication
+     *
      * @return string
      */
     public function getUid($forceAuthentication = false)
@@ -529,24 +529,24 @@ class ExternalApiClient
      *
      * This method returns an XmlRpc Client for the requested endpoint.
      *
-     * @param  string $endpoint The API endpoint
-     * @param  bool   $refresh  Force to create a new client
+     * @param string $endpoint The API endpoint
+     * @param bool   $refresh  Force to create a new client
      *
-     * @throws InvalidArgumentException When the endpoint is not valid.
+     * @throws InvalidArgumentException when the endpoint is not valid
      *
      * @return Client
      */
     public function getXmlRpcClient($endpoint = self::ENDPOINT_COMMON, $refresh = false)
     {
         // Si le point de terminaison n'est pas valide
-        if(!$this->checkEndpoint($endpoint)) {
+        if (!$this->checkEndpoint($endpoint)) {
             throw new InvalidArgumentException(sprintf('The endpoint "%s" is not valid.', $endpoint));
         }
 
         // Si on demande le rafraichissement du client ou que l'on ne possède pas le client en cache
-        if($refresh || !array_key_exists($endpoint, $this->clients)) {
+        if ($refresh || !array_key_exists($endpoint, $this->clients)) {
             // Création d'un nouveau client pour le point de terminaison
-            $this->clients[$endpoint] = Ripcord::client($this->host . '/' . $endpoint);
+            $this->clients[$endpoint] = Ripcord::client($this->host.'/'.$endpoint);
         }
 
         // Retour du client selon le point de terminaison
@@ -555,9 +555,9 @@ class ExternalApiClient
 
     /**
      * Check if the given endpoint is valid.
-     * 
-     * @param  string $endpoint
-     * 
+     *
+     * @param string $endpoint
+     *
      * @return bool
      */
     public function checkEndpoint($endpoint)
@@ -567,9 +567,9 @@ class ExternalApiClient
 
     /**
      * Check if the given object method is valid.
-     * 
-     * @param  string $method
-     * 
+     *
+     * @param string $method
+     *
      * @return bool
      */
     public function checkObjectMethod($method)
