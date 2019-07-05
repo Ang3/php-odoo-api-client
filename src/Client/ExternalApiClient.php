@@ -12,6 +12,11 @@ use Ripcord\Client\Client;
 class ExternalApiClient
 {
     /**
+     * System username.
+     */
+    const SYSTEM_USER = '__system__';
+
+    /**
      * Endpoints.
      */
     const ENDPOINT_COMMON = 'xmlrpc/2/common';
@@ -507,6 +512,12 @@ class ExternalApiClient
      */
     public function getUid($forceAuthentication = false)
     {
+        // Si on souhaite se connecter en tant que super-utilisateur
+        if(self::SYSTEM_USER === $this->user) {
+            // Retour du premier utilisateur (OdooBot)
+            return 1;
+        }
+
         // Si on force l'authentification ou que l'on a pas d'ID utilisateur
         if ($forceAuthentication || null === $this->uid) {
             // Authentification
