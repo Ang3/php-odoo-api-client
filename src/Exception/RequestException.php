@@ -54,6 +54,6 @@ class RequestException extends RuntimeException
         ];
 
         // Construction de l'exception parent
-        parent::__construct($code, $message, $previous);
+        parent::__construct($message, $code, $previous);
     }
 }
