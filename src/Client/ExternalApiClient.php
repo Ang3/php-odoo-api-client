@@ -374,7 +374,7 @@ class ExternalApiClient
      * @param string $modelName
      * @param array  $fields
      *
-     * @return array
+     * @return int
      */
     public function create($modelName, array $fields = [])
     {
