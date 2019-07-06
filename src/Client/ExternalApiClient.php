@@ -29,7 +29,7 @@ class ExternalApiClient
     const METHOD_CREATE = 'create';
     const METHOD_READ = 'read';
     const METHOD_WRITE = 'write';
-    const METHOD_DELETE = 'delete';
+    const METHOD_DELETE = 'unlink';
     const METHOD_SEARCH = 'search';
     const METHOD_SEARCH_COUNT = 'search_count';
     const METHOD_SEARCH_READ = 'search_read';
@@ -470,7 +470,7 @@ class ExternalApiClient
      * @param array  $parameters
      * @param array  $options
      *
-     * @return array
+     * @return int
      */
     public function count($modelName, array $parameters = [], array $options = [])
     {
