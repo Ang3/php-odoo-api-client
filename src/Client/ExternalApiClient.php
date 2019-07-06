@@ -372,70 +372,67 @@ class ExternalApiClient
      * Create a record.
      *
      * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
+     * @param array  $fields
      *
      * @return array
      */
-    public function create($modelName, array $parameters = [], array $options = [])
+    public function create($modelName, array $fields = [])
     {
-        return $this->call($modelName, self::METHOD_CREATE, $parameters, $options);
+        return $this->call($modelName, self::METHOD_CREATE, [$fields]);
     }
 
     /**
      * Read models.
      *
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
+     * @param string    $modelName
+     * @param array|int $ids
+     * @param array     $options
      *
      * @return array
      */
-    public function read($modelName, array $parameters, array $options = [])
+    public function read($modelName, $ids, array $options = [])
     {
-        return $this->call($modelName, self::METHOD_READ, $parameters, $options);
+        return $this->call($modelName, self::METHOD_READ, (array) $ids, $options);
     }
 
     /**
      * Update a record.
      *
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
+     * @param string    $modelName
+     * @param array|int $ids
+     * @param array     $fields
      *
      * @return array
      */
-    public function update($modelName, array $parameters = [], array $options = [])
+    public function update($modelName, $ids, array $fields = [])
     {
-        return $this->call($modelName, self::METHOD_WRITE, $parameters, $options);
+        return $this->call($modelName, self::METHOD_WRITE, [(array) $ids, $fields]);
     }
 
     /**
      * Delete models.
      *
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
+     * @param string    $modelName
+     * @param array|int $ids
      *
      * @return array
      */
-    public function delete($modelName, array $parameters, array $options = [])
+    public function delete($modelName, $ids)
     {
-        return $this->call($modelName, self::METHOD_DELETE, $parameters, $options);
+        return $this->call($modelName, self::METHOD_DELETE, [(array) $ids]);
     }
 
     /**
      * List model fields.
      *
      * @param string $modelName
-     * @param array  $parameters
      * @param array  $options
      *
      * @return array
      */
-    public function listFields($modelName, array $parameters = [], array $options = [])
+    public function listFields($modelName, array $options = [])
     {
-        return $this->call($modelName, self::METHOD_LIST_FIELDS, $parameters, $options);
+        return $this->call($modelName, self::METHOD_LIST_FIELDS, [], $options);
     }
 
     /**
@@ -449,7 +446,7 @@ class ExternalApiClient
      */
     public function searchAndRead($modelName, array $parameters = [], array $options = [])
     {
-        return $this->call($modelName, self::METHOD_SEARCH_READ, $parameters, $options);
+        return $this->call($modelName, self::METHOD_SEARCH_READ, [$parameters], $options);
     }
 
     /**
@@ -463,7 +460,7 @@ class ExternalApiClient
      */
     public function search($modelName, array $parameters = [], array $options = [])
     {
-        return $this->call($modelName, self::METHOD_SEARCH, $parameters, $options);
+        return $this->call($modelName, self::METHOD_SEARCH, [$parameters], $options);
     }
 
     /**
@@ -477,7 +474,7 @@ class ExternalApiClient
      */
     public function count($modelName, array $parameters = [], array $options = [])
     {
-        return $this->call($modelName, self::METHOD_SEARCH_COUNT, $parameters, $options);
+        return $this->call($modelName, self::METHOD_SEARCH_COUNT, [$parameters], $options);
     }
 
     /**
@@ -501,12 +498,12 @@ class ExternalApiClient
         // Lancement de la requête et récupération des données
         $data = $this
             ->getXmlRpcClient(self::ENDPOINT_OBJECT)
-            ->execute_kw($this->database, $this->getUid(), $this->password, $name, $method, [$parameters], $options)
+            ->execute_kw($this->database, $this->getUid(), $this->password, $name, $method, $parameters, $options)
         ;
 
         // Si les données représente une erreur
         if (is_array($data) && xmlrpc_is_fault($data)) {
-            throw new RequestException($this, $name, $method, [$parameters], $options, $data);
+            throw new RequestException($this, $name, $method, $parameters, $options, $data);
         }
 
         // Retour des données
