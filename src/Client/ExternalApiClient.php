@@ -3,6 +3,7 @@
 namespace Ang3\Component\OdooApiClient\Client;
 
 use InvalidArgumentException;
+use Ang3\Component\OdooApiClient\Exception\RequestException;
 use Ripcord\Ripcord;
 use Ripcord\Client\Client;
 
@@ -497,10 +498,19 @@ class ExternalApiClient
             throw new InvalidArgumentException(sprintf('Unknown API object method "%s".', $method));
         }
 
-        return $this
+        // Lancement de la requête et récupération des données
+        $data = $this
             ->getXmlRpcClient(self::ENDPOINT_OBJECT)
             ->execute_kw($this->database, $this->getUid(), $this->password, $name, $method, [$parameters], $options)
         ;
+
+        // Si les données représente une erreur
+        if (is_array($data) && !empty($data['faultCode'])) {
+            throw new RequestException($name, $method, [$parameters], $options, $data);
+        }
+
+        // Retour des données
+        return $data;
     }
 
     /**
@@ -508,12 +518,12 @@ class ExternalApiClient
      *
      * @param bool $forceAuthentication Force authentication
      *
-     * @return string
+     * @return int
      */
     public function getUid($forceAuthentication = false)
     {
         // Si on souhaite se connecter en tant que super-utilisateur
-        if(self::SYSTEM_USER === $this->user) {
+        if (self::SYSTEM_USER === $this->user) {
             // Retour du premier utilisateur (OdooBot)
             return 1;
         }
