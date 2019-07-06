@@ -4,12 +4,18 @@ namespace Ang3\Component\OdooApiClient\Exception;
 
 use RuntimeException;
 use Throwable;
+use Ang3\Component\OdooApiClient\Client\ExternalApiClient;
 
 /**
  * @author Joanis ROUANET
  */
 class RequestException extends RuntimeException
 {
+    /**
+     * @var ExternalApiClient
+     */
+    private $client;
+
     /**
      * @var string
      */
@@ -33,15 +39,17 @@ class RequestException extends RuntimeException
     /**
      * Constructor of the exception.
      *
-     * @param string $method
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
-     * @param array  $result
+     * @param ExternalApiClient $client
+     * @param string            $method
+     * @param string            $modelName
+     * @param array             $parameters
+     * @param array             $options
+     * @param array             $result
      */
-    public function __construct($method, $modelName, array $parameters = [], array $options = [], array $result = [], Throwable $previous = null)
+    public function __construct(ExternalApiClient $client, $method, $modelName, array $parameters = [], array $options = [], array $result = [], Throwable $previous = null)
     {
         // Hydratation
+        $this->client = $client;
         $this->method = $method;
         $this->modelName = $modelName;
         $this->parameters = $parameters;
@@ -55,5 +63,45 @@ class RequestException extends RuntimeException
 
         // Construction de l'exception parent
         parent::__construct($message, $code, $previous);
+    }
+
+    /**
+     * @return ExternalApiClient
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelName()
+    {
+        return $this->modelName;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }

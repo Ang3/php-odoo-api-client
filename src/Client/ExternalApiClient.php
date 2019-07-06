@@ -506,7 +506,7 @@ class ExternalApiClient
 
         // Si les données représente une erreur
         if (is_array($data) && xmlrpc_is_fault($data)) {
-            throw new RequestException($name, $method, [$parameters], $options, $data);
+            throw new RequestException($this, $name, $method, [$parameters], $options, $data);
         }
 
         // Retour des données
