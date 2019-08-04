@@ -481,15 +481,15 @@ class ExternalApiClient
      * Call method of Odoo model.
      *
      * @param string $name       The model name
-     * @param string $method     The method name
+     * @param string $action     The action name
      * @param array  $parameters An array/list of parameters passed by position
      * @param array  $options    A mapping/dict of parameters to pass by keyword (optional)
      *
-     * @throws InvalidArgumentException when the API object method is unknown
+     * @throws RequestException when the request failed.
      *
      * @return mixed
      */
-    public function call($name, $method, array $parameters = [], array $options = [])
+    public function call($name, $action, array $parameters = [], array $options = [])
     {
         // Lancement de la requête et récupération des données
         $data = $this

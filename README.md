@@ -30,7 +30,7 @@ Usage
 
 require_once 'vendor/autoload.php';
 
-use Ang3\Component\OdooApiClient\Client\ExternalApiClient;
+use Ang3\Component\OdooApiClient\ExternalApiClient;
 
 $client = new ExternalApiClient('<host>', '<database>', '<user>', '<password>');
 
