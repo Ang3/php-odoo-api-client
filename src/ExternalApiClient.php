@@ -24,7 +24,7 @@ class ExternalApiClient
     const ENDPOINT_OBJECT = 'xmlrpc/2/object';
 
     /**
-     * Object default actions.
+     * Object default methods.
      */
     const CREATE = 'create';
     const READ = 'read';
@@ -54,7 +54,7 @@ class ExternalApiClient
      *
      * @var array
      */
-    private static $defaultActions = array(
+    private static $defaultMethods = array(
         self::CREATE,
         self::READ,
         self::WRITE,
@@ -151,15 +151,15 @@ class ExternalApiClient
     }
 
     /**
-     * Get default actions.
+     * Get default methods.
      *
      * @static
      *
      * @return array
      */
-    public static function getDefaultActions()
+    public static function getDefaultMethods()
     {
-        return self::$defaultActions;
+        return self::$defaultMethods;
     }
 
     /**
@@ -481,15 +481,15 @@ class ExternalApiClient
      * Call method of Odoo model.
      *
      * @param string $name       The model name
-     * @param string $action     The action name
+     * @param string $method     The method name
      * @param array  $parameters An array/list of parameters passed by position
      * @param array  $options    A mapping/dict of parameters to pass by keyword (optional)
      *
-     * @throws RequestException when the request failed.
+     * @throws RequestException when the request failed
      *
      * @return mixed
      */
-    public function call($name, $action, array $parameters = [], array $options = [])
+    public function call($name, $method, array $parameters = [], array $options = [])
     {
         // Lancement de la requête et récupération des données
         $data = $this
