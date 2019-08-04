@@ -3,7 +3,7 @@
 namespace Ang3\Component\OdooApiClient\Factory;
 
 use InvalidArgumentException;
-use Ang3\Component\OdooApiClient\Client\ExternalApiClient;
+use Ang3\Component\OdooApiClient\ExternalApiClient;
 
 /**
  * @author Joanis ROUANET

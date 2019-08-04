@@ -1,6 +1,6 @@
 <?php
 
-namespace Ang3\Component\OdooApiClient\Client;
+namespace Ang3\Component\OdooApiClient;
 
 use InvalidArgumentException;
 use Ang3\Component\OdooApiClient\Exception\RequestException;
@@ -24,16 +24,16 @@ class ExternalApiClient
     const ENDPOINT_OBJECT = 'xmlrpc/2/object';
 
     /**
-     * Object methods.
+     * Object default actions.
      */
-    const METHOD_CREATE = 'create';
-    const METHOD_READ = 'read';
-    const METHOD_WRITE = 'write';
-    const METHOD_DELETE = 'unlink';
-    const METHOD_SEARCH = 'search';
-    const METHOD_SEARCH_COUNT = 'search_count';
-    const METHOD_SEARCH_READ = 'search_read';
-    const METHOD_LIST_FIELDS = 'fields_get';
+    const CREATE = 'create';
+    const READ = 'read';
+    const WRITE = 'write';
+    const DELETE = 'unlink';
+    const SEARCH = 'search';
+    const SEARCH_COUNT = 'search_count';
+    const SEARCH_READ = 'search_read';
+    const LIST_FIELDS = 'fields_get';
 
     /**
      * API endpoints list.
@@ -54,15 +54,15 @@ class ExternalApiClient
      *
      * @var array
      */
-    private static $objectMethods = array(
-        self::METHOD_CREATE,
-        self::METHOD_READ,
-        self::METHOD_WRITE,
-        self::METHOD_DELETE,
-        self::METHOD_SEARCH,
-        self::METHOD_SEARCH_COUNT,
-        self::METHOD_SEARCH_READ,
-        self::METHOD_LIST_FIELDS,
+    private static $defaultActions = array(
+        self::CREATE,
+        self::READ,
+        self::WRITE,
+        self::DELETE,
+        self::SEARCH,
+        self::SEARCH_COUNT,
+        self::SEARCH_READ,
+        self::LIST_FIELDS,
     );
 
     /**
@@ -151,15 +151,15 @@ class ExternalApiClient
     }
 
     /**
-     * Get object methods.
+     * Get default actions.
      *
      * @static
      *
      * @return array
      */
-    public static function getObjectMethods()
+    public static function getDefaultActions()
     {
-        return self::$objectMethods;
+        return self::$defaultActions;
     }
 
     /**
@@ -378,7 +378,7 @@ class ExternalApiClient
      */
     public function create($modelName, array $fields = [])
     {
-        return $this->call($modelName, self::METHOD_CREATE, [$fields]);
+        return $this->call($modelName, self::CREATE, [$fields]);
     }
 
     /**
@@ -392,7 +392,7 @@ class ExternalApiClient
      */
     public function read($modelName, $ids, array $options = [])
     {
-        return $this->call($modelName, self::METHOD_READ, (array) $ids, $options);
+        return $this->call($modelName, self::READ, (array) $ids, $options);
     }
 
     /**
@@ -406,7 +406,7 @@ class ExternalApiClient
      */
     public function update($modelName, $ids, array $fields = [])
     {
-        return $this->call($modelName, self::METHOD_WRITE, [(array) $ids, $fields]);
+        return $this->call($modelName, self::WRITE, [(array) $ids, $fields]);
     }
 
     /**
@@ -419,7 +419,7 @@ class ExternalApiClient
      */
     public function delete($modelName, $ids)
     {
-        return $this->call($modelName, self::METHOD_DELETE, [(array) $ids]);
+        return $this->call($modelName, self::DELETE, [(array) $ids]);
     }
 
     /**
@@ -432,7 +432,7 @@ class ExternalApiClient
      */
     public function listFields($modelName, array $options = [])
     {
-        return $this->call($modelName, self::METHOD_LIST_FIELDS, [], $options);
+        return $this->call($modelName, self::LIST_FIELDS, [], $options);
     }
 
     /**
@@ -446,7 +446,7 @@ class ExternalApiClient
      */
     public function searchAndRead($modelName, array $parameters = [], array $options = [])
     {
-        return $this->call($modelName, self::METHOD_SEARCH_READ, [$parameters], $options);
+        return $this->call($modelName, self::SEARCH_READ, [$parameters], $options);
     }
 
     /**
@@ -460,7 +460,7 @@ class ExternalApiClient
      */
     public function search($modelName, array $parameters = [], array $options = [])
     {
-        return $this->call($modelName, self::METHOD_SEARCH, [$parameters], $options);
+        return $this->call($modelName, self::SEARCH, [$parameters], $options);
     }
 
     /**
@@ -474,7 +474,7 @@ class ExternalApiClient
      */
     public function count($modelName, array $parameters = [], array $options = [])
     {
-        return $this->call($modelName, self::METHOD_SEARCH_COUNT, [$parameters], $options);
+        return $this->call($modelName, self::SEARCH_COUNT, [$parameters], $options);
     }
 
     /**
@@ -491,10 +491,6 @@ class ExternalApiClient
      */
     public function call($name, $method, array $parameters = [], array $options = [])
     {
-        if (!$this->checkObjectMethod($method)) {
-            throw new InvalidArgumentException(sprintf('Unknown API object method "%s".', $method));
-        }
-
         // Lancement de la requête et récupération des données
         $data = $this
             ->getXmlRpcClient(self::ENDPOINT_OBJECT)
@@ -581,17 +577,5 @@ class ExternalApiClient
     public function checkEndpoint($endpoint)
     {
         return in_array($endpoint, self::$endpoints);
-    }
-
-    /**
-     * Check if the given object method is valid.
-     *
-     * @param string $method
-     *
-     * @return bool
-     */
-    public function checkObjectMethod($method)
-    {
-        return in_array($method, self::$objectMethods);
     }
 }

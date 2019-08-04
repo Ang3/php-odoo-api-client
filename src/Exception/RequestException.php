@@ -4,7 +4,7 @@ namespace Ang3\Component\OdooApiClient\Exception;
 
 use RuntimeException;
 use Throwable;
-use Ang3\Component\OdooApiClient\Client\ExternalApiClient;
+use Ang3\Component\OdooApiClient\ExternalApiClient;
 
 /**
  * @author Joanis ROUANET
