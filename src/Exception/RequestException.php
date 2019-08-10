@@ -2,14 +2,13 @@
 
 namespace Ang3\Component\OdooApiClient\Exception;
 
-use RuntimeException;
 use Throwable;
 use Ang3\Component\OdooApiClient\ExternalApiClient;
 
 /**
  * @author Joanis ROUANET
  */
-class RequestException extends RuntimeException
+class RequestException extends OdooException
 {
     /**
      * @var ExternalApiClient
@@ -45,6 +44,7 @@ class RequestException extends RuntimeException
      * @param array             $parameters
      * @param array             $options
      * @param array             $result
+     * @param Throwable|null    $previous
      */
     public function __construct(ExternalApiClient $client, $method, $modelName, array $parameters = [], array $options = [], array $result = [], Throwable $previous = null)
     {
