@@ -42,3 +42,15 @@ var_dump($client->read('res.company', [2]));
 ```
 
 That's it!
+
+Upgrades
+========
+
+### From 2.* to 3.*
+
+- Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```
+
+ORM project
+===========
+
+Looking for more advanced features? Look at [there](https://github.com/Ang3/php-odoo-orm).
