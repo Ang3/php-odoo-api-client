@@ -1,5 +1,5 @@
-PHP OdooApiClient
-=================
+PHP Odoo API client
+===================
 
 [![Build Status](https://travis-ci.org/Ang3/php-odoo-api-client.svg?branch=master)](https://travis-ci.org/Ang3/php-odoo-api-client) [![Latest Stable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/stable)](https://packagist.org/packages/ang3/php-odoo-api-client) [![Latest Unstable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/unstable)](https://packagist.org/packages/ang3/php-odoo-api-client) [![Total Downloads](https://poser.pugx.org/ang3/php-odoo-api-client/downloads)](https://packagist.org/packages/ang3/php-odoo-api-client)
 
@@ -30,7 +30,7 @@ Usage
 
 require_once 'vendor/autoload.php';
 
-use Ang3\Component\OdooApiClient\ExternalApiClient;
+use Ang3\Component\Odoo\Client\ExternalApiClient;
 
 $client = new ExternalApiClient('<host>', '<database>', '<user>', '<password>');
 
