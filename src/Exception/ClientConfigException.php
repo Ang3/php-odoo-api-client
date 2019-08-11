@@ -1,6 +1,6 @@
 <?php
 
-namespace Ang3\Component\OdooApiClient\Exception;
+namespace Ang3\Component\Odoo\Client\Exception;
 
 use Throwable;
 

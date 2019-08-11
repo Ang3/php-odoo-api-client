@@ -1,9 +1,9 @@
 <?php
 
-namespace Ang3\Component\OdooApiClient\Exception;
+namespace Ang3\Component\Odoo\Client\Exception;
 
 use Throwable;
-use Ang3\Component\OdooApiClient\ExternalApiClient;
+use Ang3\Component\Odoo\Client\ExternalApiClient;
 
 /**
  * @author Joanis ROUANET

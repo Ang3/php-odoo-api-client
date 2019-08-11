@@ -12,7 +12,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Ang3\\Component\\OdooApiClient\\": "src/" }
+        "psr-4": { "Ang3\\Component\\Odoo\\Client\\": "src/" }
     },
     "require": {
         "php": ">=7.1",

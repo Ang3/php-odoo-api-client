@@ -1,9 +1,9 @@
 <?php
 
-namespace Ang3\Component\OdooApiClient;
+namespace Ang3\Component\Odoo\Client;
 
 use InvalidArgumentException;
-use Ang3\Component\OdooApiClient\Exception\RequestException;
+use Ang3\Component\Odoo\Client\Exception\RequestException;
 use Ripcord\Ripcord;
 use Ripcord\Client\Client;
 

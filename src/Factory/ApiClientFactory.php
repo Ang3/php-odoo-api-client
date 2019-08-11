@@ -1,9 +1,9 @@
 <?php
 
-namespace Ang3\Component\OdooApiClient\Factory;
+namespace Ang3\Component\Odoo\Client\Factory;
 
-use Ang3\Component\OdooApiClient\Exception\ClientConfigException;
-use Ang3\Component\OdooApiClient\ExternalApiClient;
+use Ang3\Component\Odoo\Client\Exception\ClientConfigException;
+use Ang3\Component\Odoo\Client\ExternalApiClient;
 
 /**
  * @author Joanis ROUANET
