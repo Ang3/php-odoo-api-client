@@ -19,7 +19,6 @@
         "darkaonline/ripcord": "^0.1.7"
     },
     "require-dev": {
-        "ang3/php-dev-binaries": "^1.0",
-        "phpunit/phpunit": "^6.0 || ^7.0"
+        "ang3/php-dev-binaries": "^1.0"
     }
 }
