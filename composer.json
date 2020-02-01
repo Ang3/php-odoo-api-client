@@ -8,17 +8,18 @@
         {
             "name": "Joanis ROUANET",
             "email": "joanis.ang3@gmail.com",
-            "homepage": "http://www.lixye.fr"
+            "homepage": "https://github.com/Ang3"
         }
     ],
     "autoload": {
-        "psr-4": { "Ang3\\Component\\Odoo\\Client\\": "src/" }
+        "psr-4": { "Ang3\\Component\\Odoo\\": "src/" }
     },
     "require": {
         "php": ">=7.1",
         "darkaonline/ripcord": "^0.1.7"
     },
     "require-dev": {
+        "ang3/php-dev-binaries": "^1.0",
         "phpunit/phpunit": "^7.0"
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Ang3\Component\Odoo\Client;
+namespace Ang3\Component\Odoo;
 
+use Ang3\Component\Odoo\Exception\RequestException;
 use InvalidArgumentException;
-use Ang3\Component\Odoo\Client\Exception\RequestException;
-use Ripcord\Ripcord;
 use Ripcord\Client\Client;
+use Ripcord\Ripcord;
 
 /**
  * @author Joanis ROUANET
@@ -42,10 +42,10 @@ class ExternalApiClient
      *
      * @var array
      */
-    private static $endpoints = array(
+    private static $endpoints = [
         self::ENDPOINT_COMMON,
         self::ENDPOINT_OBJECT,
-    );
+    ];
 
     /**
      * API object methods list.
@@ -54,7 +54,7 @@ class ExternalApiClient
      *
      * @var array
      */
-    private static $defaultMethods = array(
+    private static $defaultMethods = [
         self::CREATE,
         self::READ,
         self::WRITE,
@@ -63,7 +63,7 @@ class ExternalApiClient
         self::SEARCH_COUNT,
         self::SEARCH_READ,
         self::LIST_FIELDS,
-    );
+    ];
 
     /**
      * Client host.
@@ -114,16 +114,7 @@ class ExternalApiClient
      */
     private $uid;
 
-    /**
-     * Constructor of the client.
-     *
-     * @param string $host
-     * @param string $database
-     * @param string $user
-     * @param string $password
-     * @param array  $options
-     */
-    public function __construct($host, $database, $user, $password, array $options = [])
+    public function __construct(string $host, string $database, string $user, string $password, array $options = [])
     {
         $this->host = $host;
         $this->database = $database;
@@ -132,235 +123,44 @@ class ExternalApiClient
         $this->options = $options;
     }
 
-    //
-    // ---------------------------------------------------------------------------------------
-    // --- Setters & Getters
-    // ---------------------------------------------------------------------------------------
-    //
-
     /**
-     * Get endpoints.
-     *
      * @static
      *
-     * @return array
+     * @throws InvalidArgumentException when a parameters is missing or not valid
      */
-    public static function getEndpoints()
+    public static function createfromArray(array $parameters = [], array $options = []): self
     {
-        return self::$endpoints;
-    }
-
-    /**
-     * Get default methods.
-     *
-     * @static
-     *
-     * @return array
-     */
-    public static function getDefaultMethods()
-    {
-        return self::$defaultMethods;
-    }
-
-    /**
-     * Set host.
-     *
-     * @param string $host
-     *
-     * @return self
-     */
-    public function setHost($host)
-    {
-        $this->host = $host;
-
-        return $this;
-    }
-
-    /**
-     * Get host.
-     *
-     * @return string
-     */
-    public function getHost()
-    {
-        return $this->host;
-    }
-
-    /**
-     * Set database.
-     *
-     * @param string $database
-     *
-     * @return self
-     */
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-
-        return $this;
-    }
-
-    /**
-     * Get database.
-     *
-     * @return string
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * Set user.
-     *
-     * @param string $user
-     *
-     * @return self
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user.
-     *
-     * @return string
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set password.
-     *
-     * @param string $password
-     *
-     * @return self
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * Get password.
-     *
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    /**
-     * Set options.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function setOptions(array $options)
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * Get options.
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Set clients.
-     *
-     * @param array $clients
-     *
-     * @throws InvalidArgumentException when at least one client is not valid
-     *
-     * @return self
-     */
-    public function setClients(array $clients)
-    {
-        // Pour chaque client
-        foreach ($clients as $client) {
-            // Si ce n'est pas un objet
-            if (!is_object($client)) {
-                throw new InvalidArgumentException('Expected object, "%s" given.', gettype($client));
-            }
-
-            // Si ce n'est pas une instance de client XML-RPC
-            if (!($client instanceof Client)) {
-                throw new InvalidArgumentException('Expected instance of class "%s", "%s" given.', Client::class, get_class($client));
-            }
+        // Si pas d'URL
+        if (!array_key_exists('url', $parameters)) {
+            throw new InvalidArgumentException('Missing required parameter "url".');
         }
 
-        $this->clients = $clients;
+        // Si pas de nom de base de données Odoo
+        if (!array_key_exists('database', $parameters)) {
+            throw new InvalidArgumentException('Missing required parameter "database".');
+        }
 
-        return $this;
+        // Si pas d'utilisateur
+        if (!array_key_exists('user', $parameters)) {
+            throw new InvalidArgumentException('Missing required parameter "user".');
+        }
+
+        // Si pas de mot de passe
+        if (!array_key_exists('password', $parameters)) {
+            throw new InvalidArgumentException('Missing required parameter "password".');
+        }
+
+        // Récupération des options éventuelles du client
+        $options = array_key_exists('options', $parameters) ? $parameters['options'] : [];
+
+        // Retour de la nouvelle instance
+        return new self($parameters['url'], $parameters['database'], $parameters['user'], $parameters['password'], $options);
     }
-
-    /**
-     * Set the common client.
-     *
-     * @param Client $client
-     *
-     * @return self
-     */
-    public function setCommonClient(Client $client)
-    {
-        $this->clients[self::ENDPOINT_COMMON] = $client;
-
-        return $this;
-    }
-
-    /**
-     * Set the object client.
-     *
-     * @param Client $client
-     *
-     * @return self
-     */
-    public function setObjectClient(Client $client)
-    {
-        $this->clients[self::ENDPOINT_OBJECT] = $client;
-
-        return $this;
-    }
-
-    /**
-     * Get clients.
-     *
-     * @return array
-     */
-    public function getClients()
-    {
-        return $this->clients;
-    }
-
-    //
-    // ---------------------------------------------------------------------------------------
-    // --- Client calls
-    // ---------------------------------------------------------------------------------------
-    //
 
     /**
      * Get used API version.
-     *
-     * @return string
      */
-    public function version()
+    public function version(): string
     {
         return $this
             ->getXmlRpcClient(self::ENDPOINT_COMMON)
@@ -370,13 +170,8 @@ class ExternalApiClient
 
     /**
      * Create a record.
-     *
-     * @param string $modelName
-     * @param array  $fields
-     *
-     * @return int
      */
-    public function create($modelName, array $fields = [])
+    public function create(string $modelName, array $fields = []): int
     {
         return $this->call($modelName, self::CREATE, [$fields]);
     }
@@ -384,13 +179,9 @@ class ExternalApiClient
     /**
      * Read models.
      *
-     * @param string    $modelName
      * @param array|int $ids
-     * @param array     $options
-     *
-     * @return array
      */
-    public function read($modelName, $ids, array $options = [])
+    public function read(string $modelName, $ids, array $options = []): array
     {
         return $this->call($modelName, self::READ, (array) $ids, $options);
     }
@@ -398,13 +189,9 @@ class ExternalApiClient
     /**
      * Update a record.
      *
-     * @param string    $modelName
      * @param array|int $ids
-     * @param array     $fields
-     *
-     * @return array
      */
-    public function update($modelName, $ids, array $fields = [])
+    public function update(string $modelName, $ids, array $fields = []): array
     {
         return $this->call($modelName, self::WRITE, [(array) $ids, $fields]);
     }
@@ -412,67 +199,41 @@ class ExternalApiClient
     /**
      * Delete models.
      *
-     * @param string    $modelName
      * @param array|int $ids
-     *
-     * @return array
      */
-    public function delete($modelName, $ids)
+    public function delete(string $modelName, $ids): array
     {
         return $this->call($modelName, self::DELETE, [(array) $ids]);
     }
 
     /**
      * List model fields.
-     *
-     * @param string $modelName
-     * @param array  $options
-     *
-     * @return array
      */
-    public function listFields($modelName, array $options = [])
+    public function listFields(string $modelName, array $options = []): array
     {
         return $this->call($modelName, self::LIST_FIELDS, [], $options);
     }
 
     /**
      * Search and read models.
-     *
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
-     *
-     * @return array
      */
-    public function searchAndRead($modelName, array $parameters = [], array $options = [])
+    public function searchAndRead(string $modelName, array $parameters = [], array $options = []): array
     {
         return $this->call($modelName, self::SEARCH_READ, [$parameters], $options);
     }
 
     /**
      * Search models.
-     *
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
-     *
-     * @return array
      */
-    public function search($modelName, array $parameters = [], array $options = [])
+    public function search(string $modelName, array $parameters = [], array $options = []): array
     {
         return $this->call($modelName, self::SEARCH, [$parameters], $options);
     }
 
     /**
      * Count models.
-     *
-     * @param string $modelName
-     * @param array  $parameters
-     * @param array  $options
-     *
-     * @return int
      */
-    public function count($modelName, array $parameters = [], array $options = [])
+    public function count(string $modelName, array $parameters = [], array $options = []): int
     {
         return $this->call($modelName, self::SEARCH_COUNT, [$parameters], $options);
     }
@@ -489,7 +250,7 @@ class ExternalApiClient
      *
      * @return mixed
      */
-    public function call($name, $method, array $parameters = [], array $options = [])
+    public function call(string $name, string $method, array $parameters = [], array $options = [])
     {
         // Lancement de la requête et récupération des données
         $data = $this
@@ -508,12 +269,8 @@ class ExternalApiClient
 
     /**
      * Get the uid of logged client.
-     *
-     * @param bool $forceAuthentication Force authentication
-     *
-     * @return int
      */
-    public function getUid($forceAuthentication = false)
+    public function getUid(bool $forceAuthentication = false): int
     {
         // Si on souhaite se connecter en tant que super-utilisateur
         if (self::SYSTEM_USER === $this->user) {
@@ -547,10 +304,8 @@ class ExternalApiClient
      * @param bool   $refresh  Force to create a new client
      *
      * @throws InvalidArgumentException when the endpoint is not valid
-     *
-     * @return Client
      */
-    public function getXmlRpcClient($endpoint = self::ENDPOINT_COMMON, $refresh = false)
+    public function getXmlRpcClient(string $endpoint = self::ENDPOINT_COMMON, bool $refresh = false): Client
     {
         // Si le point de terminaison n'est pas valide
         if (!$this->checkEndpoint($endpoint)) {
@@ -569,13 +324,129 @@ class ExternalApiClient
 
     /**
      * Check if the given endpoint is valid.
-     *
-     * @param string $endpoint
-     *
-     * @return bool
      */
-    public function checkEndpoint($endpoint)
+    public function checkEndpoint(string $endpoint): bool
     {
         return in_array($endpoint, self::$endpoints);
+    }
+
+    public function setHost(string $host): self
+    {
+        $this->host = $host;
+
+        return $this;
+    }
+
+    public function getHost(): string
+    {
+        return $this->host;
+    }
+
+    public function setDatabase(string $database): self
+    {
+        $this->database = $database;
+
+        return $this;
+    }
+
+    public function getDatabase(): string
+    {
+        return $this->database;
+    }
+
+    public function setUser(string $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getUser(): string
+    {
+        return $this->user;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setOptions(array $options): self
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set clients.
+     *
+     * @throws InvalidArgumentException when at least one client is not valid
+     */
+    public function setClients(array $clients): self
+    {
+        // Pour chaque client
+        foreach ($clients as $client) {
+            // Si ce n'est pas un objet
+            if (!is_object($client)) {
+                throw new InvalidArgumentException(sprintf('Expected object, "%s" given.', gettype($client)));
+            }
+
+            // Si ce n'est pas une instance de client XML-RPC
+            if (!($client instanceof Client)) {
+                throw new InvalidArgumentException(sprintf('Expected instance of class "%s", "%s" given.', Client::class, get_class($client)));
+            }
+        }
+
+        $this->clients = $clients;
+
+        return $this;
+    }
+
+    public function setCommonClient(Client $client): self
+    {
+        $this->clients[self::ENDPOINT_COMMON] = $client;
+
+        return $this;
+    }
+
+    public function setObjectClient(Client $client): self
+    {
+        $this->clients[self::ENDPOINT_OBJECT] = $client;
+
+        return $this;
+    }
+
+    public function getClients(): array
+    {
+        return $this->clients;
+    }
+
+    /**
+     * @static
+     */
+    public static function getEndpoints(): array
+    {
+        return self::$endpoints;
+    }
+
+    /**
+     * @static
+     */
+    public static function getDefaultMethods(): array
+    {
+        return self::$defaultMethods;
     }
 }

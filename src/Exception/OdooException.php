@@ -1,6 +1,6 @@
 <?php
 
-namespace Ang3\Component\Odoo\Client\Exception;
+namespace Ang3\Component\Odoo\Exception;
 
 use RuntimeException;
 
