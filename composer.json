@@ -20,6 +20,6 @@
     },
     "require-dev": {
         "ang3/php-dev-binaries": "^1.0",
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^6.0 || ^7.0"
     }
 }

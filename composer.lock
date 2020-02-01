@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e9daac4df7c523c9422493f59500f5a",
+    "content-hash": "8f4d7995c0738653a0a30e666d4cb02d",
     "packages": [
         {
             "name": "darkaonline/ripcord",
