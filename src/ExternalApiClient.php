@@ -158,22 +158,19 @@ class ExternalApiClient
     }
 
     /**
-     * Get used API version.
-     */
-    public function version(): string
-    {
-        return $this
-            ->getXmlRpcClient(self::ENDPOINT_COMMON)
-            ->version()
-        ;
-    }
-
-    /**
      * Create a record.
      */
     public function create(string $modelName, array $fields = []): int
     {
         return $this->call($modelName, self::CREATE, [$fields]);
+    }
+
+    /**
+     * Search models.
+     */
+    public function search(string $modelName, array $parameters = [], array $options = []): array
+    {
+        return $this->call($modelName, self::SEARCH, [$parameters], $options);
     }
 
     /**
@@ -187,34 +184,6 @@ class ExternalApiClient
     }
 
     /**
-     * Update a record.
-     *
-     * @param array|int $ids
-     */
-    public function update(string $modelName, $ids, array $fields = []): array
-    {
-        return $this->call($modelName, self::WRITE, [(array) $ids, $fields]);
-    }
-
-    /**
-     * Delete models.
-     *
-     * @param array|int $ids
-     */
-    public function delete(string $modelName, $ids): array
-    {
-        return $this->call($modelName, self::DELETE, [(array) $ids]);
-    }
-
-    /**
-     * List model fields.
-     */
-    public function listFields(string $modelName, array $options = []): array
-    {
-        return $this->call($modelName, self::LIST_FIELDS, [], $options);
-    }
-
-    /**
      * Search and read models.
      */
     public function searchAndRead(string $modelName, array $parameters = [], array $options = []): array
@@ -223,11 +192,13 @@ class ExternalApiClient
     }
 
     /**
-     * Search models.
+     * Update a record.
+     *
+     * @param array|int $ids
      */
-    public function search(string $modelName, array $parameters = [], array $options = []): array
+    public function update(string $modelName, $ids, array $fields = []): void
     {
-        return $this->call($modelName, self::SEARCH, [$parameters], $options);
+        $this->call($modelName, self::WRITE, [(array) $ids, $fields]);
     }
 
     /**
@@ -236,6 +207,24 @@ class ExternalApiClient
     public function count(string $modelName, array $parameters = [], array $options = []): int
     {
         return $this->call($modelName, self::SEARCH_COUNT, [$parameters], $options);
+    }
+
+    /**
+     * Delete models.
+     *
+     * @param array|int $ids
+     */
+    public function delete(string $modelName, $ids): void
+    {
+        $this->call($modelName, self::DELETE, [(array) $ids]);
+    }
+
+    /**
+     * List model fields.
+     */
+    public function listFields(string $modelName, array $options = []): array
+    {
+        return $this->call($modelName, self::LIST_FIELDS, [], $options);
     }
 
     /**
@@ -293,6 +282,17 @@ class ExternalApiClient
 
         // Retour de l'ID
         return $this->uid;
+    }
+
+    /**
+     * Get used API version.
+     */
+    public function getVersion(): string
+    {
+        return $this
+            ->getXmlRpcClient(self::ENDPOINT_COMMON)
+            ->version()
+        ;
     }
 
     /**

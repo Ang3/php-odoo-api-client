@@ -25,23 +25,93 @@ of the Composer documentation.
 Usage
 =====
 
+First, you have to create a client instance:
+
 ```php
 <?php
 
 require_once 'vendor/autoload.php';
 
-use Ang3\Component\Odoo\Client\ExternalApiClient;
+use Ang3\Component\Odoo\ExternalApiClient;
 
-$client = new ExternalApiClient('<host>', '<database>', '<user>', '<password>');
+// Create instance...
+$client = new ExternalApiClient('<host>', '<database>', '<user>', '<password>' /*, $options = []*/);
 
-var_dump($client->version());
-var_dump($client->getUid());
-var_dump($client->search('res.company'));
-var_dump($client->read('res.company', [2]));
+// You can create client from array parameters
+$client = ExternalApiClient::createFromArray([
+	'host' => '<host>',
+	'database' => '<database>',
+	'user' => '<user>',
+	'password' => '<password>',
+], /*, $options = []*/);
 
 ```
 
-That's it!
+### ORM
+
+#### Create record
+
+```php
+$recordId = $client->create('res.company', $fields = []);
+```
+
+#### Search records
+
+```php
+$records = $client->search('res.company');
+```
+
+#### Read records
+
+```php
+$records = $client->read('res.company', [2]);
+```
+
+#### Search and read records
+
+```php
+$records = $client->searchAndRead('res.company', $options = []);
+```
+
+#### Update records
+
+```php
+$client->read('res.company', [2, 3], [
+	'display_name' => 'foo'
+]);
+```
+
+#### Count records
+
+```php
+$nbRecords = $client->count('res.company', $parameters = [], $options = []);
+```
+
+#### Delete records
+
+```php
+$client->delete('res.company', [2, 3]);
+```
+
+#### List record fields
+
+```php
+$fields = $client->listFields('res.company', $options = []);
+```
+
+### Miscellaneous
+
+#### Get the UUID
+
+```php
+$uuid = $client->getUid(); // (string)
+```
+
+#### Get the version
+
+```php
+$version = $client->version(); // (string)
+```
 
 Upgrades
 ========
@@ -50,7 +120,8 @@ Upgrades
 
 - Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```
 
-ORM project
-===========
+### From 3.* to 4.*
 
-Looking for more advanced features? Look at [there](https://github.com/Ang3/php-odoo-orm).
+- Updated namespace ```Ang3\Component\Odoo\Client``` to ```Ang3\Component\Odoo```
+
+That's it!
