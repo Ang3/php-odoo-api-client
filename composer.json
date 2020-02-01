@@ -15,7 +15,7 @@
         "psr-4": { "Ang3\\Component\\Odoo\\": "src/" }
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.2",
         "darkaonline/ripcord": "^0.1.7"
     },
     "require-dev": {
