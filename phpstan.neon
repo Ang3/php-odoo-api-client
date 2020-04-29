@@ -1,6 +1,7 @@
 parameters:
+  inferPrivatePropertyTypeFromConstructor: true
   paths:
     - %currentWorkingDirectory%/src
   checkMissingIterableValueType: false
   ignoreErrors:
-  	- '#Call to an undefined method Ripcord\\Client\\Client::(.*)#'
+  	#- '#Call to an undefined method Ripcord\\Client\\Client::(.*)#'

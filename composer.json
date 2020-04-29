@@ -15,10 +15,14 @@
         "psr-4": { "Ang3\\Component\\Odoo\\": "src/" }
     },
     "require": {
-        "php": ">=7.2",
-        "darkaonline/ripcord": "^0.1.7"
+        "php": ">=7.1",
+        "ext-curl": "*",
+        "phpxmlrpc/phpxmlrpc": "^4.0",
+        "symfony/serializer": "^3.0 || ^4.0 || ^5.0"
     },
     "require-dev": {
-        "ang3/php-dev-binaries": "^1.0"
+        "roave/security-advisories": "dev-master",
+        "ang3/php-dev-binaries": "^1.0",
+        "symfony/var-dumper": "^4.0"
     }
 }
