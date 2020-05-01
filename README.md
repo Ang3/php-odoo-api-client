@@ -50,7 +50,20 @@ $client = new Client([
 Exceptions:
 - ```Ang3\Component\Odoo\Exception\MissingConfigParameterException``` when a required parameter is missing.
 
-### Built-in methods
+Then, make your call:
+
+```php
+$result = $client->call($name, $method, $parameters = [], $options = []);
+```
+
+Exceptions:
+- ```Ang3\Component\Odoo\Exception\AuthenticationException``` when authentication failed.
+- ```Ang3\Component\Odoo\Exception\RemoteException``` when request failed.
+
+Built-in methods
+----------------
+
+For all these methods, all previous client exceptions can be thrown too.
 
 **Create record**
 
@@ -125,7 +138,8 @@ Please see the section [Expression Builder](#expression-builder) for more inform
 $fields = $client->listFields('res.company', $options = []);
 ```
 
-### Expression builder
+Expression Builder
+------------------
 
 **Added in v.5.0**
 
