@@ -206,12 +206,16 @@ class ExpressionBuilder
     }
 
     /**
-     * @param DomainInterface|array $criteria
+     * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria is not valid
      */
-    public function criteriaParams($criteria): array
+    public function criteriaParams($criteria = null): array
     {
+        if (!$criteria) {
+            return [];
+        }
+
         if ($criteria instanceof DomainInterface) {
             if ($criteria instanceof CompositeDomain) {
                 $criteria = $criteria->normalize();
@@ -243,8 +247,15 @@ class ExpressionBuilder
         return $this->criteriaParams($andX);
     }
 
+    /**
+     * @throws InvalidArgumentException when data is empty
+     */
     public function dataParams(array $data): array
     {
+        if (!$data) {
+            throw new InvalidArgumentException('Data parameters cannot be empty');
+        }
+
         foreach ($data as $key => $value) {
             if ($value instanceof OperationInterface) {
                 $data[$key] = $value->getCommand();

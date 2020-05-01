@@ -147,11 +147,11 @@ class Client
     /**
      * Find ID of record(s) by criteria and options.
      *
-     * @param DomainInterface|array $criteria
+     * @param DomainInterface|array|null $criteria
      *
      * @return array<int>
      */
-    public function search(string $modelName, $criteria, array $options = []): array
+    public function search(string $modelName, $criteria = null, array $options = []): array
     {
         return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->criteriaParams($criteria), $options);
     }
@@ -159,11 +159,11 @@ class Client
     /**
      * Find record(s) by criteria and options.
      *
-     * @param DomainInterface|array $criteria
+     * @param DomainInterface|array|null $criteria
      *
      * @return array<int, array>
      */
-    public function findBy(string $modelName, $criteria, array $options = []): array
+    public function findBy(string $modelName, $criteria = null, array $options = []): array
     {
         return (array) $this->call($modelName, self::FIND, $this->expressionBuilder->criteriaParams($criteria), $options);
     }
@@ -171,9 +171,9 @@ class Client
     /**
      * Count number of records for a model and criteria.
      *
-     * @param DomainInterface|array $criteria
+     * @param DomainInterface|array|null $criteria
      */
-    public function count(string $modelName, $criteria): int
+    public function count(string $modelName, $criteria = null): int
     {
         return (int) $this->call($modelName, self::COUNT, $this->expressionBuilder->criteriaParams($criteria));
     }

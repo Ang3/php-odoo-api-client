@@ -32,72 +32,88 @@ First, you have to create a client instance:
 
 require_once 'vendor/autoload.php';
 
-use Ang3\Component\Odoo\ExternalApiClient;
+use Ang3\Component\Odoo\Client;
 
 // Create instance...
-$client = new ExternalApiClient('<host>', '<database>', '<user>', '<password>' /*, $options = []*/);
-
-// You can create client from array parameters
-$client = ExternalApiClient::createFromArray([
-	'host' => '<host>',
-	'database' => '<database>',
-	'user' => '<user>',
-	'password' => '<password>',
-], /*, $options = []*/);
-
+$client = new Client([
+    'host' => '<host>',
+    'database' => '<database>',
+    'user' => '<user>',
+    'password' => '<password>',
+ ]);
 ```
 
-### ORM
+### Built-in methods
 
-#### Create record
+**Create record**
 
 ```php
-$recordId = $client->create('res.company', $fields = []);
+$data = [
+    'field_name' => 'value'
+];
+
+$recordId = $client->create('res.company', $data);
 ```
 
-#### Search records
+**Read records**
+
+```php
+$ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
+
+$records = $client->read('res.company', $ids);
+```
+
+**Update records**
+
+```php
+$ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
+
+$data = [
+    'field_name' => 'value'
+];
+
+$client->read('res.company', $ids, $data);
+```
+
+**Delete records**
+
+```php
+$ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
+
+$client->delete('res.company', $ids);
+```
+
+**Search records**
+
+Get the ID of matched record(s).
 
 ```php
 $records = $client->search('res.company');
 ```
 
-#### Read records
+**Find records**
 
 ```php
-$records = $client->read('res.company', [2]);
+$records = $client->find('res.company', $criteria = null, $options = []);
 ```
 
-#### Search and read records
+**Count records**
 
 ```php
-$records = $client->searchAndRead('res.company', $options = []);
+$nbRecords = $client->count('res.company', $criteria = null, $options = []);
 ```
 
-#### Update records
-
-```php
-$client->read('res.company', [2, 3], [
-	'display_name' => 'foo'
-]);
-```
-
-#### Count records
-
-```php
-$nbRecords = $client->count('res.company', $parameters = [], $options = []);
-```
-
-#### Delete records
-
-```php
-$client->delete('res.company', [2, 3]);
-```
-
-#### List record fields
+**List record fields**
 
 ```php
 $fields = $client->listFields('res.company', $options = []);
 ```
+
+### Expression builder
+
+**Added in v.5.0**
+
+Documentation in progress! :)
 
 ### Miscellaneous
 
@@ -110,18 +126,24 @@ $uuid = $client->getUid(); // (string)
 #### Get the version
 
 ```php
-$version = $client->version(); // (string)
+$version = $client->version(); // (array)
 ```
 
 Upgrades
 ========
 
-### From 2.* to 3.*
+### From 4.* to 5.*
 
-- Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```
+- Deleted static method ```Client::createFromConfig(array $config)```. Use ```new Client(array $config)``` instead.
+- Renamed method ```searchAndRead(...)``` to ```find(...)```
+- Added expression builder support.
 
 ### From 3.* to 4.*
 
 - Updated namespace ```Ang3\Component\Odoo\Client``` to ```Ang3\Component\Odoo```
+
+### From 2.* to 3.*
+
+- Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```
 
 That's it!
