@@ -1,6 +1,6 @@
 <?php
 
-namespace Ang3\Component\Odoo\Query\Domain;
+namespace Ang3\Component\Odoo\Expression;
 
 use Generator;
 
@@ -29,6 +29,13 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         $this->setDomains($domains);
     }
 
+    public function __clone()
+    {
+        foreach ($this->domains as $key => $domain) {
+            $this->domains[$key] = clone $domain;
+        }
+    }
+
     /**
      * @return DomainInterface[]|Generator
      */
@@ -39,11 +46,34 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         }
     }
 
-    public function __clone()
+    public function toArray(): array
     {
-        foreach ($this->domains as $key => $domain) {
-            $this->domains[$key] = clone $domain;
+        $result = [$this->operator];
+        $normalizedDomain = $this->normalize();
+
+        if (!$normalizedDomain) {
+            return [];
         }
+
+        if (!($normalizedDomain instanceof self)) {
+            return $normalizedDomain->toArray();
+        }
+
+        foreach ($normalizedDomain as $domain) {
+            if ($domain instanceof self) {
+                $expr = $domain->toArray();
+
+                foreach ($expr as $value) {
+                    $result[] = $value;
+                }
+
+                continue;
+            }
+
+            $result[] = $domain->toArray();
+        }
+
+        return $result;
     }
 
     public function getOperator(): string
@@ -111,36 +141,6 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
     public function count(): int
     {
         return count($this->domains);
-    }
-
-    public function toArray(): array
-    {
-        $result = [$this->operator];
-        $normalizedDomain = $this->normalize();
-
-        if (!$normalizedDomain) {
-            return [];
-        }
-
-        if (!($normalizedDomain instanceof self)) {
-            return $normalizedDomain->toArray();
-        }
-
-        foreach ($normalizedDomain as $domain) {
-            if ($domain instanceof self) {
-                $expr = $domain->toArray();
-
-                foreach ($expr as $value) {
-                    $result[] = $value;
-                }
-
-                continue;
-            }
-
-            $result[] = $domain->toArray();
-        }
-
-        return $result;
     }
 
     public function normalize(): ?DomainInterface

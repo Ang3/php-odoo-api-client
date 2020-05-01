@@ -2,21 +2,19 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Ang3\Component\Odoo\Query\Domain\DomainBuilder;
+use Ang3\Component\Odoo\Expression\ExpressionBuilder;
 
-$domainBuilder = new DomainBuilder();
+$expr = new ExpressionBuilder();
 
-$operation = $domainBuilder->andX(
-	$domainBuilder->orX(
-		$domainBuilder->eq('A', 1),
-		$domainBuilder->eq('B', 1),
-		$domainBuilder->eq('C', 1),
-		$domainBuilder->eq('D', 1)
+$operation = $expr->andX(
+	$expr->orX(
+		$expr->eq('A', 1),
+		$expr->eq('B', 1)
 	),
-	$domainBuilder->orX(
-		$domainBuilder->eq('E', 1),
-		$domainBuilder->eq('F', 1),
-		$domainBuilder->eq('G', 1)
+	$expr->orX(
+		$expr->eq('C', 1),
+		$expr->eq('D', 1),
+		$expr->eq('E', 1)
 	)
 );
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ang3\Component\Odoo\Query\Domain;
+namespace Ang3\Component\Odoo\Expression;
 
 class Domain implements DomainInterface
 {
@@ -53,6 +53,11 @@ class Domain implements DomainInterface
         $this->value = is_object($this->value) ? clone $this->value : $this->value;
     }
 
+    public function toArray(): array
+    {
+        return [$this->fieldName, $this->operator, $this->value];
+    }
+
     public function getFieldName(): string
     {
         return $this->fieldName;
@@ -93,10 +98,5 @@ class Domain implements DomainInterface
         $this->value = $value;
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        return [$this->fieldName, $this->operator, $this->value];
     }
 }

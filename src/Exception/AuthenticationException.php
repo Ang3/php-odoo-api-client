@@ -2,7 +2,7 @@
 
 namespace Ang3\Component\Odoo\Exception;
 
-class AuthenticationException extends \RuntimeException
+class AuthenticationException extends RequestException
 {
     public const DEFAULT_MESSAGE = 'Bad credentials';
 

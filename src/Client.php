@@ -5,6 +5,8 @@ namespace Ang3\Component\Odoo;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RemoteException;
+use Ang3\Component\Odoo\Expression\DomainInterface;
+use Ang3\Component\Odoo\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\XmlRpc\Encoder;
 use Ang3\Component\Odoo\XmlRpc\EncoderInterface;
 use Ang3\Component\Odoo\XmlRpc\Endpoint;
@@ -17,6 +19,18 @@ class Client
      */
     public const ENDPOINT_COMMON = 'xmlrpc/2/common';
     public const ENDPOINT_OBJECT = 'xmlrpc/2/object';
+
+    /**
+     * ORM methods.
+     */
+    const CREATE = 'create';
+    const READ = 'read';
+    const UPDATE = 'write';
+    const DELETE = 'unlink';
+    const FIND = 'search_read';
+    const SEARCH = 'search';
+    const COUNT = 'search_count';
+    const LIST_FIELDS = 'fields_get';
 
     /**
      * @var string
@@ -54,6 +68,11 @@ class Client
     private $encoder;
 
     /**
+     * @var ExpressionBuilder
+     */
+    private $expressionBuilder;
+
+    /**
      * @var LoggerInterface|null
      */
     private $logger;
@@ -63,7 +82,7 @@ class Client
      */
     private $uid;
 
-    public function __construct(array $config, LoggerInterface $logger = null, EncoderInterface $encoder = null)
+    public function __construct(array $config, LoggerInterface $logger = null)
     {
         $getParam = static function ($config, $paramName, $paramKey) {
             $value = $config[$paramName] ?? $config[$paramKey] ?? null;
@@ -79,14 +98,92 @@ class Client
         $this->database = $getParam($config, 'database', 1);
         $this->username = $getParam($config, 'username', 2);
         $this->password = $getParam($config, 'password', 3);
-        $this->encoder = $encoder ?: new Encoder();
+        $this->encoder = new Encoder();
+        $this->expressionBuilder = new ExpressionBuilder();
         $this->logger = $logger;
         $this->initEndpoints();
     }
 
-    public function createManager(): Manager
+    /**
+     * Create a new record.
+     *
+     * @return int the ID of the new record
+     */
+    public function create(string $modelName, array $data): int
     {
-        return new Manager($this);
+        return (int) $this->call($modelName, self::CREATE, $this->expressionBuilder->dataParams($data));
+    }
+
+    /**
+     * Read records.
+     *
+     * @param array|int $ids
+     */
+    public function read(string $modelName, $ids, array $options = []): array
+    {
+        return (array) $this->call($modelName, self::READ, (array) $ids, $options);
+    }
+
+    /**
+     * Update a record(s).
+     *
+     * @param array|int $ids
+     */
+    public function update(string $modelName, $ids, array $data = []): void
+    {
+        $this->call($modelName, self::UPDATE, [(array) $ids, $this->expressionBuilder->dataParams($data)]);
+    }
+
+    /**
+     * Delete record(s).
+     *
+     * @param array|int $ids
+     */
+    public function delete(string $modelName, $ids): void
+    {
+        $this->call($modelName, self::DELETE, [(array) $ids]);
+    }
+
+    /**
+     * Find ID of record(s) by criteria and options.
+     *
+     * @param DomainInterface|array $criteria
+     *
+     * @return array<int>
+     */
+    public function search(string $modelName, $criteria, array $options = []): array
+    {
+        return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->criteriaParams($criteria), $options);
+    }
+
+    /**
+     * Find record(s) by criteria and options.
+     *
+     * @param DomainInterface|array $criteria
+     *
+     * @return array<int, array>
+     */
+    public function findBy(string $modelName, $criteria, array $options = []): array
+    {
+        return (array) $this->call($modelName, self::FIND, $this->expressionBuilder->criteriaParams($criteria), $options);
+    }
+
+    /**
+     * Count number of records for a model and criteria.
+     *
+     * @param DomainInterface|array $criteria
+     */
+    public function count(string $modelName, $criteria): int
+    {
+        return (int) $this->call($modelName, self::COUNT, $this->expressionBuilder->criteriaParams($criteria));
+    }
+
+    /**
+     * List model fields.
+     */
+    public function listFields(string $modelName, array $options = []): array
+    {
+        return (array) $this->call($modelName, self::LIST_FIELDS, [], $options);
     }
 
     /**
@@ -99,7 +196,7 @@ class Client
     {
         return $this->objectEndpoint->call('execute_kw', [
             $this->database,
-            $this->getUid(),
+            $this->authenticate(),
             $this->password,
             $name,
             $method,
@@ -108,7 +205,7 @@ class Client
         ]);
     }
 
-    public function getVersion(): array
+    public function version(): array
     {
         return $this->commonEndpoint->call('version');
     }
@@ -116,7 +213,7 @@ class Client
     /**
      * @throws AuthenticationException when authentication failed
      */
-    public function getUid(): int
+    public function authenticate(): int
     {
         if (null === $this->uid) {
             $uid = $this->commonEndpoint
@@ -135,6 +232,11 @@ class Client
         }
 
         return $this->uid;
+    }
+
+    public function expr(): ExpressionBuilder
+    {
+        return $this->expressionBuilder;
     }
 
     public function getIdentifier(): string
@@ -227,6 +329,18 @@ class Client
     {
         $this->encoder = $encoder;
         $this->initEndpoints();
+
+        return $this;
+    }
+
+    public function getExpressionBuilder(): ExpressionBuilder
+    {
+        return $this->expressionBuilder;
+    }
+
+    public function setExpressionBuilder(ExpressionBuilder $expressionBuilder): self
+    {
+        $this->expressionBuilder = $expressionBuilder;
 
         return $this;
     }

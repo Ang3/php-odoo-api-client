@@ -2,7 +2,7 @@
 
 namespace Ang3\Component\Odoo\Exception;
 
-class RemoteException extends \RuntimeException
+class RemoteException extends RequestException
 {
     /**
      * @var array<int, array<string, mixed>>
