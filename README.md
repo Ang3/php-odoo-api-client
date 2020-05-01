@@ -88,7 +88,7 @@ $client->delete('res.company', $ids);
 Get the ID of matched record(s).
 
 ```php
-$records = $client->search('res.company');
+$records = $client->search('res.company', $criteria = null, $options = []);
 ```
 
 **Find records**
