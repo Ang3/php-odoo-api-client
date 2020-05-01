@@ -5,6 +5,11 @@ PHP Odoo API client
 
 Odoo External API client. See [documentation](https://www.odoo.com/documentation/12.0/webservices/odoo.html) for more information.
 
+**Documentation for v5.0 (master)**
+
+For older versions, please see the last stable 
+[documentation](https://github.com/Ang3/php-odoo-api-client/tree/v4.0.0).
+
 Installation
 ============
 
