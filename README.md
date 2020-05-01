@@ -39,7 +39,6 @@ require_once 'vendor/autoload.php';
 
 use Ang3\Component\Odoo\Client;
 
-// Create instance...
 $client = new Client([
     'host' => '<host>',
     'database' => '<database>',
@@ -47,6 +46,9 @@ $client = new Client([
     'password' => '<password>',
  ]);
 ```
+
+Exceptions:
+- ```Ang3\Component\Odoo\Exception\MissingConfigParameterException``` when a required parameter is missing.
 
 ### Built-in methods
 
@@ -64,7 +66,6 @@ $recordId = $client->create('res.company', $data);
 
 ```php
 $ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
-
 $records = $client->read('res.company', $ids);
 ```
 
@@ -72,7 +73,6 @@ $records = $client->read('res.company', $ids);
 
 ```php
 $ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
-
 $data = [
     'field_name' => 'value'
 ];
@@ -84,7 +84,6 @@ $client->read('res.company', $ids, $data);
 
 ```php
 $ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
-
 $client->delete('res.company', $ids);
 ```
 
@@ -93,20 +92,32 @@ $client->delete('res.company', $ids);
 Get the ID of matched record(s).
 
 ```php
+$criteria = [[['id', '=', 18]]];
 $records = $client->search('res.company', $criteria = null, $options = []);
 ```
+
+The variable ```$criteria``` can be an expression. 
+Please see the section [Expression Builder](#expression-builder) for more information about expressions.
 
 **Find records**
 
 ```php
+$criteria = [[['id', '=', 18]]];
 $records = $client->find('res.company', $criteria = null, $options = []);
 ```
+
+The variable ```$criteria``` can be an expression. 
+Please see the section [Expression Builder](#expression-builder) for more information about expressions.
 
 **Count records**
 
 ```php
+$criteria = [[['id', '=', 18]]];
 $nbRecords = $client->count('res.company', $criteria = null, $options = []);
 ```
+
+The variable ```$criteria``` can be an expression. 
+Please see the section [Expression Builder](#expression-builder) for more information about expressions.
 
 **List record fields**
 

@@ -82,6 +82,9 @@ class Client
      */
     private $uid;
 
+	/**
+	 * @throws MissingConfigParameterException when a required parameter is missing
+	 */
     public function __construct(array $config, LoggerInterface $logger = null)
     {
         $getParam = static function ($config, $paramName, $paramKey) {
