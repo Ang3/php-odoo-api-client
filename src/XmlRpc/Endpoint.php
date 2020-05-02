@@ -39,7 +39,8 @@ class Endpoint
     }
 
     /**
-     * @throws RemoteException when a fault code as been returned
+     * @throws RemoteException  when a fault code as been returned
+     * @throws RequestException on endpoint request error
      *
      * @return mixed
      */
@@ -92,6 +93,19 @@ class Endpoint
             $this->logger->info('XML-RPC response decoded', array_merge($context, [
                 'data_type' => gettype($data),
             ]));
+        }
+
+        if (is_array($data) && !empty($data['fault'])) {
+            $error = [
+                'code' => (int) ($data['fault']['faultCode'] ?? 0),
+                'message' => (string) ($data['fault']['faultString'] ?? 'Unknown error'),
+            ];
+
+            if ($this->logger) {
+                $this->logger->info('XML-RPC response error: {message} - Code {code}', array_merge($context, $error));
+            }
+
+            throw RemoteException::createFromXmlResult($error['code'], $error['message']);
         }
 
         return $data['params']['param'] ?? $data;

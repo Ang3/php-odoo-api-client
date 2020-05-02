@@ -215,7 +215,7 @@ class Client
 
     /**
      * @throws AuthenticationException when authentication failed
-     * @throws RemoteException         when request failed
+     * @throws RemoteException         on remote exception
      *
      * @return mixed
      */

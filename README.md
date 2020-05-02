@@ -443,8 +443,10 @@ Upgrades
 
 ### From 4.* to 5.*
 
+- Deleted static method ```Client::createFromConfig(array $config)```. **Use ```new Client(array $config)``` instead**.
+
+
 - Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc)
-- Deleted static method ```Client::createFromConfig(array $config)```. Use ```new Client(array $config)``` instead.
 - Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```
 - Added ORM methods ```find(...)``` to ```findOneBy(...)```
 - Added expression builder support.
