@@ -12,7 +12,7 @@
 	</php>
 
 	<testsuites>
-		<testsuite name="PHP OdooApiClient tests">
+		<testsuite name="PHP Odoo API client tests">
 			<directory>tests</directory>
 		</testsuite>
 	</testsuites>

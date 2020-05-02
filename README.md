@@ -443,9 +443,12 @@ Upgrades
 
 ### From 4.* to 5.*
 
-- Deleted static method ```Client::createFromConfig(array $config)```. **Use ```new Client(array $config)``` instead**.
+What you have to do:
+- Create the client with the constructor ```new Client(array $config)``` instead of calling static method ```Client::createFromConfig(array $config)```.
+- Replace usages of the method ```searchAndRead``` by the method ```findBy```.
 
-
+Logs:
+- Deleted static method ```Client::createFromConfig(array $config)```.
 - Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc)
 - Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```
 - Added ORM methods ```find(...)``` to ```findOneBy(...)```

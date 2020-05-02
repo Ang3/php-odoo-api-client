@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This example reproduces the explanation of Ray Carnes in the followed link.
+ *
+ * @see https://www.odoo.com/fr_FR/forum/aide-1/question/domain-notation-using-multiple-and-nested-and-2170
+ */
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
@@ -21,3 +27,5 @@ $operation = $expr->andX(
 dump($operation);
 dump($operation->normalize());
 dump($operation->toArray());
+
+// Expected: [ '&', '|', (A), (B), '|', (C), '|', (D), (E) ]
