@@ -101,7 +101,12 @@ class ExpressionBuilder
     }
 
     /**
-     * Check if the field is LIKE the value.
+     * Check if the variable is LIKE the value.
+     *
+     * An underscore _ in the pattern stands for (matches) any single character
+     * A percent sign % matches any string of zero or more characters.
+     *
+     * If $strict is set to FALSE, the value pattern is "%value%" (automatically wrapped into signs %).
      *
      * @param mixed $value
      */

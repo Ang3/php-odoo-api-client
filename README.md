@@ -10,14 +10,21 @@ Odoo External API client. See [documentation](https://www.odoo.com/documentation
 For older versions, please see the last stable 
 [documentation](https://github.com/Ang3/php-odoo-api-client/tree/v4.0.0).
 
+**Main features**
+
+- XML-RPC client
+- Remote exception with parsed trace back.
+- Expression builder
+
 Installation
 ============
 
-Step 1: Download sources
-------------------------
+**Requirements**
+
+The php extension ```php-curl``` and ```php-xml``` must be enabled.
 
 Open a command console, enter your project directory and execute the
-following command to download the latest stable version of this bundle:
+following command to download the latest stable version of the client:
 
 ```console
 $ composer require ang3/php-odoo-api-client
@@ -59,104 +66,376 @@ $result = $client->call($name, $method, $parameters = [], $options = []);
 Exceptions:
 - ```Ang3\Component\Odoo\Exception\AuthenticationException``` when authentication failed.
 - ```Ang3\Component\Odoo\Exception\RemoteException``` when request failed.
+- ```Ang3\Component\Odoo\Exception\RequestException``` on other request error.
 
-Built-in methods
-----------------
+These previous exception can be thrown by all methods of the client.
 
-For all these methods, all previous client exceptions can be thrown too.
+Built-in ORM methods
+====================
 
-**Create record**
+Write records
+-------------
+
+For all these methods, the parameter ```$data``` can contains *collection field operations*. 
+Please see the section [Expression builder](#expression-builder) to manage *collection fields* easily.
+
+**Create a record**
 
 ```php
 $data = [
     'field_name' => 'value'
 ];
 
-$recordId = $client->create('res.company', $data);
+$recordId = $client->create('model_name', $data);
 ```
+
+The method returns the ID of the created record.
+
+**Update a record**
+
+```php
+$ids = [1,2,3]; // Can be a value of type int|array<int>
+
+$data = [
+    'field_name' => 'value'
+];
+
+$client->update('model_name', $ids, $data); // void
+```
+
+The method returns ```void```.
+
+Search records
+--------------
 
 **Read records**
 
+Get a list of records by ID.
+
 ```php
-$ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
-$records = $client->read('res.company', $ids);
+$ids = [1,2,3]; // Can be a value of type int|array<int>
+
+$records = $client->read('model_name', $ids);
 ```
 
-**Update records**
+The method returns an array of records of type ```array<array>```.
+
+**Find a record by ID**
 
 ```php
-$ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
+$id = 1; // Must be an integer
+
+$record = $client->find('model_name', $id, $options = []);
+```
+
+The method returns the record as ```array```, or ```NULL``` is the record was not found.
+
+---
+
+For each method below, the value of the parameter ```$criteria``` can be ```NULL```, 
+an array or a *domain expression*.
+
+Please see the section [Expression builder](#expression-builder) to build *domain expressions*.
+
+**Search record(s)**
+
+Get a list of ID for matched record(s).
+
+```php
+$criteria = [[['id', '=', 18]]];
+
+$recordIds = $client->search('model_name', $criteria = null, $options = []);
+```
+
+The method returns a list of ID of type ```array<int>```.
+
+**Find ONE record by criteria and options**
+
+```php
+$record = $client->findOneBy('model_name', $criteria = null, $options = []);
+```
+
+The method returns the record as ```array```, or ```NULL``` is the record was not found.
+
+**Find records by criteria and options**
+
+```php
+$criteria = [[['foo', '=', 'bar']]];
+
+$records = $client->findBy('model_name', $criteria = null, $options = []);
+```
+
+The method returns an array of records of type ```array<array>```.
+
+**Count records by criteria**
+
+```php
+$criteria = [[['foo', '=', 'bar']]];
+
+$nbRecords = $client->count('model_name', $criteria = null);
+```
+
+The method returns an ```integer```.
+
+Delete records
+--------------
+
+You can delete many records at one time.
+
+```php
+$ids = [1,2,3]; // Can be a value of type int|array<int>
+
+$client->delete('model_name', $ids);
+```
+
+The method returns ```void```.
+
+Expression builder
+====================
+
+There are two kinds of expressions : ```domains``` for criteria and ```collection operations``` in data writing.
+Odoo has its own array format for those expressions. The aim of the expression builder is to provide some 
+helper methods to simplify a programmer's life.
+
+Each builder method creates an instance of ```Ang3\Component\Odoo\Expression\ExpressionInterface```. 
+The only one method of this interface is ```toArray()``` in order to get a normalized array of the expression.
+
+Get the expression builder
+--------------------------
+
+Here is an example of how to build a ```ExpressionBuilder``` object from a ```Client``` instance:
+
+```php
+$expr = $client->getExpressionBuilder();
+// Or $expr = $client->expr();
+```
+
+You can still use the expression builder as standalone by creating an instance yourself.
+
+```php
+use Ang3\Component\Odoo\Expression\ExpressionBuilder;
+
+$expr = new ExpressionBuilder();
+```
+
+Domains
+-------
+
+For all **search** queries (```search```, ```findBy```, ```findOneBy``` and ```count```), 
+Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains). 
+Moreover, it uses a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
+
+It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
+for you. :)
+
+To illustrate how to work with them, here is an example using ```ExpressionBuilder``` helper methods:
+
+```php
+// $client instanceof Client
+
+// Get the expression builder
+$expr = $client->expr();
+
+$result = $client->findBy('model_name', $expr->andX( // Logical node "AND"
+	$expr->gte('id', 10), // id >= 10
+	$expr->lte('id', 100), // id <= 10
+), $options = []);
+```
+
+Of course, you can nest logical nodes:
+
+```php
+$result = $client->findBy('model_name', $expr->andX(
+    $expr->orX(
+        $expr->eq('A', 1),
+        $expr->eq('B', 1)
+    ),
+    $expr->orX(
+        $expr->eq('C', 1),
+        $expr->eq('D', 1),
+        $expr->eq('E', 1)
+    )
+), $options = []);
+```
+
+The client formats automatically the whole query parameters for all search methods by calling 
+the special builder method ```criteriaParams()``` internally.
+
+Here is a complete list of helper methods available in ```ExpressionBuilder``` for domain expressions:
+
+```php
+/**
+ * Create a logical operation "AND".
+ */
+public function andX(DomainInterface ...$domains): CompositeDomain;
+
+/**
+ * Create a logical operation "OR".
+ */
+public function orX(DomainInterface ...$domains): CompositeDomain;
+
+/**
+ * Create a logical operation "NOT".
+ */
+public function notX(DomainInterface ...$domains): CompositeDomain;
+
+/**
+ * Check if the field is EQUAL TO the value.
+ *
+ * @param mixed $value
+ */
+public function eq(string $fieldName, $value): Domain;
+
+/**
+ * Check if the field is NOT EQUAL TO the value.
+ *
+ * @param mixed $value
+ */
+public function neq(string $fieldName, $value): Domain;
+
+/**
+ * Check if the field is UNSET OR EQUAL TO the value.
+ *
+ * @param mixed $value
+ */
+public function ueq(string $fieldName, $value): Domain;
+
+/**
+ * Check if the field is LESS THAN the value.
+ *
+ * @param mixed $value
+ */
+public function lt(string $fieldName, $value): Domain;
+
+/**
+ * Check if the field is LESS THAN OR EQUAL the value.
+ *
+ * @param mixed $value
+ */
+public function lte(string $fieldName, $value): Domain;
+
+/**
+ * Check if the field is GREATER THAN the value.
+ *
+ * @param mixed $value
+ */
+public function gt(string $fieldName, $value): Domain;
+
+/**
+ * Check if the field is GREATER THAN OR EQUAL the value.
+ *
+ * @param mixed $value
+ */
+public function gte(string $fieldName, $value): Domain;
+
+/**
+ * Check if the variable is LIKE the value.
+ *
+ * An underscore _ in the pattern stands for (matches) any single character
+ * A percent sign % matches any string of zero or more characters.
+ *
+ * If $strict is set to FALSE, the value pattern is "%value%" (automatically wrapped into signs %).
+ *
+ * @param mixed $value
+ */
+public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Domain;
+
+/**
+ * Check if the field is IS NOT LIKE the value.
+ *
+ * @param mixed $value
+ */
+public function notLike(string $fieldName, $value, bool $caseSensitive = true): Domain;
+
+/**
+ * Check if the field is IN values list.
+ */
+public function in(string $fieldName, array $values = []): Domain;
+
+/**
+ * Check if the field is NOT IN values list.
+ */
+public function notIn(string $fieldName, array $values = []): Domain;
+```
+
+Collection operations
+---------------------
+
+In data writing context, Odoo allows you to manage ***toMany** collection fields with special commands. 
+Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) to known what we are talking about.
+
+The expression builder provides helper methods to build a *command expression*. 
+Each method creates an instance of ```Ang3\Component\Odoo\Expression\OperationInterface``` that extends 
+```Ang3\Component\Odoo\Expression\ExpressionInterface```.
+
+To illustrate how to work with them, here is an example using ```ExpressionBuilder``` helper methods:
+
+```php
+// $client instanceof Client
+
+// Get the expression builder
+$expr = $client->expr();
+
+// Prepare new record data
 $data = [
-    'field_name' => 'value'
+    'foo' => 'bar',
+    'bar_ids' => [ // Field of type "manytoMany"
+        $expr->addRecord(3), // Add the record of ID 3 to the set
+        $expr->createRecord([  // Create a new sub record and add it to the set
+            'bar' => 'baz'
+            // ...
+        ])
+    ]
 ];
 
-$client->read('res.company', $ids, $data);
+$result = $client->create('model_name', $data);
 ```
 
-**Delete records**
+The client formats automatically the whole query parameters for all writing methods 
+(```create``` and ```update```) by calling the special builder method ```dataParams()``` internally.
+
+Here is a complete list of helper methods available in ```ExpressionBuilder``` for operation expressions:
 
 ```php
-$ids = [1,2,3]; // Or $ids = 1 (array<int>|int)
-$client->delete('res.company', $ids);
-```
+/**
+ * Adds a new record created from data.
+ */
+public function createRecord(array $data): Operation;
 
-**Search records**
+/**
+ * Updates an existing record of id $id with data.
+ * /!\ Can not be used in record insert query.
+ */
+public function updateRecord(int $id, array $data): Operation;
 
-Get the ID of matched record(s).
+/**
+ * Adds an existing record of id $id to the collection.
+ */
+public function addRecord(int $id): Operation;
 
-```php
-$criteria = [[['id', '=', 18]]];
-$records = $client->search('res.company', $criteria = null, $options = []);
-```
+/**
+ * Removes the record of id $id from the collection, but does not delete it.
+ * /!\ Can not be used in record insert query.
+ */
+public function removeRecord(int $id): Operation;
 
-The variable ```$criteria``` can be an expression. 
-Please see the section [Expression Builder](#expression-builder) for more information about expressions.
+/**
+ * Removes the record of id $id from the collection, then deletes it from the database.
+ * /!\ Can not be used in record insert query.
+ */
+public function deleteRecord(int $id): Operation;
 
-**Find records**
+/**
+ * Replaces all existing records in the collection by the $ids list,
+ * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
+ */
+public function replaceRecords(array $ids = []): Operation;
 
-```php
-$criteria = [[['id', '=', 18]]];
-$records = $client->find('res.company', $criteria = null, $options = []);
-```
-
-The variable ```$criteria``` can be an expression. 
-Please see the section [Expression Builder](#expression-builder) for more information about expressions.
-
-**Count records**
-
-```php
-$criteria = [[['id', '=', 18]]];
-$nbRecords = $client->count('res.company', $criteria = null, $options = []);
-```
-
-The variable ```$criteria``` can be an expression. 
-Please see the section [Expression Builder](#expression-builder) for more information about expressions.
-
-**List record fields**
-
-```php
-$fields = $client->listFields('res.company', $options = []);
-```
-
-Expression Builder
-------------------
-
-**Added in v.5.0**
-
-Documentation in progress! :)
-
-### Miscellaneous
-
-#### Get the UUID
-
-```php
-$uuid = $client->getUid(); // (string)
-```
-
-#### Get the version
-
-```php
-$version = $client->version(); // (array)
+/**
+ * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
+ * /!\ Can not be used in record insert query.
+ */
+public function clearRecords(): Operation;
 ```
 
 Upgrades
@@ -164,8 +443,10 @@ Upgrades
 
 ### From 4.* to 5.*
 
+- Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc)
 - Deleted static method ```Client::createFromConfig(array $config)```. Use ```new Client(array $config)``` instead.
-- Renamed method ```searchAndRead(...)``` to ```find(...)```
+- Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```
+- Added ORM methods ```find(...)``` to ```findOneBy(...)```
 - Added expression builder support.
 
 ### From 3.* to 4.*

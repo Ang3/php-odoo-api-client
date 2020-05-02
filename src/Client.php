@@ -82,9 +82,9 @@ class Client
      */
     private $uid;
 
-	/**
-	 * @throws MissingConfigParameterException when a required parameter is missing
-	 */
+    /**
+     * @throws MissingConfigParameterException when a required parameter is missing
+     */
     public function __construct(array $config, LoggerInterface $logger = null)
     {
         $getParam = static function ($config, $paramName, $paramKey) {
@@ -157,6 +157,30 @@ class Client
     public function search(string $modelName, $criteria = null, array $options = []): array
     {
         return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->criteriaParams($criteria), $options);
+    }
+
+    /**
+     * Find ONE record by ID and options.
+     *
+     * @return array
+     */
+    public function find(string $modelName, int $id, array $options = []): ?array
+    {
+        return $this->findOneBy($modelName, $this->expr()->eq('id', $id), $options);
+    }
+
+    /**
+     * Find ONE record by criteria and options.
+     *
+     * @param DomainInterface|array|null $criteria
+     *
+     * @return array
+     */
+    public function findOneBy(string $modelName, $criteria = null, array $options = []): ?array
+    {
+        $result = (array) $this->findBy($modelName, $criteria, $options);
+
+        return array_pop($result);
     }
 
     /**
