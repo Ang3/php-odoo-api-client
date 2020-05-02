@@ -35,9 +35,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function eq(string $fieldName, $value): Domain
+    public function eq(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::EQUAL_TO, $value);
+        return new Comparison($fieldName, Comparison::EQUAL_TO, $value);
     }
 
     /**
@@ -45,9 +45,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function neq(string $fieldName, $value): Domain
+    public function neq(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::NOT_EQUAL_TO, $value);
+        return new Comparison($fieldName, Comparison::NOT_EQUAL_TO, $value);
     }
 
     /**
@@ -55,9 +55,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function ueq(string $fieldName, $value): Domain
+    public function ueq(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::UNSET_OR_EQUAL_TO, $value);
+        return new Comparison($fieldName, Comparison::UNSET_OR_EQUAL_TO, $value);
     }
 
     /**
@@ -65,9 +65,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function lt(string $fieldName, $value): Domain
+    public function lt(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::LESS_THAN, $value);
+        return new Comparison($fieldName, Comparison::LESS_THAN, $value);
     }
 
     /**
@@ -75,9 +75,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function lte(string $fieldName, $value): Domain
+    public function lte(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::LESS_THAN_OR_EQUAL, $value);
+        return new Comparison($fieldName, Comparison::LESS_THAN_OR_EQUAL, $value);
     }
 
     /**
@@ -85,9 +85,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function gt(string $fieldName, $value): Domain
+    public function gt(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::GREATER_THAN, $value);
+        return new Comparison($fieldName, Comparison::GREATER_THAN, $value);
     }
 
     /**
@@ -95,9 +95,9 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function gte(string $fieldName, $value): Domain
+    public function gte(string $fieldName, $value): Comparison
     {
-        return new Domain($fieldName, Domain::GREATER_THAN_OR_EQUAL, $value);
+        return new Comparison($fieldName, Comparison::GREATER_THAN_OR_EQUAL, $value);
     }
 
     /**
@@ -110,15 +110,15 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Domain
+    public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Comparison
     {
         if ($strict) {
-            $operator = $caseSensitive ? Domain::EQUAL_LIKE : Domain::INSENSITIVE_EQUAL_LIKE;
+            $operator = $caseSensitive ? Comparison::EQUAL_LIKE : Comparison::INSENSITIVE_EQUAL_LIKE;
         } else {
-            $operator = $caseSensitive ? Domain::LIKE : Domain::INSENSITIVE_LIKE;
+            $operator = $caseSensitive ? Comparison::LIKE : Comparison::INSENSITIVE_LIKE;
         }
 
-        return new Domain($fieldName, $operator, $value);
+        return new Comparison($fieldName, $operator, $value);
     }
 
     /**
@@ -126,27 +126,27 @@ class ExpressionBuilder
      *
      * @param mixed $value
      */
-    public function notLike(string $fieldName, $value, bool $caseSensitive = true): Domain
+    public function notLike(string $fieldName, $value, bool $caseSensitive = true): Comparison
     {
-        $operator = $caseSensitive ? Domain::NOT_LIKE : Domain::INSENSITIVE_NOT_LIKE;
+        $operator = $caseSensitive ? Comparison::NOT_LIKE : Comparison::INSENSITIVE_NOT_LIKE;
 
-        return new Domain($fieldName, $operator, $value);
+        return new Comparison($fieldName, $operator, $value);
     }
 
     /**
      * Check if the field is IN values list.
      */
-    public function in(string $fieldName, array $values = []): Domain
+    public function in(string $fieldName, array $values = []): Comparison
     {
-        return new Domain($fieldName, Domain::IN, $values);
+        return new Comparison($fieldName, Comparison::IN, $values);
     }
 
     /**
      * Check if the field is NOT IN values list.
      */
-    public function notIn(string $fieldName, array $values = []): Domain
+    public function notIn(string $fieldName, array $values = []): Comparison
     {
-        return new Domain($fieldName, Domain::NOT_IN, $values);
+        return new Comparison($fieldName, Comparison::NOT_IN, $values);
     }
 
     /**

@@ -145,23 +145,28 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
 
     public function normalize(): ?DomainInterface
     {
-        if (self::NOT === $this->operator) {
-            $domain = new self(self::AND);
-
-            foreach ($this->domains as $operand) {
-                if ($operand instanceof self) {
-                    $operand = $operand->normalize();
-                }
-
-                if (!$operand) {
-                    continue;
-                }
-
-                $subDomain = new self(self::NOT, [$operand]);
-                $domain->add($subDomain);
+        if ((self::NOT === $this->operator)) {
+            if ($this->count() < 1) {
+                return null;
             }
 
-            return $domain;
+            if ($this->count() > 1) {
+                $andX = new self(self::AND);
+
+                foreach ($this->domains as $operand) {
+                    $andX->add($operand);
+                }
+
+                $andX = $andX->normalize();
+
+                if (!$andX) {
+                    return null;
+                }
+
+                $this->setDomains([$andX]);
+            }
+
+            return $this;
         }
 
         $operands = $this->domains;

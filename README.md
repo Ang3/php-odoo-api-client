@@ -284,49 +284,49 @@ public function notX(DomainInterface ...$domains): CompositeDomain;
  *
  * @param mixed $value
  */
-public function eq(string $fieldName, $value): Domain;
+public function eq(string $fieldName, $value): Comparison;
 
 /**
  * Check if the field is NOT EQUAL TO the value.
  *
  * @param mixed $value
  */
-public function neq(string $fieldName, $value): Domain;
+public function neq(string $fieldName, $value): Comparison;
 
 /**
  * Check if the field is UNSET OR EQUAL TO the value.
  *
  * @param mixed $value
  */
-public function ueq(string $fieldName, $value): Domain;
+public function ueq(string $fieldName, $value): Comparison;
 
 /**
  * Check if the field is LESS THAN the value.
  *
  * @param mixed $value
  */
-public function lt(string $fieldName, $value): Domain;
+public function lt(string $fieldName, $value): Comparison;
 
 /**
  * Check if the field is LESS THAN OR EQUAL the value.
  *
  * @param mixed $value
  */
-public function lte(string $fieldName, $value): Domain;
+public function lte(string $fieldName, $value): Comparison;
 
 /**
  * Check if the field is GREATER THAN the value.
  *
  * @param mixed $value
  */
-public function gt(string $fieldName, $value): Domain;
+public function gt(string $fieldName, $value): Comparison;
 
 /**
  * Check if the field is GREATER THAN OR EQUAL the value.
  *
  * @param mixed $value
  */
-public function gte(string $fieldName, $value): Domain;
+public function gte(string $fieldName, $value): Comparison;
 
 /**
  * Check if the variable is LIKE the value.
@@ -338,24 +338,24 @@ public function gte(string $fieldName, $value): Domain;
  *
  * @param mixed $value
  */
-public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Domain;
+public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Comparison;
 
 /**
  * Check if the field is IS NOT LIKE the value.
  *
  * @param mixed $value
  */
-public function notLike(string $fieldName, $value, bool $caseSensitive = true): Domain;
+public function notLike(string $fieldName, $value, bool $caseSensitive = true): Comparison;
 
 /**
  * Check if the field is IN values list.
  */
-public function in(string $fieldName, array $values = []): Domain;
+public function in(string $fieldName, array $values = []): Comparison;
 
 /**
  * Check if the field is NOT IN values list.
  */
-public function notIn(string $fieldName, array $values = []): Domain;
+public function notIn(string $fieldName, array $values = []): Comparison;
 ```
 
 Collection operations
@@ -364,7 +364,7 @@ Collection operations
 In data writing context, Odoo allows you to manage ***toMany** collection fields with special commands. 
 Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) to known what we are talking about.
 
-The expression builder provides helper methods to build a *command expression*. 
+The expression builder provides helper methods to build a *operation expression*. 
 Each method creates an instance of ```Ang3\Component\Odoo\Expression\OperationInterface``` that extends 
 ```Ang3\Component\Odoo\Expression\ExpressionInterface```.
 

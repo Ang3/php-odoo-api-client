@@ -1,0 +1,7 @@
+parameters:
+  checkMissingIterableValueType: false
+  checkGenericClassInNonGenericObjectType: false
+  autoload_files:
+    - vendor/autoload.php
+  paths:
+    - %currentWorkingDirectory%/tests

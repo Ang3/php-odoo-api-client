@@ -2,7 +2,7 @@
 
 namespace Ang3\Component\Odoo\Expression;
 
-class Domain implements DomainInterface
+class Comparison implements DomainInterface
 {
     /**
      * Comparison operators.
