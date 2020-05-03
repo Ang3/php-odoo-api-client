@@ -1,18 +1,18 @@
 <?php
 
-namespace Ang3\Component\Odoo\Tests;
+namespace Ang3\Component\Odoo\Tests\Utils;
 
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionProperty;
 
-trait ReflectionTrait
+class Reflector
 {
     /**
-     * @throws ReflectionException
-     *
      * @return mixed
+     *
+     * @throws ReflectionException
      */
     public function getObjectValue(object $object, string $propertyName)
     {
@@ -38,13 +38,10 @@ trait ReflectionTrait
      *
      * @throws ReflectionException
      */
-    public function getMethod($objectOrClass, string $methodName, bool $setAccessible = true): ReflectionMethod
+    public function getMethod($objectOrClass, string $methodName, bool $setAccessible = true): ?ReflectionMethod
     {
-        if ($objectOrClass instanceof ReflectionClass) {
-            return $objectOrClass->getMethod($methodName);
-        }
-
-        $method = new ReflectionMethod($objectOrClass, $methodName);
+        $class = $this->getClass($objectOrClass);
+        $method = $class->getMethod($methodName);
 
         if ($setAccessible) {
             $method->setAccessible(true);
@@ -58,13 +55,10 @@ trait ReflectionTrait
      *
      * @throws ReflectionException
      */
-    public function getProperty($objectOrClass, string $propertyName, bool $setAccessible = true): ReflectionProperty
+    public function getProperty($objectOrClass, string $propertyName, bool $setAccessible = true): ?ReflectionProperty
     {
-        if ($objectOrClass instanceof ReflectionClass) {
-            return $objectOrClass->getProperty($propertyName);
-        }
-
-        $property = new ReflectionProperty($objectOrClass, $propertyName);
+        $class = $this->getClass($objectOrClass);
+        $property = $class->getProperty($propertyName);
 
         if ($setAccessible) {
             $property->setAccessible(true);
@@ -81,13 +75,12 @@ trait ReflectionTrait
     public function getClass($objectOrClass): ReflectionClass
     {
         if (is_string($objectOrClass)) {
-            if (!class_exists($objectOrClass)) {
-                throw new \RuntimeException(sprintf('The class %s was not found', $objectOrClass));
-            }
+            /* @var class-string $class */
+            $class = $objectOrClass;
 
-            /* @var class-string $objectOrClass */
+            return new ReflectionClass($class);
         }
 
-        return new ReflectionClass($objectOrClass);
+        return $objectOrClass instanceof ReflectionClass ? $objectOrClass : new ReflectionClass($objectOrClass);
     }
 }

@@ -5,9 +5,39 @@ namespace Ang3\Component\Odoo\Tests\Expression;
 use Ang3\Component\Odoo\Expression\Comparison;
 use Ang3\Component\Odoo\Expression\CompositeDomain;
 use Ang3\Component\Odoo\Expression\DomainInterface;
+use ReflectionException;
 
+/**
+ * @coversDefaultClass \Ang3\Component\Odoo\Expression\CompositeDomain
+ */
 class CompositeDomainTest extends AbstractDomainTest
 {
+    /**
+     * @covers ::setOperation
+     * @covers ::getOperator
+     * @covers ::add
+     * @covers ::remove
+     * @covers ::has
+     *
+     * @throws ReflectionException
+     */
+    public function testAccessors(): void
+    {
+        $comparison = new CompositeDomain(CompositeDomain::AND, []);
+        $fakeDomain = $this->createMock(DomainInterface::class);
+
+        $this
+            ->createObjectTester($comparison)
+            ->assertPropertyAccessorsAndMutators('operator', CompositeDomain::OR)
+            ->assertPropertyAccessorsAndMutators('domains', $fakeDomain, [
+                'is_collection' => true,
+                'adder' => ['name' => 'add'],
+                'remover' => ['name' => 'remove'],
+                'hasser' => ['name' => 'has'],
+            ])
+        ;
+    }
+
     public function provideToArrayDataSet(): array
     {
         $comparisonA = $this->createFakeComparison('A');

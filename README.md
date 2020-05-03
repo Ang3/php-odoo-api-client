@@ -228,7 +228,7 @@ Moreover, it uses a *polish notation* for logical operations (```AND```, ```OR``
 It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
 for you. :)
 
-To illustrate how to work with them, here is an example using ```ExpressionBuilder``` helper methods:
+To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
 
 ```php
 // $client instanceof Client
@@ -368,7 +368,7 @@ The expression builder provides helper methods to build a *operation expression*
 Each method creates an instance of ```Ang3\Component\Odoo\Expression\OperationInterface``` that extends 
 ```Ang3\Component\Odoo\Expression\ExpressionInterface```.
 
-To illustrate how to work with them, here is an example using ```ExpressionBuilder``` helper methods:
+To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
 
 ```php
 // $client instanceof Client

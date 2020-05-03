@@ -5,4 +5,4 @@ parameters:
     - %currentWorkingDirectory%/src
   checkMissingIterableValueType: false
   ignoreErrors:
-  	#- '#Call to an undefined method Ripcord\\Client\\Client::(.*)#'
+  	#- '#(.*) expects class-string\<T of object\>\|T of object, (.*) given$#'

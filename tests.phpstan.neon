@@ -5,3 +5,5 @@ parameters:
     - vendor/autoload.php
   paths:
     - %currentWorkingDirectory%/tests
+  ignoreErrors:
+  	- '#(.*) expects (.*\|)?class\-string(\||<.*)?, (.*) given#'
