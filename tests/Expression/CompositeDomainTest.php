@@ -21,7 +21,7 @@ class CompositeDomainTest extends AbstractDomainTest
      *
      * @throws ReflectionException
      */
-    public function testAccessors(): void
+    public function testAccessorsAndMutators(): void
     {
         $comparison = new CompositeDomain(CompositeDomain::AND, []);
         $fakeDomain = $this->createMock(DomainInterface::class);
@@ -38,6 +38,9 @@ class CompositeDomainTest extends AbstractDomainTest
         ;
     }
 
+    /**
+     * Data provider for the test of method ::toArray().
+     */
     public function provideToArrayDataSet(): array
     {
         $comparisonA = $this->createFakeComparison('A');

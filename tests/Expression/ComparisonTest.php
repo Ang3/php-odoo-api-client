@@ -20,7 +20,7 @@ class ComparisonTest extends AbstractDomainTest
      *
      * @throws ReflectionException
      */
-    public function testAccessors(): void
+    public function testAccessorsAndMutators(): void
     {
         $comparison = new Comparison('foo', Comparison::EQUAL_TO, 'bar');
 
