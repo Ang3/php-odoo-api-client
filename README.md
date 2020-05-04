@@ -34,6 +34,20 @@ This command requires you to have Composer installed globally, as explained
 in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
+Summary
+=======
+
+- [Usage](#usage)
+- [Built-in ORM methods](#built-in-orm-methods)
+    - [Write records](#write-records) - Create and update records
+    - [Search records](#search-records) - Search and read records
+    - [Delete records](#delete-records)
+- [Expression builder](##expression-builder) - Build Oodo array expressions
+    - [Get the expression builder](#get-the-expression-builder)
+    - [Domains](#domains) - Build Odoo domain expressions
+    - [Collection operations](#collection-operations) - Build Odoo collection field operations
+- [Upgrades](#upgrades)
+
 Usage
 =====
 
