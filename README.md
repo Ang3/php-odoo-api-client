@@ -9,16 +9,16 @@ If you are in Symfony application, I suggest you to install the bundle
 [ang3/odoo-api-bundle](https://github.com/Ang3/odoo-api-bundle). 
 It provides a registry you can configure easily and deploys clients as services.
 
-**Documentation for v5.0 (master)**
-
-For older versions, please see the last stable 
-[documentation](https://github.com/Ang3/php-odoo-api-client/tree/v4.0.0).
-
 **Main features**
 
 - XML-RPC client
 - Remote exception with parsed trace back.
 - Expression builder **added in v5.0**
+
+**Documentation for v5.0 (master)**
+
+For older versions, please see the last stable 
+[documentation](https://github.com/Ang3/php-odoo-api-client/tree/v4.0.0).
 
 Requirements
 ============
@@ -30,8 +30,6 @@ Requirements
     
 Installation
 ============
-
-If you are developing 
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of the client:
