@@ -3,17 +3,18 @@ PHP Odoo API client
 
 [![Build Status](https://travis-ci.org/Ang3/php-odoo-api-client.svg?branch=master)](https://travis-ci.org/Ang3/php-odoo-api-client) [![Latest Stable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/stable)](https://packagist.org/packages/ang3/php-odoo-api-client) [![Latest Unstable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/unstable)](https://packagist.org/packages/ang3/php-odoo-api-client) [![Total Downloads](https://poser.pugx.org/ang3/php-odoo-api-client/downloads)](https://packagist.org/packages/ang3/php-odoo-api-client)
 
-Odoo External API client. See [documentation](https://www.odoo.com/documentation/12.0/webservices/odoo.html) for more information.
-
-If you are in Symfony application, I suggest you to install the bundle 
-[ang3/odoo-api-bundle](https://github.com/Ang3/odoo-api-bundle). 
-It provides a registry you can configure easily and deploys clients as services.
+Odoo API client using 
+[XML-RPC Odoo ORM External API](https://www.odoo.com/documentation/12.0/webservices/odoo.html).
 
 **Main features**
 
 - XML-RPC client
 - Remote exception with parsed trace back.
 - Expression builder **added in v5.0**
+
+If you are in Symfony application, I suggest you to install the bundle 
+[ang3/odoo-api-bundle](https://github.com/Ang3/odoo-api-bundle). 
+It provides a registry you can configure easily and deploys clients as services.
 
 **Documentation for v5.0 (master)**
 
@@ -27,7 +28,15 @@ Requirements
 - As mentioned in the documentation of the package [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc/blob/master/INSTALL.md#requirements):
     - The extension ```php-curl``` is needed if you wish to use SSL or HTTP 1.1 to communicate with remote servers.
     - The native extension ```php-xmlrpc``` is not required, but if it is installed, there will be no interference with the operation of this library.
-    
+
+| Odoo server | Compatibility | Comment |
+| --- | --- | --- |
+| v13.0 | Yes | Some Odoo model names changed (e.g account.invoice > account.move) |
+| v12.0 | Yes | First tested version
+| v11.0 | Unknown |
+| v10.0 | Unknown |
+| < v10 | Unknown |
+
 Installation
 ============
 
@@ -471,17 +480,17 @@ What you have to do:
 
 Logs:
 - Deleted static method ```Client::createFromConfig(array $config)```.
-- Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc)
-- Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```
-- Added ORM methods ```find(...)``` to ```findOneBy(...)```
+- Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc).
+- Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```.
+- Added ORM methods ```find(...)``` to ```findOneBy(...)```.
 - Added expression builder support.
 
 ### From 3.* to 4.*
 
-- Updated namespace ```Ang3\Component\Odoo\Client``` to ```Ang3\Component\Odoo```
+- Updated namespace ```Ang3\Component\Odoo\Client``` to ```Ang3\Component\Odoo```.
 
 ### From 2.* to 3.*
 
-- Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```
+- Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```.
 
 That's it!
