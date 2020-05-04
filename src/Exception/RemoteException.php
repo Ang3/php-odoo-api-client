@@ -13,41 +13,38 @@ class RemoteException extends RequestException
     {
         $exception = new self($faultString, $faultCode);
 
-        $messages = array_filter(explode("\n", $faultString));
-        foreach ($messages as $key => $message) {
-            $messages[$key] = trim($message);
-        }
+        if (preg_match('#Traceback \(most recent call last\)#', $faultString)) {
+            $messages = array_filter(explode("\n", $faultString));
 
-        array_shift($messages);
-        $messages = array_values($messages);
-        $messageParts = [];
-        $trace = [];
-
-        foreach ($messages as $i => $value) {
-            if (preg_match('#^File "(.*)", line (\d+), in (.*)#', $messages[$i], $matches)) {
-                $exception = new self($messages[$i + 1], $faultCode, $exception);
-
-                $trace[] = [
-                    'file' => $matches[1],
-                    'line' => (int) $matches[2],
-                    'method' => $matches[3],
-                    'statement' => $messages[$i + 1],
-                ];
-
-                ++$i;
-
-                continue;
+            foreach ($messages as $key => $message) {
+                $messages[$key] = trim($message);
             }
 
-            if (preg_match('#\w+#', $messages[$i])) {
-                $messageParts[] = $value;
+            array_shift($messages);
+            $messages = array_values($messages);
+            $messageParts = [];
+            $trace = [];
+
+            foreach ($messages as $i => $value) {
+                if (preg_match('#^File "(.*)", line (\d+), in (.*)#', $value, $matches)) {
+                    $trace[$i] = [
+                        'file' => $matches[1],
+                        'line' => (int) $matches[2],
+                        'method' => $matches[3],
+                        'statement' => $messages[$i + 1],
+                    ];
+
+                    continue;
+                }
+
+                if ($i > 0 && !isset($trace[$i - 1]) && preg_match('#\w+#', $messages[$i])) {
+                    $messageParts[] = $value;
+                }
             }
+
+            $exception = new self(implode("\n", $messageParts), $faultCode);
+            $exception->traceBack = array_reverse($trace);
         }
-
-        $message = $trace ? implode("\n", $messageParts) : $faultString;
-
-        $exception = new self($message, $faultCode);
-        $exception->traceBack = array_reverse($trace);
 
         return $exception;
     }
