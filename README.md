@@ -476,7 +476,7 @@ What you have to do:
 Logs:
 - Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc).
 - Created XML-RPC client.
-- Deleted static method ```Client::createFromConfig(array $config)```..
+- Deleted static method ```Client::createFromConfig(array $config)```.
 - Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```.
 - Added ORM methods ```find(...)``` to ```findOneBy(...)```.
 - Added expression builder support.
