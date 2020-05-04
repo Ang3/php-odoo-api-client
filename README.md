@@ -50,11 +50,11 @@ Summary
     - [Write records](#write-records) - Create and update records
     - [Search records](#search-records) - Search and read records
     - [Delete records](#delete-records)
-- [Expression builder](##expression-builder) - Build Oodo array expressions
-    - [Get the expression builder](#get-the-expression-builder)
+- [Expression builder](##expression-builder) - Oodo array expressions
+    - [Get the expression builder](#get-the-expression-builder) - Create or get a builder
     - [Domains](#domains) - Build Odoo domain expressions
     - [Collection operations](#collection-operations) - Build Odoo collection field operations
-- [Upgrades](#upgrades)
+- [Upgrades](#upgrades) - Major changes
 
 Usage
 =====
