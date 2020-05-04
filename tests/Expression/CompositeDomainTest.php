@@ -39,7 +39,7 @@ class CompositeDomainTest extends AbstractDomainTest
     }
 
     /**
-     * Data provider for the test of method ::toArray().
+     * Data provider for the test for method ::toArray().
      */
     public function provideToArrayDataSet(): array
     {
@@ -115,6 +115,8 @@ class CompositeDomainTest extends AbstractDomainTest
     }
 
     /**
+     * @covers ::toArray
+     *
      * @dataProvider provideToArrayDataSet
      *
      * @param mixed $expectedResult
