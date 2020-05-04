@@ -5,6 +5,10 @@ PHP Odoo API client
 
 Odoo External API client. See [documentation](https://www.odoo.com/documentation/12.0/webservices/odoo.html) for more information.
 
+If you are in Symfony application, I suggest you to install the bundle 
+[ang3/odoo-api-bundle](https://github.com/Ang3/odoo-api-bundle). 
+It provides a registry you can configure easily and deploys clients as services.
+
 **Documentation for v5.0 (master)**
 
 For older versions, please see the last stable 
@@ -14,14 +18,20 @@ For older versions, please see the last stable
 
 - XML-RPC client
 - Remote exception with parsed trace back.
-- Expression builder
+- Expression builder **added in v5.0**
 
+Requirements
+============
+
+- The extension ```php-xml``` must be enabled.
+- As mentioned in the documentation of the package [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc/blob/master/INSTALL.md#requirements):
+    - The extension ```php-curl``` is needed if you wish to use SSL or HTTP 1.1 to communicate with remote servers.
+    - The native extension ```php-xmlrpc``` is not required, but if it is installed, there will be no interference with the operation of this library.
+    
 Installation
 ============
 
-**Requirements**
-
-The php extension ```php-curl``` and ```php-xml``` must be enabled.
+If you are developing 
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of the client:
