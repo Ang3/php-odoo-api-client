@@ -222,8 +222,8 @@ Domains
 -------
 
 For all **search** queries (```search```, ```findBy```, ```findOneBy``` and ```count```), 
-Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains). 
-Moreover, it uses a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
+Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains) 
+with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
 
 It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
 for you. :)
