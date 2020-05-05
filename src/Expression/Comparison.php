@@ -74,11 +74,6 @@ class Comparison implements DomainInterface
         $this->value = is_object($this->value) ? clone $this->value : $this->value;
     }
 
-    public function __toString(): string
-    {
-        return sprintf('%s %s %s', $this->fieldName, $this->operator, $this->toString($this->value));
-    }
-
     public function toArray(): array
     {
         return [$this->fieldName, $this->operator, $this->value];
@@ -132,37 +127,5 @@ class Comparison implements DomainInterface
         $this->value = $value;
 
         return $this;
-    }
-
-    /**
-     * @internal
-     *
-     * @param mixed $value
-     */
-    private function toString($value = null): string
-    {
-        if (null === $value) {
-            return 'NULL';
-        }
-
-        if (is_bool($value)) {
-            $value = $value ? 'true' : 'false';
-        } elseif (is_int($value) || is_float($value)) {
-            $value = (string) $value;
-        } elseif (is_string($value)) {
-            $value = sprintf('"%s"', addslashes($value));
-        } elseif (is_array($value)) {
-            $values = $value;
-
-            foreach ($values as $key => $subValue) {
-                $values[$key] = $this->toString($subValue);
-            }
-
-            return sprintf('[%s]', implode(', ', $values));
-        } else {
-            $value = sprintf('"%s"', json_encode($value, JSON_HEX_QUOT) ?: '');
-        }
-
-        return $value;
     }
 }

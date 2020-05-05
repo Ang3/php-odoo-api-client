@@ -262,17 +262,25 @@ class ExpressionBuilder
             throw new InvalidArgumentException(sprintf('Expected $criteria value of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
-        foreach ($criteria as $key => $value) {
+        return $this->formatDomains($criteria);
+    }
+
+    /**
+     * @internal
+     */
+    private function formatDomains(array $data = []): array
+    {
+        foreach ($data as $key => $value) {
             if ($value instanceof DomainInterface) {
-                $criteria[$key] = $value->toArray();
+                $data[$key] = $value->toArray();
                 continue;
             }
 
             if (is_array($value)) {
-                $criteria[$key] = $this->normalizeDomains($value);
+                $data[$key] = $this->formatDomains($value);
             }
         }
 
-        return $criteria;
+        return $data;
     }
 }

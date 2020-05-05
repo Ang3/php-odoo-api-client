@@ -45,48 +45,6 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         }
     }
 
-    public function __toString(): string
-    {
-        $domains = $this->domains;
-
-        usort($domains, static function ($a, $b) {
-            if (get_class($a) === get_class($b)) {
-                if ($a instanceof self) {
-                    if ($a->count() === $b->count()) {
-                        return 0;
-                    }
-
-                    return $a->count() < $b->count() ? -1 : 1;
-                }
-
-                return 0;
-            }
-
-            if ($a instanceof CompositeDomain) {
-                return 1;
-            }
-
-            if ($b instanceof CompositeDomain) {
-                return -1;
-            }
-
-            return 0;
-        });
-
-        foreach ($domains as $key => $domain) {
-            $domains[$key] = $domain instanceof self ? sprintf('(%s)', $domain) : (string) $domain;
-        }
-
-        switch ($this->operator) {
-            case self::AND: $operator = 'AND'; break;
-            case self::OR: $operator = 'OR'; break;
-            case self::NOT: $operator = 'NOT'; break;
-            default: $operator = $this->operator; break;
-        }
-
-        return implode(sprintf(' %s ', $operator), $domains);
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -209,32 +167,30 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         $this->domains = [];
 
         foreach ($domains as $domain) {
-            if ($domain) {
-                $this->add($domain);
+            if (!$domain) {
+                continue;
             }
+
+            $this->add($domain);
         }
 
         return $this;
     }
 
-    public function add(DomainInterface ...$domains): self
+    public function add(DomainInterface $domain): self
     {
-        foreach ($domains as $domain) {
-            if (!$this->has($domain)) {
-                $this->domains[] = $domain;
-            }
+        if (!$this->has($domain)) {
+            $this->domains[] = $domain;
         }
 
         return $this;
     }
 
-    public function remove(DomainInterface ...$domains): self
+    public function remove(DomainInterface $domain): self
     {
-        foreach ($domains as $value) {
-            foreach ($this->domains as $key => $domain) {
-                if ($domain === $value) {
-                    unset($this->domains[$key]);
-                }
+        foreach ($this->domains as $key => $value) {
+            if ($value === $domain) {
+                unset($this->domains[$key]);
             }
         }
 
