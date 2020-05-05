@@ -25,7 +25,7 @@ $operation = $expr->andX(
 );
 
 dump($operation);
-dump($operation->normalize());
 dump($operation->toArray());
+dump($operation->__toString());
 
 // Expected: [ '&', '|', (A), (B), '|', (C), '|', (D), (E) ]

@@ -4,12 +4,13 @@ namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
-use Ang3\Component\Odoo\Exception\RemoteException;
+use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Expression\DomainInterface;
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\XmlRpc\Encoder;
 use Ang3\Component\Odoo\XmlRpc\EncoderInterface;
 use Ang3\Component\Odoo\XmlRpc\Endpoint;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 class Client
@@ -110,17 +111,26 @@ class Client
     /**
      * Create a new record.
      *
+     * @throws InvalidArgumentException when $data is empty
+     * @throws RequestException         when request failed
+     *
      * @return int the ID of the new record
      */
     public function create(string $modelName, array $data): int
     {
-        return (int) $this->call($modelName, self::CREATE, $this->expressionBuilder->dataParams($data));
+        if (!$data) {
+            throw new InvalidArgumentException('Data cannot be empty');
+        }
+
+        return (int) $this->call($modelName, self::CREATE, $data);
     }
 
     /**
      * Read records.
      *
      * @param array|int $ids
+     *
+     * @throws RequestException when request failed
      */
     public function read(string $modelName, $ids, array $options = []): array
     {
@@ -131,16 +141,24 @@ class Client
      * Update a record(s).
      *
      * @param array|int $ids
+     *
+     * @throws RequestException when request failed
      */
     public function update(string $modelName, $ids, array $data = []): void
     {
-        $this->call($modelName, self::UPDATE, [(array) $ids, $this->expressionBuilder->dataParams($data)]);
+        if (!$data) {
+            return;
+        }
+
+        $this->call($modelName, self::UPDATE, [(array) $ids, $data]);
     }
 
     /**
      * Delete record(s).
      *
      * @param array|int $ids
+     *
+     * @throws RequestException when request failed
      */
     public function delete(string $modelName, $ids): void
     {
@@ -152,15 +170,22 @@ class Client
      *
      * @param DomainInterface|array|null $criteria
      *
+     * @throws InvalidArgumentException when $criteria value is not valid
+     * @throws RequestException         when request failed
+     *
      * @return array<int>
      */
     public function search(string $modelName, $criteria = null, array $options = []): array
     {
-        return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->criteriaParams($criteria), $options);
+        $options = $this->clearOptions($options, ['fields']);
+
+        return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->normalizeDomains($criteria), $options);
     }
 
     /**
      * Find ONE record by ID and options.
+     *
+     * @throws RequestException when request failed
      *
      * @return array
      */
@@ -173,6 +198,9 @@ class Client
      * Find ONE record by criteria and options.
      *
      * @param DomainInterface|array|null $criteria
+     *
+     * @throws InvalidArgumentException when $criteria value is not valid
+     * @throws RequestException         when request failed
      *
      * @return array
      */
@@ -188,21 +216,27 @@ class Client
      *
      * @param DomainInterface|array|null $criteria
      *
+     * @throws InvalidArgumentException when $criteria value is not valid
+     * @throws RequestException         when request failed
+     *
      * @return array<int, array>
      */
     public function findBy(string $modelName, $criteria = null, array $options = []): array
     {
-        return (array) $this->call($modelName, self::FIND, $this->expressionBuilder->criteriaParams($criteria), $options);
+        return (array) $this->call($modelName, self::FIND, $this->expressionBuilder->normalizeDomains($criteria), $options);
     }
 
     /**
      * Count number of records for a model and criteria.
      *
      * @param DomainInterface|array|null $criteria
+     *
+     * @throws InvalidArgumentException when $criteria value is not valid
+     * @throws RequestException         when request failed
      */
     public function count(string $modelName, $criteria = null): int
     {
-        return (int) $this->call($modelName, self::COUNT, $this->expressionBuilder->criteriaParams($criteria));
+        return (int) $this->call($modelName, self::COUNT, $this->expressionBuilder->normalizeDomains($criteria));
     }
 
     /**
@@ -214,8 +248,7 @@ class Client
     }
 
     /**
-     * @throws AuthenticationException when authentication failed
-     * @throws RemoteException         on remote exception
+     * @throws RequestException when request failed
      *
      * @return mixed
      */
@@ -239,6 +272,7 @@ class Client
 
     /**
      * @throws AuthenticationException when authentication failed
+     * @throws RequestException        when endpoint request failed
      */
     public function authenticate(): int
     {
@@ -394,5 +428,19 @@ class Client
         $this->objectEndpoint = new Endpoint(sprintf('%s/%s', $this->url, self::ENDPOINT_OBJECT), $this->logger, $this->encoder);
 
         return $this;
+    }
+
+    /**
+     * @internal
+     */
+    private function clearOptions(array $options = [], array $toRemove = []): array
+    {
+        foreach ($options as $key => $value) {
+            if (in_array($key, $toRemove, true)) {
+                unset($options[$key]);
+            }
+        }
+
+        return $options;
     }
 }

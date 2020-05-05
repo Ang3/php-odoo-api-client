@@ -14,6 +14,15 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
     public const NOT = '!';
 
     /**
+     * @var string[]
+     */
+    private static $operators = [
+        self::AND,
+        self::OR,
+        self::NOT,
+    ];
+
+    /**
      * @var string
      */
     private $operator;
@@ -36,7 +45,51 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         }
     }
 
+    public function __toString(): string
+    {
+        $domains = $this->domains;
+
+        usort($domains, static function ($a, $b) {
+            if (get_class($a) === get_class($b)) {
+                if ($a instanceof self) {
+                    if ($a->count() === $b->count()) {
+                        return 0;
+                    }
+
+                    return $a->count() < $b->count() ? -1 : 1;
+                }
+
+                return 0;
+            }
+
+            if ($a instanceof CompositeDomain) {
+                return 1;
+            }
+
+            if ($b instanceof CompositeDomain) {
+                return -1;
+            }
+
+            return 0;
+        });
+
+        foreach ($domains as $key => $domain) {
+            $domains[$key] = $domain instanceof self ? sprintf('(%s)', $domain) : (string) $domain;
+        }
+
+        switch ($this->operator) {
+            case self::AND: $operator = 'AND'; break;
+            case self::OR: $operator = 'OR'; break;
+            case self::NOT: $operator = 'NOT'; break;
+            default: $operator = $this->operator; break;
+        }
+
+        return implode(sprintf(' %s ', $operator), $domains);
+    }
+
     /**
+     * {@inheritdoc}
+     *
      * @return DomainInterface[]|Generator
      */
     public function getIterator(): Generator
@@ -46,34 +99,89 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         }
     }
 
+    /**
+     * @static
+     *
+     * @return string[]
+     */
+    public static function getOperators(): array
+    {
+        return self::$operators;
+    }
+
     public function toArray(): array
     {
-        $result = [$this->operator];
-        $normalizedDomain = $this->normalize();
+        $domain = $this->prepare();
 
-        if (!$normalizedDomain) {
-            return [];
+        if (!($domain instanceof self)) {
+            return $domain ? $domain->toArray() : [];
         }
 
-        if (!($normalizedDomain instanceof self)) {
-            return $normalizedDomain->toArray();
-        }
+        $result = [$domain->getOperator()];
 
-        foreach ($normalizedDomain as $domain) {
+        foreach ($domain->getDomains() as $domain) {
+            $domainArray = $domain->toArray();
+
             if ($domain instanceof self) {
-                $expr = $domain->toArray();
-
-                foreach ($expr as $value) {
+                foreach ($domainArray as $value) {
                     $result[] = $value;
                 }
 
                 continue;
             }
 
-            $result[] = $domain->toArray();
+            $result[] = $domainArray;
         }
 
         return $result;
+    }
+
+    /**
+     * @internal
+     *
+     * Create a copy according to arity policy of Odoo polish notation
+     */
+    private function prepare(): ?DomainInterface
+    {
+        $domains = $this->domains;
+        $nbDomains = count($domains);
+
+        if (0 === $nbDomains) {
+            return null;
+        }
+
+        if (1 === $nbDomains) {
+            return self::NOT === $this->operator ? $this : array_shift($domains);
+        }
+
+        if (self::NOT === $this->operator) {
+            $andX = new self(self::AND, $domains);
+
+            return new self($this->operator, [$andX->prepare()]);
+        }
+
+        if (2 === $nbDomains) {
+            return $this;
+        }
+
+        foreach ($domains as $key => $subDomain) {
+            if ($subDomain instanceof self) {
+                $domains[$key] = $subDomain->prepare();
+
+                if (!$domains[$key]) {
+                    unset($domains[$key]);
+                }
+
+                continue;
+            }
+        }
+
+        $firstDomain = array_shift($domains);
+        $subDomain = new self($this->operator, $domains);
+
+        return new self($this->operator, [
+            $firstDomain, $subDomain->prepare(),
+        ]);
     }
 
     public function getOperator(): string
@@ -143,76 +251,8 @@ class CompositeDomain implements DomainInterface, \IteratorAggregate
         return count($this->domains);
     }
 
-    public function normalize(): ?DomainInterface
+    public function isEmpty(): bool
     {
-        if ((self::NOT === $this->operator)) {
-            if ($this->count() < 1) {
-                return null;
-            }
-
-            if ($this->count() > 1) {
-                $andX = new self(self::AND);
-
-                foreach ($this->domains as $operand) {
-                    $andX->add($operand);
-                }
-
-                $andX = $andX->normalize();
-
-                if (!$andX) {
-                    return null;
-                }
-
-                $this->setDomains([$andX]);
-            }
-
-            return $this;
-        }
-
-        $operands = $this->domains;
-
-        foreach ($operands as $key => $operand) {
-            if ($operand instanceof self) {
-                $operand = $operand->normalize();
-            }
-
-            if (!$operand) {
-                unset($operands[$key]);
-            }
-
-            $operands[$key] = $operand;
-        }
-
-        if (!$operands) {
-            return null;
-        }
-
-        $nbOperands = count($operands);
-
-        if ($nbOperands < 2) {
-            return array_pop($operands);
-        }
-
-        if (2 === $nbOperands) {
-            return new self($this->operator, $operands);
-        }
-
-        $normalizedDomain = new self($this->operator);
-        $currentDomain = $normalizedDomain;
-        $lastOperandKey = $nbOperands - 1;
-
-        foreach ($operands as $key => $operand) {
-            if ($key < $lastOperandKey && 1 === $currentDomain->count()) {
-                $subDomain = new self($this->operator, [$operand]);
-                $currentDomain->add($subDomain);
-                $currentDomain = $subDomain;
-
-                continue;
-            }
-
-            $currentDomain->add($operand);
-        }
-
-        return $normalizedDomain;
+        return 0 === count($this->domains);
     }
 }

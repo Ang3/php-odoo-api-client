@@ -24,6 +24,27 @@ class Comparison implements DomainInterface
     public const NOT_IN = 'not in';
 
     /**
+     * @var string[]
+     */
+    private static $operators = [
+        self::UNSET_OR_EQUAL_TO,
+        self::EQUAL_TO,
+        self::NOT_EQUAL_TO,
+        self::LESS_THAN,
+        self::LESS_THAN_OR_EQUAL,
+        self::GREATER_THAN,
+        self::GREATER_THAN_OR_EQUAL,
+        self::EQUAL_LIKE,
+        self::INSENSITIVE_EQUAL_LIKE,
+        self::LIKE,
+        self::NOT_LIKE,
+        self::INSENSITIVE_LIKE,
+        self::INSENSITIVE_NOT_LIKE,
+        self::IN,
+        self::NOT_IN,
+    ];
+
+    /**
      * @var string
      */
     private $fieldName;
@@ -53,9 +74,22 @@ class Comparison implements DomainInterface
         $this->value = is_object($this->value) ? clone $this->value : $this->value;
     }
 
+    public function __toString(): string
+    {
+        return sprintf('%s %s %s', $this->fieldName, $this->operator, $this->toString($this->value));
+    }
+
     public function toArray(): array
     {
         return [$this->fieldName, $this->operator, $this->value];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getOperators(): array
+    {
+        return self::$operators;
     }
 
     public function getFieldName(): string
@@ -98,5 +132,37 @@ class Comparison implements DomainInterface
         $this->value = $value;
 
         return $this;
+    }
+
+    /**
+     * @internal
+     *
+     * @param mixed $value
+     */
+    private function toString($value = null): string
+    {
+        if (null === $value) {
+            return 'NULL';
+        }
+
+        if (is_bool($value)) {
+            $value = $value ? 'true' : 'false';
+        } elseif (is_int($value) || is_float($value)) {
+            $value = (string) $value;
+        } elseif (is_string($value)) {
+            $value = sprintf('"%s"', addslashes($value));
+        } elseif (is_array($value)) {
+            $values = $value;
+
+            foreach ($values as $key => $subValue) {
+                $values[$key] = $this->toString($subValue);
+            }
+
+            return sprintf('[%s]', implode(', ', $values));
+        } else {
+            $value = sprintf('"%s"', json_encode($value, JSON_HEX_QUOT) ?: '');
+        }
+
+        return $value;
     }
 }

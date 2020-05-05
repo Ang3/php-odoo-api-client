@@ -2,7 +2,6 @@
 
 namespace Ang3\Component\Odoo\Tests\Expression;
 
-use Ang3\Component\Odoo\Expression\Comparison;
 use Ang3\Component\Odoo\Expression\CompositeDomain;
 use Ang3\Component\Odoo\Expression\DomainInterface;
 use ReflectionException;
@@ -23,11 +22,11 @@ class CompositeDomainTest extends AbstractDomainTest
      */
     public function testAccessorsAndMutators(): void
     {
-        $comparison = new CompositeDomain(CompositeDomain::AND, []);
+        $domain = new CompositeDomain(CompositeDomain::AND, []);
         $fakeDomain = $this->createMock(DomainInterface::class);
 
         $this
-            ->createObjectTester($comparison)
+            ->createObjectTester($domain)
             ->assertPropertyAccessorsAndMutators('operator', CompositeDomain::OR)
             ->assertPropertyAccessorsAndMutators('domains', $fakeDomain, [
                 'is_collection' => true,
@@ -43,9 +42,14 @@ class CompositeDomainTest extends AbstractDomainTest
      */
     public function provideToArrayDataSet(): array
     {
-        $comparisonA = $this->createFakeComparison('A');
-        $comparisonB = $this->createFakeComparison('B');
-        $comparisonC = $this->createFakeComparison('C');
+        $domainA = $this->createFakeDomain('A');
+        $domainB = $this->createFakeDomain('B');
+        $domainC = $this->createFakeDomain('C');
+        $domainD = $this->createFakeDomain('D');
+        $domainE = $this->createFakeDomain('E');
+        $domainF = $this->createFakeDomain('F');
+        $domainG = $this->createFakeDomain('G');
+        $domainH = $this->createFakeDomain('H');
 
         $data = [
             // [ <operator>, <domains>, <expected_result> ],
@@ -53,61 +57,61 @@ class CompositeDomainTest extends AbstractDomainTest
                 CompositeDomain::AND, [], [],
             ],
             [ // 1
-                CompositeDomain::AND, [$comparisonA],
-                $comparisonA->toArray(),
+                CompositeDomain::AND, [$domainA],
+                $domainA->toArray(),
             ],
             [ // 2
-                CompositeDomain::AND, [$comparisonA, $comparisonB],
-                ['&', $comparisonA->toArray(), $comparisonB->toArray()],
+                CompositeDomain::AND, [$domainA, $domainB],
+                ['&', $domainA->toArray(), $domainB->toArray()],
             ],
             [ // 3
-                CompositeDomain::AND, [$comparisonA, $comparisonB, $comparisonC],
-                ['&', $comparisonA->toArray(), '&', $comparisonB->toArray(), $comparisonC->toArray()],
+                CompositeDomain::AND, [$domainA, $domainB, $domainC],
+                ['&', $domainA->toArray(), '&', $domainB->toArray(), $domainC->toArray()],
             ],
             [ // 4
                 CompositeDomain::OR, [], [],
             ],
             [ // 5
-                CompositeDomain::OR, [$comparisonA],
-                $comparisonA->toArray(),
+                CompositeDomain::OR, [$domainA],
+                $domainA->toArray(),
             ],
             [ // 6
-                CompositeDomain::OR, [$comparisonA, $comparisonB],
-                ['|', $comparisonA->toArray(), $comparisonB->toArray()],
+                CompositeDomain::OR, [$domainA, $domainB],
+                ['|', $domainA->toArray(), $domainB->toArray()],
             ],
             [ // 7
-                CompositeDomain::OR, [$comparisonA, $comparisonB, $comparisonC],
-                ['|', $comparisonA->toArray(), '|', $comparisonB->toArray(), $comparisonC->toArray()],
+                CompositeDomain::OR, [$domainA, $domainB, $domainC],
+                ['|', $domainA->toArray(), '|', $domainB->toArray(), $domainC->toArray()],
             ],
             [ // 8
                 CompositeDomain::NOT, [], [],
             ],
             [ // 9
-                CompositeDomain::NOT, [$comparisonA],
-                ['!', $comparisonA->toArray()],
+                CompositeDomain::NOT, [$domainA],
+                ['!', $domainA->toArray()],
             ],
             [ // 10
-                CompositeDomain::NOT, [$comparisonA, $comparisonB],
-                ['!', '&', $comparisonA->toArray(), $comparisonB->toArray()],
+                CompositeDomain::NOT, [$domainA, $domainB],
+                ['!', '&', $domainA->toArray(), $domainB->toArray()],
             ],
             [ // 11
-                CompositeDomain::NOT, [$comparisonA, $comparisonB, $comparisonC],
-                ['!', '&', $comparisonA->toArray(), '&', $comparisonB->toArray(), $comparisonC->toArray()],
+                CompositeDomain::NOT, [$domainA, $domainB, $domainC],
+                ['!', '&', $domainA->toArray(), '&', $domainB->toArray(), $domainC->toArray()],
             ],
         ];
 
         /**
          * @see https://www.odoo.com/fr_FR/forum/aide-1/question/domain-notation-using-multiple-and-nested-and-2170
          */
-        $orXA = $this->createFakeCompositeDomain(['|', ['A'], ['B']]);
-        $orXB = $this->createFakeCompositeDomain(['|', ['C'], '|', ['D'], ['E']]);
+        $orXA = new CompositeDomain(CompositeDomain::OR, [$domainA, $domainB]);
+        $orXB = new CompositeDomain(CompositeDomain::OR, [$domainC, $domainD, $domainE]);
         $expectedResult = ['&', '|', ['A'], ['B'], '|', ['C'], '|', ['D'], ['E']];
         $data[] = [CompositeDomain::AND, [$orXA, $orXB], $expectedResult];
 
-        // Final test
-        $orXA = $this->createFakeCompositeDomain(['|', ['A'], ['B']]);
-        $orXB = $this->createFakeCompositeDomain(['|', ['C'], '|', ['D'], ['E']]);
-        $orXC = $this->createFakeCompositeDomain(['|', ['F'], '|', ['G'], ['H']]);
+        // #13 Final test
+        $orXA = new CompositeDomain(CompositeDomain::OR, [$domainA, $domainB]);
+        $orXB = new CompositeDomain(CompositeDomain::OR, [$domainC, $domainD, $domainE]);
+        $orXC = new CompositeDomain(CompositeDomain::OR, [$domainF, $domainG, $domainH]);
         $expectedResult = ['&', '|', ['A'], ['B'], '&', '|', ['C'], '|', ['D'], ['E'], '|', ['F'], '|', ['G'], ['H']];
         $data[] = [CompositeDomain::AND, [$orXA, $orXB, $orXC], $expectedResult];
 
@@ -116,7 +120,6 @@ class CompositeDomainTest extends AbstractDomainTest
 
     /**
      * @covers ::toArray
-     *
      * @dataProvider provideToArrayDataSet
      *
      * @param mixed $expectedResult
@@ -124,38 +127,19 @@ class CompositeDomainTest extends AbstractDomainTest
     public function testToArray(string $operator, array $domains = [], $expectedResult = null, string $message = ''): void
     {
         $domain = new CompositeDomain($operator, $domains);
-
         $this->assertEquals($expectedResult, $domain->toArray(), $message);
     }
 
     /**
      * @param mixed $expression
      */
-    protected function createFakeCompositeDomain($expression, ?DomainInterface $normalization = null): CompositeDomain
+    protected function createFakeDomain($expression): DomainInterface
     {
-        $compositeDomain = $this->createMock(CompositeDomain::class);
-        $compositeDomain
+        $fakeDomain = $this->createMock(DomainInterface::class);
+        $fakeDomain
             ->method('toArray')
             ->willReturn(is_array($expression) ? $expression : (array) $expression);
 
-        $normalization = $normalization ?: $compositeDomain;
-        $compositeDomain
-            ->method('normalize')
-            ->willReturn($normalization);
-
-        return $compositeDomain;
-    }
-
-    /**
-     * @param mixed $expression
-     */
-    protected function createFakeComparison($expression): Comparison
-    {
-        $comparison = $this->createMock(Comparison::class);
-        $comparison
-            ->method('toArray')
-            ->willReturn(is_array($expression) ? $expression : (array) $expression);
-
-        return $comparison;
+        return $fakeDomain;
     }
 }

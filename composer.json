@@ -21,7 +21,8 @@
         "php": ">=7.2",
         "ext-curl": "*",
         "phpxmlrpc/phpxmlrpc": "^4.0",
-        "symfony/serializer": ">=3.2.0"
+        "symfony/serializer": ">=3.2.0",
+      "ext-json": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

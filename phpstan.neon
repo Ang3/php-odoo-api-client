@@ -1,8 +1,8 @@
 parameters:
   inferPrivatePropertyTypeFromConstructor: true
   checkGenericClassInNonGenericObjectType: false
+  checkMissingIterableValueType: false
   paths:
     - %currentWorkingDirectory%/src
-  checkMissingIterableValueType: false
   ignoreErrors:
   	#- '#(.*) expects class-string\<T of object\>\|T of object, (.*) given$#'

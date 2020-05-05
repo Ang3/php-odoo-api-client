@@ -7,6 +7,17 @@ use InvalidArgumentException;
 class ExpressionBuilder
 {
     /**
+     * Odoo operations key.
+     */
+    public const CREATE = 0;
+    public const UPDATE = 1;
+    public const DELETE = 2;
+    public const REMOVE = 3;
+    public const ADD = 4;
+    public const CLEAR = 5;
+    public const REPLACE = 6;
+
+    /**
      * Create a logical operation "AND".
      */
     public function andX(DomainInterface ...$domains): CompositeDomain
@@ -135,143 +146,133 @@ class ExpressionBuilder
 
     /**
      * Check if the field is IN values list.
+     *
+     * @param bool|int|float|string|array $values
      */
-    public function in(string $fieldName, array $values = []): Comparison
+    public function in(string $fieldName, $values): Comparison
     {
-        return new Comparison($fieldName, Comparison::IN, $values);
+        return new Comparison($fieldName, Comparison::IN, $this->getValues($values));
     }
 
     /**
      * Check if the field is NOT IN values list.
+     *
+     * @param bool|int|float|string|array $values
      */
-    public function notIn(string $fieldName, array $values = []): Comparison
+    public function notIn(string $fieldName, $values): Comparison
     {
-        return new Comparison($fieldName, Comparison::NOT_IN, $values);
+        return new Comparison($fieldName, Comparison::NOT_IN, $this->getValues($values));
+    }
+
+    /**
+     * @internal
+     *
+     * @param bool|int|float|string|array $values
+     */
+    private function getValues($values): array
+    {
+        return is_array($values) ? $values : [$values];
     }
 
     /**
      * Adds a new record created from data.
+     *
+     * @throws InvalidArgumentException when $data is empty
      */
-    public function createRecord(array $data): Operation
+    public function createRecord(array $data): array
     {
-        return new Operation(Operation::CREATE, null, $data);
+        if (!$data) {
+            throw new InvalidArgumentException('Data cannot be empty');
+        }
+
+        return [self::CREATE, 0, $data];
     }
 
     /**
      * Updates an existing record of id $id with data.
-     * /!\ Can not be used in record insert query.
+     * /!\ Can not be used in record create operation.
+     *
+     * @throws InvalidArgumentException when $data is empty
      */
-    public function updateRecord(int $id, array $data): Operation
+    public function updateRecord(int $id, array $data): array
     {
-        return new Operation(Operation::UPDATE, $id, $data);
+        if (!$data) {
+            throw new InvalidArgumentException('Data cannot be empty');
+        }
+
+        return [self::UPDATE, $id, $data];
     }
 
     /**
      * Adds an existing record of id $id to the collection.
      */
-    public function addRecord(int $id): Operation
+    public function addRecord(int $id): array
     {
-        return new Operation(Operation::ADD, $id);
+        return [self::ADD, $id, 0];
     }
 
     /**
      * Removes the record of id $id from the collection, but does not delete it.
-     * /!\ Can not be used in record insert query.
+     * /!\ Can not be used in record create operation.
      */
-    public function removeRecord(int $id): Operation
+    public function removeRecord(int $id): array
     {
-        return new Operation(Operation::REMOVE, $id);
+        return [self::REMOVE, $id, 0];
     }
 
     /**
      * Removes the record of id $id from the collection, then deletes it from the database.
-     * /!\ Can not be used in record insert query.
+     * /!\ Can not be used in record create operation.
      */
-    public function deleteRecord(int $id): Operation
+    public function deleteRecord(int $id): array
     {
-        return new Operation(Operation::DELETE, $id);
+        return [self::DELETE, $id, 0];
     }
 
     /**
      * Replaces all existing records in the collection by the $ids list,
      * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
      */
-    public function replaceRecords(array $ids = []): Operation
+    public function replaceRecords(array $ids = []): array
     {
-        return new Operation(Operation::REPLACE, null, $ids);
+        return [self::REPLACE, 0, $ids];
     }
 
     /**
      * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
-     * /!\ Can not be used in record insert query.
+     * /!\ Can not be used in record create operation.
      */
-    public function clearRecords(): Operation
+    public function clearRecords(): array
     {
-        return new Operation(Operation::CLEAR);
+        return [self::CLEAR, 0, 0];
     }
 
     /**
      * @param DomainInterface|array|null $criteria
      *
-     * @throws InvalidArgumentException when $criteria is not valid
+     * @throws InvalidArgumentException when $criteria value is not valid
      */
-    public function criteriaParams($criteria = null): array
+    public function normalizeDomains($criteria = null): array
     {
-        if (!$criteria) {
-            return [];
-        }
-
         if ($criteria instanceof DomainInterface) {
-            if ($criteria instanceof CompositeDomain) {
-                $criteria = $criteria->normalize();
-            }
-
-            if ($criteria instanceof CompositeDomain || $criteria instanceof CustomDomain) {
-                return [$criteria->toArray()];
-            }
-
-            return [[$criteria->toArray()]];
+            return $criteria instanceof CompositeDomain ? [$criteria->toArray()] : [[$criteria->toArray()]];
         }
 
-        $criteria = array_values((array) $criteria);
-        $andX = $this->andX();
-
-        foreach ($criteria as $key => $domain) {
-            if (!($domain instanceof DomainInterface)) {
-                if (!is_array($domain)) {
-                    $invalidType = is_object($domain) ? get_class($domain) : gettype($domain);
-                    throw new InvalidArgumentException(sprintf('Expected criteria of type %s|array, %s given', DomainInterface::class, $invalidType));
-                }
-
-                $domain = new CustomDomain($domain);
-            }
-
-            $andX->add($domain);
+        if (!is_array($criteria)) {
+            throw new InvalidArgumentException(sprintf('Expected $criteria value of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
-        return $this->criteriaParams($andX);
-    }
-
-    /**
-     * @throws InvalidArgumentException when data is empty
-     */
-    public function dataParams(array $data): array
-    {
-        if (!$data) {
-            throw new InvalidArgumentException('Data parameters cannot be empty');
-        }
-
-        foreach ($data as $key => $value) {
-            if ($value instanceof OperationInterface) {
-                $data[$key] = $value->getCommand();
+        foreach ($criteria as $key => $value) {
+            if ($value instanceof DomainInterface) {
+                $criteria[$key] = $value->toArray();
                 continue;
             }
 
             if (is_array($value)) {
-                $data[$key] = $this->dataParams($value);
+                $criteria[$key] = $this->normalizeDomains($value);
             }
         }
 
-        return $data;
+        return $criteria;
     }
 }
