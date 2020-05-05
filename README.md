@@ -22,7 +22,8 @@ Requirements
 - The extension ```php-xml``` must be enabled.
 - As mentioned in the documentation of the package [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc/blob/master/INSTALL.md#requirements):
     - The extension ```php-curl``` is needed if you wish to use SSL or HTTP 1.1 to communicate with remote servers.
-    - The native extension ```php-xmlrpc``` is not required, but if it is installed, there will be no interference with the operation of this library.
+    - The native extension ```php-xmlrpc``` is not required, but if it is installed, 
+    there will be no interference with the operation of this library.
 
 | Odoo server | Compatibility | Comment |
 | --- | --- | --- |
@@ -219,12 +220,11 @@ The method returns ```void```.
 Expression builder
 ====================
 
-There are two kinds of expressions : ```domains``` for criteria and ```collection operations``` in data writing.
-Odoo has its own array format for those expressions. The aim of the expression builder is to provide some 
+There are two kinds of expressions : ```domains``` for criteria 
+and ```collection operations``` in data writing.
+Odoo has its own array format for those expressions. 
+The aim of the expression builder is to provide some 
 helper methods to simplify a programmer's life.
-
-Each builder method creates an instance of ```Ang3\Component\Odoo\Expression\ExpressionInterface```. 
-The only one method of this interface is ```toArray()``` in order to get a normalized array of the expression.
 
 Get the expression builder
 --------------------------
@@ -253,6 +253,9 @@ with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT`
 
 It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
 for you. :)
+
+Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```. 
+The only one method of this interface is ```toArray()``` in order to get a normalized array of the expression.
 
 To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
 
@@ -284,8 +287,8 @@ $result = $client->findBy('model_name', $expr->andX(
 ), $options = []);
 ```
 
-The client formats automatically the whole query parameters for all search methods by calling 
-the special builder method ```criteriaParams()``` internally.
+The client formats automatically all domains by calling the special builder 
+method ```normalizeDomains()``` internally.
 
 Here is a complete list of helper methods available in ```ExpressionBuilder``` for domain expressions:
 
@@ -390,9 +393,8 @@ Collection operations
 In data writing context, Odoo allows you to manage ***toMany** collection fields with special commands. 
 Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) to known what we are talking about.
 
-The expression builder provides helper methods to build a *operation expression*. 
-Each method creates an instance of ```Ang3\Component\Odoo\Expression\OperationInterface``` that extends 
-```Ang3\Component\Odoo\Expression\ExpressionInterface```.
+The expression builder provides helper methods to build a well-formed *operation command*: 
+each operation method returns the operation as array.
 
 To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
 
@@ -418,7 +420,8 @@ $result = $client->create('model_name', $data);
 ```
 
 The client formats automatically the whole query parameters for all writing methods 
-(```create``` and ```update```) by calling the special builder method ```dataParams()``` internally.
+(```create``` and ```update```) by calling the special builder 
+method ```normalizeData()``` internally.
 
 Here is a complete list of helper methods available in ```ExpressionBuilder``` for operation expressions:
 
