@@ -28,7 +28,7 @@
         "roave/security-advisories": "dev-master",
         "ang3/php-dev-binaries": "^1.0",
         "symfony/var-dumper": ">=3.2.0",
-        "phpunit/phpunit": ">=6",
+        "phpunit/phpunit": ">=6.0",
         "symfony/property-info": ">=3.2.0",
         "symfony/inflector": ">=3.2.0"
     }
