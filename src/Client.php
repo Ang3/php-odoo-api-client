@@ -227,6 +227,14 @@ class Client
     }
 
     /**
+     * Check if a record exists.
+     */
+    public function exists(string $modelName, int $id): bool
+    {
+        return 1 === $this->count($modelName, $this->expressionBuilder->normalizeDomains($this->expressionBuilder->eq('id', $id)));
+    }
+
+    /**
      * Count number of records for a model and criteria.
      *
      * @param DomainInterface|array|null $criteria

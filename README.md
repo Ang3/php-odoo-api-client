@@ -194,6 +194,14 @@ $records = $client->findBy('model_name', $criteria = null, $options = []);
 
 The method returns an array of records of type ```array<array>```.
 
+**Check if a record exists by ID**
+
+```php
+$id = 1; // Must be an integer
+
+$recordExists = $client->exists('model_name', $id);
+```
+
 **Count records by criteria**
 
 ```php
@@ -469,6 +477,10 @@ public function clearRecords(): Operation;
 
 Upgrades
 ========
+
+### v5.0.4
+
+- Added method ```Client::exists()```.
 
 ### From 4.* to 5.*
 
