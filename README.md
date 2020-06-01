@@ -478,6 +478,10 @@ public function clearRecords(): Operation;
 Upgrades
 ========
 
+### v5.0.5
+
+- Fixed method ```Client::create()```.
+
 ### v5.0.4
 
 - Added method ```Client::exists()```.
