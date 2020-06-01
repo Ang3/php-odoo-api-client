@@ -122,7 +122,7 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        return (int) $this->call($modelName, self::CREATE, $data);
+        return (int) $this->call($modelName, self::CREATE, [$data]);
     }
 
     /**
