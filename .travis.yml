@@ -12,4 +12,7 @@ before_install:
   - composer self-update
   - composer install
 
-install: php -d memory_limit=-1 $(phpenv which composer) install --no-suggest --prefer-dist
+install:
+  - if [[ $TRAVIS_PHP_VERSION < '7.3' ]]; then wget -O ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit https://phar.phpunit.de/phpunit-5.0.phar; fi
+  - if [[ $TRAVIS_PHP_VERSION < '7.3' ]]; then chmod 755 ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit; fi
+  - php -d memory_limit=-1 $(phpenv which composer) install --no-suggest --prefer-dist
