@@ -4,6 +4,7 @@ namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
+use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Expression\DomainInterface;
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
@@ -186,8 +187,6 @@ class Client
      * Find ONE record by ID and options.
      *
      * @throws RequestException when request failed
-     *
-     * @return array
      */
     public function find(string $modelName, int $id, array $options = []): ?array
     {
@@ -201,8 +200,6 @@ class Client
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
-     *
-     * @return array
      */
     public function findOneBy(string $modelName, $criteria = null, array $options = []): ?array
     {
@@ -262,15 +259,25 @@ class Client
      */
     public function call(string $name, string $method, array $parameters = [], array $options = [])
     {
-        return $this->objectEndpoint->call('execute_kw', [
-            $this->database,
-            $this->authenticate(),
-            $this->password,
-            $name,
-            $method,
-            $parameters,
-            $this->encoder->encode($options, 'struct'),
-        ]);
+        try {
+            return $this->objectEndpoint->call('execute_kw', [
+                $this->database,
+                $this->authenticate(),
+                $this->password,
+                $name,
+                $method,
+                $parameters,
+                $this->encoder->encode($options, 'struct'),
+            ]);
+        } catch (RemoteException $e) {
+            // Odoo raises an exception if the remote method does not return values.
+            // This part allows to return null when it happens
+            if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
+                return null;
+            }
+
+            throw $e;
+        }
     }
 
     public function version(): array
