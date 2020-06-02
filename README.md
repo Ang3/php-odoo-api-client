@@ -481,6 +481,8 @@ Upgrades
 ### v5.0.6
 
 - Catched remote type exception when the method returns no value.
+- Fixed composer dev dependencies
+- Updated travis configuration
 - Updated ```README.md```
 
 ### v5.0.5
