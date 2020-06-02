@@ -6,7 +6,7 @@ php:
   - 7.4
 
 before_script:
-  - curl -sSfL -o ~/.phpenv/versions/hhvm/bin/phpunit https://phar.phpunit.de/phpunit-6.5.phar
+  - curl -sSfL -o ~/.phpenv/versions/hhvm/bin/phpunit https://phar.phpunit.de/phpunit-7.0.phar
 
 before_install:
   - composer self-update
