@@ -478,6 +478,11 @@ public function clearRecords(): Operation;
 Upgrades
 ========
 
+### v5.0.6
+
+- Catched remote type exception when the method returns no value.
+- Updated ```README.md```
+
 ### v5.0.5
 
 - Fixed method ```Client::create()```.
