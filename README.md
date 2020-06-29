@@ -16,6 +16,12 @@ If you are in Symfony application, I suggest you to install the bundle
 [ang3/odoo-api-bundle](https://github.com/Ang3/odoo-api-bundle). 
 It provides a registry you can configure easily and deploys clients as services.
 
+**Coming:**
+
+- Database layer: repository classes for dedicated models (version **6.0**). 
+- An ORM has been developed to manipulate records as mapped objects (need tests) - 
+Another package will be deployed and this client will be used as driver.
+
 Requirements
 ============
 
@@ -437,49 +443,54 @@ Here is a complete list of helper methods available in ```ExpressionBuilder``` f
 /**
  * Adds a new record created from data.
  */
-public function createRecord(array $data): Operation;
+public function createRecord(array $data): array;
 
 /**
  * Updates an existing record of id $id with data.
  * /!\ Can not be used in record insert query.
  */
-public function updateRecord(int $id, array $data): Operation;
+public function updateRecord(int $id, array $data): array;
 
 /**
  * Adds an existing record of id $id to the collection.
  */
-public function addRecord(int $id): Operation;
+public function addRecord(int $id): array;
 
 /**
  * Removes the record of id $id from the collection, but does not delete it.
  * /!\ Can not be used in record insert query.
  */
-public function removeRecord(int $id): Operation;
+public function removeRecord(int $id): array;
 
 /**
  * Removes the record of id $id from the collection, then deletes it from the database.
  * /!\ Can not be used in record insert query.
  */
-public function deleteRecord(int $id): Operation;
+public function deleteRecord(int $id): array;
 
 /**
  * Replaces all existing records in the collection by the $ids list,
  * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
  */
-public function replaceRecords(array $ids = []): Operation;
+public function replaceRecords(array $ids = []): array;
 
 /**
  * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
  * /!\ Can not be used in record insert query.
  */
-public function clearRecords(): Operation;
+public function clearRecords(): array;
 ```
 
 Upgrades
 ========
 
-### v5.0.7
+### v6.0 (dev)
 
+- Todo: repository class to manage dedicated model.
+
+### v5.1.0 (last stable)
+
+- Added method ```findAll```.
 - Fixed empty array result issue.
 
 ### v5.0.6
