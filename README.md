@@ -481,8 +481,8 @@ public function replaceRecords(array $ids = []): array;
 public function clearRecords(): array;
 ```
 
-Upgrades
-========
+Upgrades & updates
+==================
 
 ### v6.0 (dev)
 
