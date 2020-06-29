@@ -260,7 +260,7 @@ class Client
     public function call(string $name, string $method, array $parameters = [], array $options = [])
     {
         try {
-            return $this->objectEndpoint->call('execute_kw', [
+            $result = $this->objectEndpoint->call('execute_kw', [
                 $this->database,
                 $this->authenticate(),
                 $this->password,
@@ -269,9 +269,30 @@ class Client
                 $parameters,
                 $this->encoder->encode($options, 'struct'),
             ]);
+
+            /*
+             * Added in v5.0.7
+             * The XML RPC client returns weird empty arrays, so we fix it now!
+             *
+             * We could do:
+             * if($result === [0=>null]) {
+             *     return [];
+             * }
+             *
+             * But we know that Odoo never returns (and forbids) a value of type NULL...
+             * I think it's better to filter all NULL values to be sure to avoid all kind of weird possible results,
+             * like below:
+             */
+            if (is_array($result)) {
+                $result = array_filter($result, function ($value) {
+                    return null !== $value;
+                });
+            }
+
+            return $result;
         } catch (RemoteException $e) {
-            // Odoo raises an exception if the remote method does not return values.
-            // This part allows to return null when it happens
+            // Odoo raises an exception if the remote method does not return values (NULL).
+            // This part allows to return null when it happens by ignoring the exception.
             if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
                 return null;
             }

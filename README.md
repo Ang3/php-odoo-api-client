@@ -478,6 +478,10 @@ public function clearRecords(): Operation;
 Upgrades
 ========
 
+### v5.0.7
+
+- Fixed empty array result issue.
+
 ### v5.0.6
 
 - Catched remote type exception when the method returns no value.
