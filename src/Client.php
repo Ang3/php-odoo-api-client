@@ -209,6 +209,18 @@ class Client
     }
 
     /**
+     * Find all record(s) with options.
+     *
+     * @throws RequestException when request failed
+     *
+     * @return array<int, array>
+     */
+    public function findAll(string $modelName, array $options = []): array
+    {
+        return (array) $this->call($modelName, self::FIND, null, $options);
+    }
+
+    /**
      * Find record(s) by criteria and options.
      *
      * @param DomainInterface|array|null $criteria
