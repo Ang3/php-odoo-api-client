@@ -44,14 +44,9 @@ class Endpoint
      *
      * @return mixed
      */
-    public function call(string $method, array $args = [])
+    public function call(string $method, array $args = [], array $loggerContext = [])
     {
-        $context = [
-            'request_id' => uniqid('xmlrpc-request-', true),
-            'endpoint' => $this->client->path,
-            'method' => $method,
-            'input_data' => $args,
-        ];
+        $loggerContext['endpoint'] = $this->client->path;
 
         foreach ($args as $key => $arg) {
             $args[$key] = $this->encoder->encode($arg);
@@ -60,7 +55,7 @@ class Endpoint
         $context['encoded_data'] = $args;
 
         if ($this->logger) {
-            $this->logger->info('XML-RPC request with method "{method}"', $context);
+            $this->logger->debug('XML-RPC request with method "{method}"', $loggerContext);
         }
 
         try {
@@ -79,18 +74,14 @@ class Endpoint
             throw RemoteException::createFromXmlResult($faultCode, $response->faultString() ?: 'Unknown error');
         }
 
-        $context = [
-            'request_id' => $context['request_id'],
-        ];
-
         if ($this->logger) {
-            $this->logger->info('XML-RPC response received', $context);
+            $this->logger->debug('XML-RPC response received', $loggerContext);
         }
 
         $data = $this->encoder->decode($response->val);
 
         if ($this->logger) {
-            $this->logger->info('XML-RPC response decoded', array_merge($context, [
+            $this->logger->debug('XML-RPC response decoded', array_merge($loggerContext, [
                 'data_type' => gettype($data),
             ]));
         }
@@ -102,7 +93,7 @@ class Endpoint
             ];
 
             if ($this->logger) {
-                $this->logger->info('XML-RPC response error: {message} - Code {code}', array_merge($context, $error));
+                $this->logger->debug('XML-RPC response error: {message} - Code {code}', array_merge($loggerContext, $error));
             }
 
             throw RemoteException::createFromXmlResult($error['code'], $error['message']);

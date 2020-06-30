@@ -217,7 +217,7 @@ class Client
      */
     public function findAll(string $modelName, array $options = []): array
     {
-        return (array) $this->call($modelName, self::FIND, null, $options);
+        return $this->findBy($modelName, null, $options);
     }
 
     /**
@@ -271,6 +271,18 @@ class Client
      */
     public function call(string $name, string $method, array $parameters = [], array $options = [])
     {
+        $loggerContext = [
+            'request_id' => uniqid('xmlrpc-request-', true),
+            'name' => $name,
+            'method' => $method,
+            'parameters' => $parameters,
+            'options' => $options,
+        ];
+
+        if ($this->logger) {
+            $this->logger->info('Calling method {method} from {model}', $loggerContext);
+        }
+
         try {
             $result = $this->objectEndpoint->call('execute_kw', [
                 $this->database,
@@ -280,7 +292,7 @@ class Client
                 $method,
                 $parameters,
                 $this->encoder->encode($options, 'struct'),
-            ]);
+            ], $loggerContext);
 
             /*
              * Added in v5.0.7
@@ -300,17 +312,22 @@ class Client
                     return null !== $value;
                 });
             }
-
-            return $result;
         } catch (RemoteException $e) {
             // Odoo raises an exception if the remote method does not return values (NULL).
             // This part allows to return null when it happens by ignoring the exception.
             if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
-                return null;
+                $result = null;
+            } else {
+                throw $e;
             }
-
-            throw $e;
         }
+
+        if ($this->logger) {
+            $loggerContext['result'] = is_scalar($result) ? $result : json_encode($result);
+            $this->logger->info('Request result: {result}', $loggerContext);
+        }
+
+        return $result;
     }
 
     public function version(): array
