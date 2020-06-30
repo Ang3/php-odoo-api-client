@@ -488,7 +488,11 @@ Upgrades & updates
 
 - Todo: repository class to manage dedicated model.
 
-### v5.1.1 (last stable)
+### v5.1.2 (last stable)
+
+- Fixed logging messages.
+
+### v5.1.1
 
 - Fixed method ```findAll```.
 - Updated endpoint logging level to ```debug``` and added client logging with level ```info```

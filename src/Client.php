@@ -280,7 +280,7 @@ class Client
         ];
 
         if ($this->logger) {
-            $this->logger->info('Calling method {method} from {model}', $loggerContext);
+            $this->logger->info('Calling method {name}::{method}', $loggerContext);
         }
 
         try {
