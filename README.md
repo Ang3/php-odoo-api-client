@@ -491,10 +491,15 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.0 (last stable)
+### v6.0.1 (last stable)
+
+- Removed dependency of package [ang3/php-dev-binaries](https://packagist.org/packages/ang3/php-dev-binaries).
+
+### v6.0.0
 
 - Added methods ```searchOne``` and ```searchAll```.
 - Back to package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord).
+- Removed XML-RPC client.
 - Removed remote exception.
 - Removed trace back feature.
 
