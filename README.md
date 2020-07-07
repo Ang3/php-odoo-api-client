@@ -26,7 +26,7 @@ Of course if you are in Symfony application you should be interested in the bund
 Requirements
 ============
 
-- The extension ```php-xmlrpc``` must be enabled.
+- The PHP extension ```php-xmlrpc``` must be enabled.
 
 | Odoo server | Compatibility | Comment |
 | --- | --- | --- |
