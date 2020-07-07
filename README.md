@@ -18,9 +18,10 @@ It provides a registry you can configure easily and deploys clients as services.
 
 **Coming:**
 
-- Database layer: repository classes for dedicated models (version **6.0**). 
-- An ORM has been developed to manipulate records as mapped objects (need tests) - 
-Another package will be deployed and this client will be used as driver.
+The ORM (Object relational mapper) is in development: 
+[ang3/php-odoo-orm](https://github.com/Ang3/php-odoo-orm) (need tests). 
+Of course if you are in Symfony application you should be interested in the bundle: 
+[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (ORM integration).
 
 Requirements
 ============
@@ -490,16 +491,14 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.0 (dev)
+### v6.0 (last stable)
 
-- Back to package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord)
+- Added methods ```searchOne``` and ```searchAll```.
+- Back to package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord).
+- Removed remote exception.
+- Removed trace back feature.
 
-### v5.1.3 (dev-master)
-
-- Added dependency to the package ```psr/log```.
-- Preparing deletion of package ```symfony/serializer```
-
-### v5.1.2 (last stable)
+### v5.1.2
 
 - Fixed logging messages.
 
