@@ -274,6 +274,8 @@ class Client
 
     /**
      * Check if a record exists.
+     *
+     * @throws RequestException when request failed
      */
     public function exists(string $modelName, int $id): bool
     {
@@ -295,6 +297,8 @@ class Client
 
     /**
      * List model fields.
+     *
+     * @throws RequestException when request failed
      */
     public function listFields(string $modelName, array $options = []): array
     {
