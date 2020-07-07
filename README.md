@@ -488,6 +488,12 @@ Upgrades & updates
 
 - Todo: repository class to manage dedicated model.
 
+### v5.1.3 (dev-master)
+
+- Added dependency to the package ```psr/log```.
+- Preparing deletion of package ```symfony/serializer```
+- Todo: fix the XPC client - Back to ripcord? parsing XML?
+
 ### v5.1.2 (last stable)
 
 - Fixed logging messages.
