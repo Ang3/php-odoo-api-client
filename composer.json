@@ -18,12 +18,12 @@
         }
     },
     "require": {
-        "php": ">=7.2",
+        "php": "^7.2",
         "ext-curl": "*",
         "ext-json": "*",
+        "ext-xmlrpc": "*",
         "psr/log": "~1.0",
-        "phpxmlrpc/phpxmlrpc": "^4.0",
-        "symfony/serializer": ">=3.2.0"
+        "darkaonline/ripcord": "^0.1.7"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

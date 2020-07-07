@@ -8,7 +8,8 @@ Odoo API client using
 
 **Main features**
 
-- XML-RPC client
+- Authentication
+- ORM methods
 - Remote exception with parsed trace back.
 - Expression builder **added in v5.0**
 
@@ -25,11 +26,7 @@ Another package will be deployed and this client will be used as driver.
 Requirements
 ============
 
-- The extension ```php-xml``` must be enabled.
-- As mentioned in the documentation of the package [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc/blob/master/INSTALL.md#requirements):
-    - The extension ```php-curl``` is needed if you wish to use SSL or HTTP 1.1 to communicate with remote servers.
-    - The native extension ```php-xmlrpc``` is not required, but if it is installed, 
-    there will be no interference with the operation of this library.
+- The extension ```php-xmlrpc``` must be enabled.
 
 | Odoo server | Compatibility | Comment |
 | --- | --- | --- |
@@ -79,16 +76,21 @@ require_once 'vendor/autoload.php';
 
 use Ang3\Component\Odoo\Client;
 
-$client = new Client([
+// Option 1: by calling the constructor...
+$client = new Client('<host>', '<database>', '<username>', '<password>', $logger = null);
+
+// Option 2 : by calling the static method ::createFromConfig() with configuration as array
+$client = Client::createFromConfig([
     'host' => '<host>',
     'database' => '<database>',
     'user' => '<user>',
     'password' => '<password>',
- ]);
+], $logger = null);
 ```
 
 Exceptions:
-- ```Ang3\Component\Odoo\Exception\MissingConfigParameterException``` when a required parameter is missing.
+- ```Ang3\Component\Odoo\Exception\MissingConfigParameterException``` when a required parameter is missing 
+from the static method ```createFromConfig()```.
 
 Then, make your call:
 
@@ -109,7 +111,8 @@ Built-in ORM methods
 Write records
 -------------
 
-For all these methods, the parameter ```$data``` can contains *collection field operations*. 
+For all these methods, the parameter ```$data``` can contains *collection field operations*.
+
 Please see the section [Expression builder](#expression-builder) to manage *collection fields* easily.
 
 **Create a record**
@@ -141,13 +144,15 @@ The method returns ```void```.
 Search records
 --------------
 
+For all these methods, the parameter ```$criteria``` must be an array. I suggest you to create tour criteria 
+with the [Expression builder](#expression-builder).
+
 **Read records**
 
 Get a list of records by ID.
 
 ```php
 $ids = [1,2,3]; // Can be a value of type int|array<int>
-
 $records = $client->read('model_name', $ids);
 ```
 
@@ -157,7 +162,6 @@ The method returns an array of records of type ```array<array>```.
 
 ```php
 $id = 1; // Must be an integer
-
 $record = $client->find('model_name', $id, $options = []);
 ```
 
@@ -170,18 +174,6 @@ an array or a *domain expression*.
 
 Please see the section [Expression builder](#expression-builder) to build *domain expressions*.
 
-**Search record(s)**
-
-Get a list of ID for matched record(s).
-
-```php
-$criteria = [[['id', '=', 18]]];
-
-$recordIds = $client->search('model_name', $criteria = null, $options = []);
-```
-
-The method returns a list of ID of type ```array<int>```.
-
 **Find ONE record by criteria and options**
 
 ```php
@@ -193,26 +185,43 @@ The method returns the record as ```array```, or ```NULL``` is the record was no
 **Find records by criteria and options**
 
 ```php
-$criteria = [[['foo', '=', 'bar']]];
-
 $records = $client->findBy('model_name', $criteria = null, $options = []);
 ```
 
 The method returns an array of records of type ```array<array>```.
 
+**Search ONE record ID by criteria and options**
+
+```php
+$recordIds = $client->searchOne('model_name', $criteria = null, $options = []);
+```
+
+**Search all record IDs by options**
+
+```php
+$recordIds = $client->searchAll('model_name', $options = []);
+```
+
+**Search record(s)**
+
+Get a list of ID for matched record(s).
+
+```php
+$recordIds = $client->search('model_name', $criteria = null, $options = []);
+```
+
+The method returns a list of ID of type ```array<int>```.
+
 **Check if a record exists by ID**
 
 ```php
 $id = 1; // Must be an integer
-
 $recordExists = $client->exists('model_name', $id);
 ```
 
 **Count records by criteria**
 
 ```php
-$criteria = [[['foo', '=', 'bar']]];
-
 $nbRecords = $client->count('model_name', $criteria = null);
 ```
 
@@ -225,7 +234,6 @@ You can delete many records at one time.
 
 ```php
 $ids = [1,2,3]; // Can be a value of type int|array<int>
-
 $client->delete('model_name', $ids);
 ```
 
@@ -486,13 +494,12 @@ Upgrades & updates
 
 ### v6.0 (dev)
 
-- Todo: repository class to manage dedicated model.
+- Back to package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord)
 
 ### v5.1.3 (dev-master)
 
 - Added dependency to the package ```psr/log```.
 - Preparing deletion of package ```symfony/serializer```
-- Todo: fix the XPC client - Back to ripcord? parsing XML?
 
 ### v5.1.2 (last stable)
 
