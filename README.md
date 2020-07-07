@@ -50,6 +50,12 @@ This command requires you to have Composer installed globally, as explained
 in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
+**Deprecation notices**
+
+In version ```0.1.7``` of the package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord), 
+some composer deprecations notices can appear at the end of the installation. 
+A pull request was posted to fix it: [pull #20](https://github.com/DarkaOnLine/Ripcord/pull/20).
+
 Summary
 =======
 
