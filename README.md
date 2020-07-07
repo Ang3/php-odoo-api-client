@@ -494,7 +494,7 @@ Upgrades & updates
 ### v6.0 (last stable)
 
 - Added methods ```searchOne``` and ```searchAll```.
-- Back to package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord).
+- Back to package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord).
 - Removed remote exception.
 - Removed trace back feature.
 
@@ -534,7 +534,7 @@ What you have to do:
 - Replace usages of the method ```searchAndRead``` by the method ```findBy```.
 
 Logs:
-- Replaced package [darkaonline/ripcord](https://github.com/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc).
+- Replaced package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc).
 - Created XML-RPC client.
 - Deleted static method ```Client::createFromConfig(array $config)```.
 - Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```.
