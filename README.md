@@ -10,7 +10,6 @@ Odoo API client using
 
 - Authentication
 - ORM methods
-- Remote exception with parsed trace back.
 - Expression builder **added in v5.0**
 
 If you are in Symfony application, I suggest you to install the bundle 
@@ -100,8 +99,7 @@ $result = $client->call($name, $method, $parameters = [], $options = []);
 
 Exceptions:
 - ```Ang3\Component\Odoo\Exception\AuthenticationException``` when authentication failed.
-- ```Ang3\Component\Odoo\Exception\RemoteException``` when request failed.
-- ```Ang3\Component\Odoo\Exception\RequestException``` on other request error.
+- ```Ang3\Component\Odoo\Exception\RequestException``` when request failed.
 
 These previous exception can be thrown by all methods of the client.
 

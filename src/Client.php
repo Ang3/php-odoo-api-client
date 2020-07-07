@@ -4,7 +4,6 @@ namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
-use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Expression\DomainInterface;
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
@@ -117,8 +116,6 @@ class Client
 
     /**
      * Create a new record.
-     *
-     * @param array $data
      *
      * @throws InvalidArgumentException when $data is empty
      * @throws RequestException         when request failed
@@ -305,7 +302,7 @@ class Client
     }
 
     /**
-     * @throws RemoteException when request failed
+     * @throws RequestException when request failed
      *
      * @return mixed
      */
@@ -330,7 +327,7 @@ class Client
             $name,
             $method,
             $parameters,
-            $options
+            $options,
         ]);
 
         if ($this->logger) {

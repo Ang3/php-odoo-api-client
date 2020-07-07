@@ -2,7 +2,7 @@
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\Exception\RemoteException;
+use Ang3\Component\Odoo\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Ripcord\Client\Client as XmlRpcClient;
 use Ripcord\Exceptions\RemoteException as XmlRpcRemoteException;
@@ -34,7 +34,7 @@ class Endpoint
     }
 
     /**
-     * @throws RemoteException when request failed
+     * @throws RequestException when request failed
      *
      * @return mixed
      */
@@ -53,11 +53,15 @@ class Endpoint
 
         try {
             $result = $this->client->__call($method, $args);
-        } catch (XmlRpcRemoteException $e) {
-            if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
-                $result = null;
+        } catch (\Throwable $e) {
+            if ($e instanceof XmlRpcRemoteException) {
+                if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
+                    $result = null;
+                } else {
+                    throw new RequestException($e->getMessage(), $e->getCode());
+                }
             } else {
-                throw new RemoteException($e->getMessage(), $e->getCode());
+                throw new RequestException('An error occurred during the request', 0, $e);
             }
         }
 
