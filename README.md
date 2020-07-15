@@ -491,7 +491,11 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.1.0 (last stable)
+### v6.1.1 (last stable)
+
+- Fixed log duplications.
+
+### v6.1.0
 
 - Replaced package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord) by 
 [ang3/php-xmlrpc-client](https://packagist.org/packages/ang3/php-xmlrpc-client).
