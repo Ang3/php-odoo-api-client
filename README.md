@@ -50,12 +50,6 @@ This command requires you to have Composer installed globally, as explained
 in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
-**Deprecation notices**
-
-In version ```0.1.7``` of the package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord), 
-some composer deprecations notices can appear at the end of the installation. 
-A pull request was posted to fix it: [pull #20](https://github.com/DarkaOnLine/Ripcord/pull/20).
-
 Summary
 =======
 
@@ -497,7 +491,12 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.0.1 (last stable)
+### v6.1.0 (last stable)
+
+- Replaced package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord) by 
+[ang3/php-xmlrpc-client](https://packagist.org/packages/ang3/php-xmlrpc-client).
+
+### v6.0.1
 
 - Removed dependency of package [ang3/php-dev-binaries](https://packagist.org/packages/ang3/php-dev-binaries).
 
