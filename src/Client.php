@@ -335,8 +335,10 @@ class Client
         ]);
 
         if ($this->logger) {
-            $loggerContext['result'] = is_scalar($result) ? $result : json_encode($result);
-            $this->logger->info('Request result: {result}', $loggerContext);
+            $result = is_scalar($result) ? $result : json_encode($result);
+            $this->logger->info(sprintf('Request result: %s', $result), [
+                'request_id' => $loggerContext['request_id'],
+            ]);
         }
 
         return $result;
@@ -464,7 +466,7 @@ class Client
      */
     private function initEndpoints(): void
     {
-        $this->commonEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_COMMON, $this->logger);
-        $this->objectEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_OBJECT, $this->logger);
+        $this->commonEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_COMMON);
+        $this->objectEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_OBJECT);
     }
 }
