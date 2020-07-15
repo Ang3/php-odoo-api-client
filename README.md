@@ -493,7 +493,7 @@ Upgrades & updates
 
 ### v6.1.1 (last stable)
 
-- Fixed log duplications.
+- Fixed logging.
 - Deleted useless files and updated ```.gitignore```
 
 ### v6.1.0
