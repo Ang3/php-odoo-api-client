@@ -495,6 +495,7 @@ Upgrades & updates
 
 - Replaced package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord) by 
 [ang3/php-xmlrpc-client](https://packagist.org/packages/ang3/php-xmlrpc-client).
+- Implemented interface ```Ang3\Component\Odoo\Exception\ExceptionInterface``` for all client exceptions.
 
 ### v6.0.1
 

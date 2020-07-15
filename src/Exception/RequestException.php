@@ -2,8 +2,10 @@
 
 namespace Ang3\Component\Odoo\Exception;
 
-use Ang3\Component\XmlRpc\Exception\RequestException as BaseRequestException;
-
-class RequestException extends BaseRequestException
+class RequestException extends \RuntimeException implements ExceptionInterface
 {
+    public function __construct(string $message, int $code = 0, \Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

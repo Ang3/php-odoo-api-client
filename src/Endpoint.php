@@ -5,7 +5,6 @@ namespace Ang3\Component\Odoo;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\XmlRpc\Client as XmlRpcClient;
 use Ang3\Component\XmlRpc\Exception\RemoteException as XmlRpcRemoteException;
-use Ang3\Component\XmlRpc\Exception\RequestException as XmlRpcRequestException;
 use Psr\Log\LoggerInterface;
 
 class Endpoint
@@ -52,14 +51,12 @@ class Endpoint
 
         try {
             $result = $this->client->call($method, $args);
-        } catch (XmlRpcRemoteException $e) {
-            if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
+        } catch (\Throwable $e) {
+            if ($e instanceof XmlRpcRemoteException && preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
                 $result = null;
             } else {
-                throw $e;
+                throw new RequestException('XML-RPC request failed', 0, $e);
             }
-        } catch (XmlRpcRequestException $e) {
-            throw new RequestException('XML-RPC request failed', 0, $e);
         }
 
         if ($this->logger) {

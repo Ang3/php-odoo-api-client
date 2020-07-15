@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae145d80c7fc55506cf7bdce8ba2142f",
+    "content-hash": "27e76d4014905c3fb0127253ccc23407",
     "packages": [
         {
             "name": "ang3/php-xmlrpc-client",
-            "version": "v1.0.0",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Ang3/php-xmlrpc-client.git",
-                "reference": "a9bbd6b60719244214fa5588bb8bd49c5abb281b"
+                "reference": "c3b7db917e2b26d3bb1dc49dd4a1521f79ad40e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Ang3/php-xmlrpc-client/zipball/a9bbd6b60719244214fa5588bb8bd49c5abb281b",
-                "reference": "a9bbd6b60719244214fa5588bb8bd49c5abb281b",
+                "url": "https://api.github.com/repos/Ang3/php-xmlrpc-client/zipball/c3b7db917e2b26d3bb1dc49dd4a1521f79ad40e5",
+                "reference": "c3b7db917e2b26d3bb1dc49dd4a1521f79ad40e5",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "xml",
                 "xmlrpc"
             ],
-            "time": "2020-07-15T18:10:11+00:00"
+            "time": "2020-07-15T19:52:03+00:00"
         },
         {
             "name": "psr/log",
