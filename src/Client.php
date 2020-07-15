@@ -240,7 +240,7 @@ class Client
      */
     public function findOneBy(string $modelName, $criteria = null, array $options = []): ?array
     {
-        $result = (array) $this->findBy($modelName, $criteria, $options);
+        $result = $this->findBy($modelName, $criteria, $options);
 
         return array_pop($result);
     }
@@ -335,8 +335,8 @@ class Client
         ]);
 
         if ($this->logger) {
-            $result = is_scalar($result) ? $result : json_encode($result);
-            $this->logger->info(sprintf('Request result: %s', $result), [
+            $loggedResult = is_scalar($result) ? $result : json_encode($result);
+            $this->logger->debug(sprintf('Request result: %s', $loggedResult), [
                 'request_id' => $loggerContext['request_id'],
             ]);
         }
