@@ -2,11 +2,10 @@
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\Exception\RequestException;
+use Ang3\Component\XmlRpc\Client as XmlRpcClient;
+use Ang3\Component\XmlRpc\Exception\RemoteException as XmlRpcRemoteException;
+use Ang3\Component\XmlRpc\Exception\RequestException;
 use Psr\Log\LoggerInterface;
-use Ripcord\Client\Client as XmlRpcClient;
-use Ripcord\Exceptions\RemoteException as XmlRpcRemoteException;
-use Ripcord\Ripcord;
 
 class Endpoint
 {
@@ -28,8 +27,7 @@ class Endpoint
     public function __construct(string $url, LoggerInterface $logger = null)
     {
         $this->url = $url;
-        $this->client = Ripcord::client($url);
-        $this->client->_throwExceptions = true;
+        $this->client = new XmlRpcClient($url);
         $this->logger = $logger;
     }
 
@@ -52,22 +50,20 @@ class Endpoint
         }
 
         try {
-            $result = $this->client->__call($method, $args);
-        } catch (\Throwable $e) {
-            if ($e instanceof XmlRpcRemoteException) {
-                if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
-                    $result = null;
-                } else {
-                    throw new RequestException($e->getMessage(), $e->getCode());
-                }
+            $result = $this->client->call($method, $args);
+        } catch (XmlRpcRemoteException $e) {
+            if (preg_match('#cannot marshal None unless allow_none is enabled#', $e->getMessage())) {
+                $result = null;
             } else {
-                throw new RequestException('An error occurred during the request', 0, $e);
+                throw $e;
             }
         }
 
         if ($this->logger) {
-            $loggerContext['result'] = is_scalar($result) ? $result : json_encode($result);
-            $this->logger->info('Request result: {result}', $loggerContext);
+            $this->logger->info('Request result: {result}', [
+                'request_id' => $loggerContext['request_id'],
+                is_scalar($result) ? $result : json_encode($result),
+            ]);
         }
 
         return $result;

@@ -4,9 +4,9 @@ namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
-use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Expression\DomainInterface;
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
+use Ang3\Component\XmlRpc\Exception\RequestException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 

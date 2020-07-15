@@ -19,16 +19,14 @@
     },
     "require": {
         "php": "^7.2",
-        "ext-curl": "*",
         "ext-json": "*",
-        "ext-xmlrpc": "*",
         "psr/log": "~1.0",
-        "darkaonline/ripcord": "^0.1.7"
+        "ang3/php-xmlrpc-client": "^1.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
         "symfony/var-dumper": ">=3.2.0",
-        "phpunit/phpunit": "^7.0",
+        "phpunit/phpunit": ">= 6.5",
         "symfony/property-info": ">=3.2.0",
         "symfony/inflector": ">=3.2.0"
     }

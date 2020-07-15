@@ -2,12 +2,12 @@
 
 namespace Ang3\Component\Odoo\Exception;
 
+use Ang3\Component\XmlRpc\Exception\RequestException;
+
 class AuthenticationException extends RequestException
 {
-    public const DEFAULT_MESSAGE = 'Bad credentials';
-
-    public function __construct(string $message = null, int $code = 0, \Throwable $previous = null)
+    public function __construct(\Throwable $previous = null)
     {
-        parent::__construct($message ?: self::DEFAULT_MESSAGE, $code, $previous);
+        parent::__construct('Bad credentials', 0, $previous);
     }
 }

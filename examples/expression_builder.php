@@ -12,7 +12,7 @@ use Ang3\Component\Odoo\Expression\ExpressionBuilder;
 
 $expr = new ExpressionBuilder();
 
-$operation = $expr->andX(
+$domain = $expr->andX(
 	$expr->orX(
 		$expr->eq('A', 1),
 		$expr->eq('B', 1)
@@ -24,8 +24,7 @@ $operation = $expr->andX(
 	)
 );
 
-dump($operation);
-dump($operation->toArray());
-dump($operation->__toString());
+dump($domain);
+dump($domain->toArray());
 
 // Expected: [ '&', '|', (A), (B), '|', (C), '|', (D), (E) ]
