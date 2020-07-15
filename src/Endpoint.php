@@ -2,9 +2,10 @@
 
 namespace Ang3\Component\Odoo;
 
+use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\XmlRpc\Client as XmlRpcClient;
 use Ang3\Component\XmlRpc\Exception\RemoteException as XmlRpcRemoteException;
-use Ang3\Component\XmlRpc\Exception\RequestException;
+use Ang3\Component\XmlRpc\Exception\RequestException as XmlRpcRequestException;
 use Psr\Log\LoggerInterface;
 
 class Endpoint
@@ -57,6 +58,8 @@ class Endpoint
             } else {
                 throw $e;
             }
+        } catch (XmlRpcRequestException $e) {
+            throw new RequestException('XML-RPC request failed', 0, $e);
         }
 
         if ($this->logger) {
