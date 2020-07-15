@@ -491,7 +491,11 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.1.1 (last stable)
+### v6.1.2 (last stable)
+
+- Deleted useless files and updated ```.gitignore```
+
+### v6.1.1
 
 - Fixed log duplications.
 
