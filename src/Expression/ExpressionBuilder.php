@@ -254,6 +254,10 @@ class ExpressionBuilder
      */
     public function normalizeDomains($criteria = null): array
     {
+        if(!$criteria) {
+            return [];
+        }
+
         if ($criteria instanceof DomainInterface) {
             return $criteria instanceof CompositeDomain ? [$criteria->toArray()] : [[$criteria->toArray()]];
         }

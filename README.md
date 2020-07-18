@@ -491,7 +491,12 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.1.1 (last stable)
+### v6.1.2 (last stable)
+
+- Fixed methods ```search*()```
+- Fixed methods when argument ```$criteria``` can be NULL
+
+### v6.1.1
 
 - Fixed logging.
 - Deleted useless files and updated ```.gitignore```

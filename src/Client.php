@@ -179,7 +179,7 @@ class Client
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function searchOne(string $modelName, $criteria = null): ?int
+    public function searchOne(string $modelName, $criteria): ?int
     {
         $options['limit'] = 1;
 
@@ -198,7 +198,9 @@ class Client
      */
     public function searchAll(string $modelName, array $options = []): array
     {
-        return $this->search($modelName, null, $options);
+        return array_column($this->findBy($modelName, null, array_merge($options, [
+            'fields' => ['id']
+        ])), 'id');
     }
 
     /**
@@ -211,7 +213,7 @@ class Client
      *
      * @return array<int>
      */
-    public function search(string $modelName, $criteria = null, array $options = []): array
+    public function search(string $modelName, $criteria, array $options = []): array
     {
         if (array_key_exists('fields', $options)) {
             unset($options['fields']);
