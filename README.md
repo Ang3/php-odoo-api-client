@@ -493,8 +493,8 @@ Upgrades & updates
 
 ### v6.1.2 (last stable)
 
-- Fixed methods ```search*()```
 - Fixed methods when argument ```$criteria``` can be NULL
+    - Fixed methods ```search*()```
 
 ### v6.1.1
 
