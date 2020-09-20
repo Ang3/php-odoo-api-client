@@ -81,9 +81,9 @@ $client = new Client('<host>', '<database>', '<username>', '<password>', $logger
 
 // Option 2 : by calling the static method ::createFromConfig() with configuration as array
 $client = Client::createFromConfig([
-    'host' => '<host>',
+    'url' => '<host>',
     'database' => '<database>',
-    'user' => '<user>',
+    'username' => '<user>',
     'password' => '<password>',
 ], $logger = null);
 ```
