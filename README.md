@@ -12,16 +12,10 @@ Odoo API client using
 - ORM methods
 - Expression builder **added in v5.0**
 
-If you are in Symfony application, I suggest you to install the bundle 
-[ang3/odoo-api-bundle](https://github.com/Ang3/odoo-api-bundle). 
-It provides a registry you can configure easily and deploys clients as services.
-
-**Coming:**
-
 The ORM (Object relational mapper) is in development: 
 [ang3/php-odoo-orm](https://github.com/Ang3/php-odoo-orm) (need tests). 
-Of course if you are in Symfony application you should be interested in the bundle: 
-[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (ORM integration).
+Of course if you are in Symfony application you should be interested in the bundle 
+[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (ORM integration - need tests).
 
 Requirements
 ============
@@ -58,7 +52,7 @@ Summary
     - [Write records](#write-records) - Create and update records
     - [Search records](#search-records) - Search and read records
     - [Delete records](#delete-records)
-- [Expression builder](##expression-builder) - Oodo array expressions
+- [Expression builder](#expression-builder) - Odoo array expressions
     - [Get the expression builder](#get-the-expression-builder) - Create or get a builder
     - [Domains](#domains) - Build Odoo domain expressions
     - [Collection operations](#collection-operations) - Build Odoo collection field operations
@@ -110,7 +104,7 @@ Built-in ORM methods
 Write records
 -------------
 
-For all these methods, the parameter ```$data``` can contains *collection field operations*.
+For all these methods, the parameter ```$data``` can contain *collection field operations*.
 
 Please see the section [Expression builder](#expression-builder) to manage *collection fields* easily.
 
@@ -121,7 +115,7 @@ $data = [
     'field_name' => 'value'
 ];
 
-$recordId = $client->create('model_name', $data);
+$recordId = $client->create('model_name', $data); // int
 ```
 
 The method returns the ID of the created record.
@@ -143,9 +137,6 @@ The method returns ```void```.
 Search records
 --------------
 
-For all these methods, the parameter ```$criteria``` must be an array. I suggest you to create tour criteria 
-with the [Expression builder](#expression-builder).
-
 **Read records**
 
 Get a list of records by ID.
@@ -164,7 +155,7 @@ $id = 1; // Must be an integer
 $record = $client->find('model_name', $id, $options = []);
 ```
 
-The method returns the record as ```array```, or ```NULL``` is the record was not found.
+The method returns the record as ```array```, or ```NULL``` if the record was not found.
 
 ---
 
@@ -179,7 +170,7 @@ Please see the section [Expression builder](#expression-builder) to build *domai
 $record = $client->findOneBy('model_name', $criteria = null, $options = []);
 ```
 
-The method returns the record as ```array```, or ```NULL``` is the record was not found.
+The method returns the record as ```array```, or ```NULL``` if the record was not found.
 
 **Find records by criteria and options**
 
@@ -192,14 +183,18 @@ The method returns an array of records of type ```array<array>```.
 **Search ONE record ID by criteria and options**
 
 ```php
-$recordIds = $client->searchOne('model_name', $criteria = null, $options = []);
+$recordId = $client->searchOne('model_name', $criteria = null, $options = []);
 ```
+
+The method returns a list of ID of type ```int|null```.
 
 **Search all record IDs by options**
 
 ```php
 $recordIds = $client->searchAll('model_name', $options = []);
 ```
+
+The method returns a list of ID of type ```array<int>```.
 
 **Search record(s)**
 
@@ -215,8 +210,10 @@ The method returns a list of ID of type ```array<int>```.
 
 ```php
 $id = 1; // Must be an integer
-$recordExists = $client->exists('model_name', $id);
+$recordExists = $client->exists('model_name', $id); // bool
 ```
+
+The method returns a value of type ```bool```.
 
 **Count records by criteria**
 
@@ -224,7 +221,7 @@ $recordExists = $client->exists('model_name', $id);
 $nbRecords = $client->count('model_name', $criteria = null);
 ```
 
-The method returns an ```integer```.
+The method returns a value of type ```int```.
 
 Delete records
 --------------
@@ -242,22 +239,22 @@ Expression builder
 ====================
 
 There are two kinds of expressions : ```domains``` for criteria 
-and ```collection operations``` in data writing.
+and ```collection operations``` in data writing context.
 Odoo has its own array format for those expressions. 
 The aim of the expression builder is to provide some 
-helper methods to simplify a programmer's life.
+helper methods to simplify your programmer's life.
 
 Get the expression builder
 --------------------------
 
-Here is an example of how to build a ```ExpressionBuilder``` object from a ```Client``` instance:
+Here is an example of how to build an object of type ```ExpressionBuilder``` from a client:
 
 ```php
 $expr = $client->getExpressionBuilder();
 // Or $expr = $client->expr();
 ```
 
-You can still use the expression builder as standalone by creating an instance yourself.
+You can still use the expression builder as standalone by creating a new instance:
 
 ```php
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
@@ -273,10 +270,10 @@ Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.
 with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
 
 It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
-for you. :)
+for you. :-)
 
 Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```. 
-The only one method of this interface is ```toArray()``` in order to get a normalized array of the expression.
+The only one method of this interface is ```toArray()``` to get a normalized array of the expression.
 
 To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
 
@@ -308,8 +305,8 @@ $result = $client->findBy('model_name', $expr->andX(
 ), $options = []);
 ```
 
-The client formats automatically all domains by calling the special builder 
-method ```normalizeDomains()``` internally.
+Internally, the client formats automatically all domains by calling the special builder 
+method ```normalizeDomains()```.
 
 Here is a complete list of helper methods available in ```ExpressionBuilder``` for domain expressions:
 
@@ -412,10 +409,11 @@ Collection operations
 ---------------------
 
 In data writing context, Odoo allows you to manage ***toMany** collection fields with special commands. 
-Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) to known what we are talking about.
+Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) 
+to known what we are talking about.
 
 The expression builder provides helper methods to build a well-formed *operation command*: 
-each operation method returns the operation as array.
+each operation method returns the operation as an array.
 
 To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
 
@@ -425,7 +423,7 @@ To illustrate how to work with operations, here is an example using ```Expressio
 // Get the expression builder
 $expr = $client->expr();
 
-// Prepare new record data
+// Prepare data for a new record
 $data = [
     'foo' => 'bar',
     'bar_ids' => [ // Field of type "manytoMany"
@@ -440,9 +438,9 @@ $data = [
 $result = $client->create('model_name', $data);
 ```
 
-The client formats automatically the whole query parameters for all writing methods 
+Internally, the client formats automatically the whole query parameters for all writing methods 
 (```create``` and ```update```) by calling the special builder 
-method ```normalizeData()``` internally.
+method ```normalizeData()```.
 
 Here is a complete list of helper methods available in ```ExpressionBuilder``` for operation expressions:
 
