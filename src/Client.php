@@ -140,7 +140,9 @@ class Client
      */
     public function read(string $modelName, $ids, array $options = []): array
     {
-        return (array) $this->call($modelName, self::READ, (array) $ids, $options);
+        $ids = [is_int($ids) ? [$ids] : (array) $ids];
+
+        return (array) $this->call($modelName, self::READ, $ids, $options);
     }
 
     /**
