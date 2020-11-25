@@ -489,7 +489,11 @@ public function clearRecords(): array;
 Upgrades & updates
 ==================
 
-### v6.1.2 (last stable)
+### v6.1.3 (last stable)
+
+- [Issue 6](https://github.com/Ang3/php-odoo-api-client/issues/6) - Fixed methods ```read()``` for integers or arrays.
+
+### v6.1.2
 
 - Fixed methods when argument ```$criteria``` can be NULL
     - Fixed methods ```search*()```
