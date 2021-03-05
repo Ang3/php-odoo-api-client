@@ -2,12 +2,11 @@
 
 namespace Ang3\Component\Odoo;
 
+use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
+use Ang3\Component\Odoo\DBAL\RecordManager;
+use Ang3\Component\Odoo\DBAL\Repository\RecordNotFoundException;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
-use Ang3\Component\Odoo\Expression\DomainInterface;
-use Ang3\Component\Odoo\Expression\ExpressionBuilder;
-use Ang3\Component\XmlRpc\Exception\RequestException;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 class Client
@@ -19,53 +18,62 @@ class Client
     public const ENDPOINT_OBJECT = 'xmlrpc/2/object';
 
     /**
-     * ORM methods.
+     * Special commands.
      */
-    const CREATE = 'create';
-    const READ = 'read';
-    const UPDATE = 'write';
-    const DELETE = 'unlink';
-    const FIND = 'search_read';
-    const SEARCH = 'search';
-    const COUNT = 'search_count';
     const LIST_FIELDS = 'fields_get';
 
     /**
+     * URL of the database.
+     *
      * @var string
      */
     private $url;
 
     /**
+     * Name of the database.
+     *
      * @var string
      */
     private $database;
 
     /**
+     * Username of internal user.
+     *
      * @var string
      */
     private $username;
 
     /**
+     * Password of internal user.
+     *
      * @var string
      */
     private $password;
 
     /**
+     * COMMON endpoint.
+     *
      * @var Endpoint
      */
     private $commonEndpoint;
 
     /**
+     * OBJECT endpoint.
+     *
      * @var Endpoint
      */
     private $objectEndpoint;
 
     /**
-     * @var ExpressionBuilder
+     * ORM record manager.
+     *
+     * @var RecordManager
      */
-    private $expressionBuilder;
+    private $recordManager;
 
     /**
+     * Optional logger.
+     *
      * @var LoggerInterface|null
      */
     private $logger;
@@ -81,7 +89,7 @@ class Client
         $this->database = $database;
         $this->username = $username;
         $this->password = $password;
-        $this->expressionBuilder = new ExpressionBuilder();
+        $this->recordManager = new RecordManager($this);
         $this->logger = $logger;
         $this->initEndpoints();
     }
@@ -117,192 +125,215 @@ class Client
     /**
      * Create a new record.
      *
-     * @throws InvalidArgumentException when $data is empty
-     * @throws RequestException         when request failed
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @return int the ID of the new record
      */
     public function create(string $modelName, array $data): int
     {
-        if (!$data) {
-            throw new InvalidArgumentException('Data cannot be empty');
-        }
-
-        return (int) $this->call($modelName, self::CREATE, [$data]);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->insert($data);
     }
 
     /**
      * Read records.
      *
-     * @param array|int $ids
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws RequestException when request failed
+     * @throws RecordNotFoundException when the record was not found
+     *
+     * @param array|int $ids
      */
     public function read(string $modelName, $ids, array $options = []): array
     {
-        $ids = [is_int($ids) ? [$ids] : (array) $ids];
-
-        return (array) $this->call($modelName, self::READ, $ids, $options);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->read($ids, $options['fields'] ?? []);
     }
 
     /**
      * Update a record(s).
      *
-     * @param array|int $ids
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws RequestException when request failed
+     * @param array|int $ids
      */
     public function update(string $modelName, $ids, array $data = []): void
     {
-        if (!$data) {
-            return;
-        }
-
-        $this->call($modelName, self::UPDATE, [(array) $ids, $data]);
+        $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->update($ids, $data);
     }
 
     /**
      * Delete record(s).
      *
-     * @param array|int $ids
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws RequestException when request failed
+     * @param array|int $ids
      */
     public function delete(string $modelName, $ids): void
     {
-        $this->call($modelName, self::DELETE, [(array) $ids]);
+        $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->delete($ids);
     }
 
     /**
      * Search one ID of record by criteria and options.
      *
-     * @param DomainInterface|array|null $criteria
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException         when request failed
+     * @param DomainInterface|array|null $criteria
      */
     public function searchOne(string $modelName, $criteria): ?int
     {
-        $options['limit'] = 1;
-
-        $result = $this->search($modelName, $this->expressionBuilder->normalizeDomains($criteria), $options);
-
-        return array_shift($result);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->searchOne($criteria);
     }
 
     /**
      * Search all ID of record(s) with options.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException         when request failed
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @return array<int>
      */
     public function searchAll(string $modelName, array $options = []): array
     {
-        return array_column($this->findBy($modelName, null, array_merge($options, [
-            'fields' => ['id']
-        ])), 'id');
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->searchAll($options['limit'] ?? null, $options['offset'] ?? null);
     }
 
     /**
      * Find ID of record(s) by criteria and options.
      *
-     * @param DomainInterface|array|null $criteria
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException         when request failed
+     * @param DomainInterface|array|null $criteria
      *
      * @return array<int>
      */
     public function search(string $modelName, $criteria, array $options = []): array
     {
-        if (array_key_exists('fields', $options)) {
-            unset($options['fields']);
-        }
-
-        return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->normalizeDomains($criteria), $options);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->search($criteria, $options['orders'] ?? null, $options['limit'] ?? null, $options['offset'] ?? null);
     }
 
     /**
      * Find ONE record by ID and options.
      *
-     * @throws RequestException when request failed
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      */
     public function find(string $modelName, int $id, array $options = []): ?array
     {
-        return $this->findOneBy($modelName, $this->expr()->eq('id', $id), $options);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->find($id, $options['fields'] ?? []);
     }
 
     /**
      * Find ONE record by criteria and options.
      *
-     * @param DomainInterface|array|null $criteria
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException         when request failed
+     * @param DomainInterface|array|null $criteria
      */
     public function findOneBy(string $modelName, $criteria = null, array $options = []): ?array
     {
-        $result = $this->findBy($modelName, $criteria, $options);
-
-        return array_pop($result);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->findOneBy($criteria, $options['fields'] ?? [], $options['orders'] ?? null, $options['offset'] ?? null);
     }
 
     /**
      * Find all record(s) with options.
      *
-     * @throws RequestException when request failed
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @return array<int, array>
      */
     public function findAll(string $modelName, array $options = []): array
     {
-        return $this->findBy($modelName, null, $options);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->findAll($options['fields'] ?? [], $options['orders'] ?? null, $options['limit'] ?? null, $options['offset'] ?? null);
     }
 
     /**
      * Find record(s) by criteria and options.
      *
-     * @param DomainInterface|array|null $criteria
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException         when request failed
+     * @param DomainInterface|array|null $criteria
      *
      * @return array<int, array>
      */
     public function findBy(string $modelName, $criteria = null, array $options = []): array
     {
-        return (array) $this->call($modelName, self::FIND, $this->expressionBuilder->normalizeDomains($criteria), $options);
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->findBy($criteria, $options['fields'] ?? [], $options['orders'] ?? null, $options['limit'] ?? null, $options['offset'] ?? null);
     }
 
     /**
      * Check if a record exists.
      *
-     * @throws RequestException when request failed
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      */
     public function exists(string $modelName, int $id): bool
     {
-        return 1 === $this->count($modelName, $this->expressionBuilder->normalizeDomains($this->expressionBuilder->eq('id', $id)));
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->exists($id);
     }
 
     /**
      * Count number of records for a model and criteria.
      *
-     * @param DomainInterface|array|null $criteria
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException         when request failed
+     * @param DomainInterface|array|null $criteria
      */
     public function count(string $modelName, $criteria = null): int
     {
-        return (int) $this->call($modelName, self::COUNT, $this->expressionBuilder->normalizeDomains($criteria));
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->count($criteria);
+    }
+
+    /**
+     * Count all records for a model.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
+     */
+    public function countAll(string $modelName): int
+    {
+        return $this
+            ->getRecordManager()
+            ->getRepository($modelName)
+            ->countAll();
     }
 
     /**
      * List model fields.
-     *
-     * @throws RequestException when request failed
      */
     public function listFields(string $modelName, array $options = []): array
     {
@@ -310,8 +341,6 @@ class Client
     }
 
     /**
-     * @throws RequestException when request failed
-     *
      * @return mixed
      */
     public function call(string $name, string $method, array $parameters = [], array $options = [])
@@ -325,7 +354,7 @@ class Client
         ];
 
         if ($this->logger) {
-            $this->logger->info('Calling method {name}::{method}', $loggerContext);
+            $this->logger->debug('Calling method {name}::{method}', $loggerContext);
         }
 
         $result = $this->objectEndpoint->call('execute_kw', [
@@ -355,7 +384,6 @@ class Client
 
     /**
      * @throws AuthenticationException when authentication failed
-     * @throws RequestException        when endpoint request failed
      */
     public function authenticate(): int
     {
@@ -381,11 +409,6 @@ class Client
         $user = preg_replace('([^a-zA-Z0-9_])', '_', $this->username);
 
         return sprintf('%s.%s.%s', sha1($this->url), $database, $user);
-    }
-
-    public function expr(): ExpressionBuilder
-    {
-        return $this->expressionBuilder;
     }
 
     public function getUrl(): string
@@ -447,9 +470,9 @@ class Client
         return $this->objectEndpoint;
     }
 
-    public function getExpressionBuilder(): ExpressionBuilder
+    public function getRecordManager(): RecordManager
     {
-        return $this->expressionBuilder;
+        return $this->recordManager;
     }
 
     public function getLogger(): ?LoggerInterface
@@ -460,7 +483,6 @@ class Client
     public function setLogger(?LoggerInterface $logger): self
     {
         $this->logger = $logger;
-        $this->initEndpoints();
 
         return $this;
     }
