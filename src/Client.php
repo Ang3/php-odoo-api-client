@@ -181,7 +181,7 @@ class Client
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function searchOne(string $modelName, $criteria): ?int
+    public function searchOne(string $modelName, $criteria = null, $options = []): ?int
     {
         $options['limit'] = 1;
 
@@ -215,7 +215,7 @@ class Client
      *
      * @return array<int>
      */
-    public function search(string $modelName, $criteria, array $options = []): array
+    public function search(string $modelName, $criteria = null, array $options = []): array
     {
         if (array_key_exists('fields', $options)) {
             unset($options['fields']);

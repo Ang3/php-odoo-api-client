@@ -172,6 +172,14 @@ $record = $client->findOneBy('model_name', $criteria = null, $options = []);
 
 The method returns the record as ```array```, or ```NULL``` if the record was not found.
 
+**Find All records with options**
+
+```php
+$record = $client->findAll('model_name', $options = []);
+```
+
+The method returns the record as ```array```, or ```NULL``` if the record was not found.
+
 **Find records by criteria and options**
 
 ```php
