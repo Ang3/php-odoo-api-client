@@ -828,10 +828,6 @@ Data support
 - Non-iterable values are automatically casted to string
   (so any non-supported objects must define the method ```__toString()```)
 
-That's it!
-
-___
-
 Resources
 =========
 
