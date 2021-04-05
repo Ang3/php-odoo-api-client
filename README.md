@@ -25,11 +25,8 @@ you call your odoo instance and manage records easily.
 
 **Good to know**
 
-The ORM (Object relational mapper) is in development: 
-[ang3/php-odoo-orm](https://github.com/Ang3/php-odoo-orm) (need tests). 
-
 If you are in Symfony application you should be interested in the bundle 
-[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (client and ORM integration - need tests).
+[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (client integration).
 
 Requirements
 ============
