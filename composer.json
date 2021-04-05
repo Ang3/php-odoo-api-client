@@ -2,7 +2,7 @@
     "name": "ang3/php-odoo-api-client",
     "type": "component",
     "description": "Odoo API client",
-    "keywords": ["odoo", "api", "client", "domain", "operation", "builder", "12", "13"],
+    "keywords": ["odoo", "api", "client", "domain", "operation", "dbal", "query", "builder", "repository", "builder", "12", "13"],
     "license": "MIT",
     "authors": [
         {
@@ -21,7 +21,8 @@
         "php": "^7.2",
         "ext-json": "*",
         "psr/log": "~1.0",
-        "ang3/php-xmlrpc-client": "^1.0.2"
+        "ang3/php-xmlrpc-client": "^1.0.2",
+        "symfony/cache": "^5.2"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

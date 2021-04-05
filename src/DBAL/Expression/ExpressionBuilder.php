@@ -1,22 +1,14 @@
 <?php
 
-namespace Ang3\Component\Odoo\Expression;
+namespace Ang3\Component\Odoo\DBAL\Expression;
 
+use DateTime;
+use DateTimeInterface;
+use Exception;
 use InvalidArgumentException;
 
 class ExpressionBuilder
 {
-    /**
-     * Odoo operations key.
-     */
-    public const CREATE = 0;
-    public const UPDATE = 1;
-    public const DELETE = 2;
-    public const REMOVE = 3;
-    public const ADD = 4;
-    public const CLEAR = 5;
-    public const REPLACE = 6;
-
     /**
      * Create a logical operation "AND".
      */
@@ -179,13 +171,9 @@ class ExpressionBuilder
      *
      * @throws InvalidArgumentException when $data is empty
      */
-    public function createRecord(array $data): array
+    public function createRecord(array $data): CollectionOperation
     {
-        if (!$data) {
-            throw new InvalidArgumentException('Data cannot be empty');
-        }
-
-        return [self::CREATE, 0, $data];
+        return CollectionOperation::create($data);
     }
 
     /**
@@ -194,97 +182,149 @@ class ExpressionBuilder
      *
      * @throws InvalidArgumentException when $data is empty
      */
-    public function updateRecord(int $id, array $data): array
+    public function updateRecord(int $id, array $data): CollectionOperation
     {
         if (!$data) {
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        return [self::UPDATE, $id, $data];
+        return CollectionOperation::update($id, $data);
     }
 
     /**
      * Adds an existing record of id $id to the collection.
      */
-    public function addRecord(int $id): array
+    public function addRecord(int $id): CollectionOperation
     {
-        return [self::ADD, $id, 0];
+        return CollectionOperation::add($id);
     }
 
     /**
      * Removes the record of id $id from the collection, but does not delete it.
      * /!\ Can not be used in record create operation.
      */
-    public function removeRecord(int $id): array
+    public function removeRecord(int $id): CollectionOperation
     {
-        return [self::REMOVE, $id, 0];
+        return CollectionOperation::remove($id);
     }
 
     /**
      * Removes the record of id $id from the collection, then deletes it from the database.
      * /!\ Can not be used in record create operation.
      */
-    public function deleteRecord(int $id): array
+    public function deleteRecord(int $id): CollectionOperation
     {
-        return [self::DELETE, $id, 0];
+        return CollectionOperation::delete($id);
     }
 
     /**
      * Replaces all existing records in the collection by the $ids list,
      * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
      */
-    public function replaceRecords(array $ids = []): array
+    public function replaceRecords(array $ids = []): CollectionOperation
     {
-        return [self::REPLACE, 0, $ids];
+        return CollectionOperation::replace($ids);
     }
 
     /**
      * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
      * /!\ Can not be used in record create operation.
      */
-    public function clearRecords(): array
+    public function clearRecords(): CollectionOperation
     {
-        return [self::CLEAR, 0, 0];
+        return CollectionOperation::clear();
     }
 
     /**
      * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
+     * @throws ConversionException      on data conversion failure
      */
     public function normalizeDomains($criteria = null): array
     {
-        if(!$criteria) {
-            return [];
+        if (!$criteria) {
+            return [[]];
         }
 
         if ($criteria instanceof DomainInterface) {
-            return $criteria instanceof CompositeDomain ? [$criteria->toArray()] : [[$criteria->toArray()]];
+            $criteriaArray = $this->formatValue($criteria->toArray());
+
+            return $criteria instanceof CompositeDomain ? [$criteriaArray] : [[$criteriaArray]];
         }
 
         if (!is_array($criteria)) {
             throw new InvalidArgumentException(sprintf('Expected $criteria value of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
-        return $this->formatDomains($criteria);
+        return $this->formatValue($criteria);
     }
 
     /**
-     * @internal
+     * @throws ConversionException on data conversion failure
      */
-    private function formatDomains(array $data = []): array
+    public function normalizeData(array $data = []): array
     {
-        foreach ($data as $key => $value) {
-            if ($value instanceof DomainInterface) {
-                $data[$key] = $value->toArray();
-                continue;
+        return $this->formatValue($data);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @throws ConversionException on data conversion failure
+     *
+     * @return mixed
+     */
+    private function formatValue($value)
+    {
+        if (is_scalar($value)) {
+            return $value;
+        }
+
+        if (is_iterable($value)) {
+            $values = [];
+
+            foreach ($value as $key => $aValue) {
+                $values[] = $aValue;
             }
 
-            if (is_array($value)) {
-                $data[$key] = $this->formatDomains($value);
+            $value = $values;
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => $aValue) {
+                $value[$key] = $this->formatValue($aValue);
+            }
+
+            return $value;
+        }
+
+        if (is_object($value)) {
+            if ($value instanceof DomainInterface) {
+                return $this->formatValue($value->toArray());
+            }
+
+            if ($value instanceof CollectionOperation) {
+                return $this->formatValue($value->toArray());
+            }
+
+            if ($value instanceof DateTimeInterface) {
+                try {
+                    $date = new DateTime(sprintf('@%s', $value->getTimestamp()));
+                } catch (Exception $e) {
+                    throw new ConversionException(sprintf('Failed to convert date from timestamp "%d"', $value->getTimestamp()), 0, $e);
+                }
+
+                $date->setTimezone(new \DateTimeZone('UTC'));
+
+                return $date->format('Y-m-d H:i:s');
             }
         }
 
-        return $data;
+        try {
+            return (string) $value;
+        } catch (Exception $e) {
+            throw new ConversionException(sprintf('Failed to convert value of type "%s" to string.', gettype($value)), 0, $e);
+        }
     }
 }

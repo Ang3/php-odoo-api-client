@@ -1,21 +1,34 @@
 PHP Odoo API client
 ===================
 
-[![Build Status](https://travis-ci.org/Ang3/php-odoo-api-client.svg?branch=master)](https://travis-ci.org/Ang3/php-odoo-api-client) [![Latest Stable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/stable)](https://packagist.org/packages/ang3/php-odoo-api-client) [![Latest Unstable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/unstable)](https://packagist.org/packages/ang3/php-odoo-api-client) [![Total Downloads](https://poser.pugx.org/ang3/php-odoo-api-client/downloads)](https://packagist.org/packages/ang3/php-odoo-api-client)
+[![Build Status](https://travis-ci.org/Ang3/php-odoo-api-client.svg?branch=master)](https://travis-ci.org/Ang3/php-odoo-api-client) 
+[![Latest Stable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/stable)](https://packagist.org/packages/ang3/php-odoo-api-client) 
+[![Latest Unstable Version](https://poser.pugx.org/ang3/php-odoo-api-client/v/unstable)](https://packagist.org/packages/ang3/php-odoo-api-client) 
+[![Total Downloads](https://poser.pugx.org/ang3/php-odoo-api-client/downloads)](https://packagist.org/packages/ang3/php-odoo-api-client)
 
 Odoo API client using 
-[XML-RPC Odoo ORM External API](https://www.odoo.com/documentation/12.0/webservices/odoo.html).
+[XML-RPC Odoo ORM External API](https://www.odoo.com/documentation/12.0/webservices/odoo.html). It allows 
+you call your odoo instance and manage records easily.
+
+**You are reading the documentation of version ```7.0```, if your version is older, please read
+[this documentation (6.1.3)](https://github.com/Ang3/php-odoo-api-client/tree/v6.1.3).** 
+Please see the file [UPGRADE-7.0.md](https://github.com/Ang3/php-odoo-api-client/blob/7.0/UPGRADE-7.0.md) 
+to upgrade your version easily.
 
 **Main features**
 
-- Authentication
-- ORM methods
-- Expression builder **added in v5.0**
+- Authentication ```<7.0```
+- Basic XML-RPC calls ```<7.0```
+- Expression builder  ```<7.0```
+- Database Abstraction Layer (DBAL) ```>=7.0```
+  - Record manager 
+  - Repositories`
+  - Query builder
 
-The ORM (Object relational mapper) is in development: 
-[ang3/php-odoo-orm](https://github.com/Ang3/php-odoo-orm) (need tests). 
-Of course if you are in Symfony application you should be interested in the bundle 
-[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (ORM integration - need tests).
+**Good to know**
+
+If you are in Symfony application you should be interested in the bundle 
+[ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (client integration).
 
 Requirements
 ============
@@ -24,11 +37,10 @@ Requirements
 
 | Odoo server | Compatibility | Comment |
 | --- | --- | --- |
+| newer | Unknown | Needs feddback |
 | v13.0 | Yes | Some Odoo model names changed (e.g account.invoice > account.move) |
-| v12.0 | Yes | First tested version
-| v11.0 | Unknown |
-| v10.0 | Unknown |
-| < v10 | Unknown |
+| v12.0 | Yes | First tested version |
+| < v12 | Unknown | Needs feddback |
 
 Installation
 ============
@@ -44,22 +56,8 @@ This command requires you to have Composer installed globally, as explained
 in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
-Summary
-=======
-
-- [Usage](#usage)
-- [Built-in ORM methods](#built-in-orm-methods)
-    - [Write records](#write-records) - Create and update records
-    - [Search records](#search-records) - Search and read records
-    - [Delete records](#delete-records)
-- [Expression builder](#expression-builder) - Odoo array expressions
-    - [Get the expression builder](#get-the-expression-builder) - Create or get a builder
-    - [Domains](#domains) - Build Odoo domain expressions
-    - [Collection operations](#collection-operations) - Build Odoo collection field operations
-- [Upgrades](#upgrades) - Major changes
-
-Usage
-=====
+Basic usage
+===========
 
 First, you have to create a client instance:
 
@@ -98,174 +96,500 @@ Exceptions:
 
 These previous exception can be thrown by all methods of the client.
 
-Built-in ORM methods
-====================
+DBAL (Database Abstraction Layer)
+=================================
 
-Write records
+First of all, Odoo is a database. Each "model" is a table and has its own fields.
+
+> DBAL features was added in version ```7.0``` - If your version is older, please use the built-in 
+ORM methods of the client like explained in the 
+> [dedicated documentation](https://github.com/Ang3/php-odoo-api-client/tree/v6.1.3):
+be aware that these client ORM methods are deprecated since version ```7.0```.
+
+Record manager
+--------------
+
+The client provides a record manager to manage records of your Odoo models.
+
+You can get the related manager of the client like below:
+
+```php
+$recordManager = $client->getRecordManager();
+```
+
+You can also create your own with a client instance:
+
+```php
+use Ang3\Component\Odoo\DBAL\RecordManager;
+
+/** @var \Ang3\Component\Odoo\Client $myClient */
+$recordManager = new RecordManager($myClient);
+```
+
+### Built-in ORM methods
+
+Here is all built-in ORM methods provided by the record manager:
+
+```php
+use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
+
+/**
+ * Create a new record.
+ *
+ * @return int the ID of the new record
+ */public function create(string $modelName, array $data): int;
+
+/**
+ * Update record(s).
+ *
+ * NB: It is not currently possible to perform “computed” updates (by criteria).
+ * To do it, you have to perform a search then an update with search result IDs.
+ *
+ * @param array|int $ids
+ */
+public function update(string $modelName, $ids, array $data = []): void;
+
+/**
+ * Delete record(s).
+ *
+ * NB: It is not currently possible to perform “computed” deletes (by criteria).
+ * To do it, you have to perform a search then a delete with search result IDs.
+ *
+ * @param array|int $ids
+ */
+public function delete(string $modelName, $ids): void;
+
+/**
+ * Search one ID of record by criteria.
+ */
+public function searchOne(string $modelName, ?DomainInterface $criteria): ?int;
+
+/**
+ * Search all ID of record(s).
+ *
+ * @return int[]
+ */
+public function searchAll(string $modelName, array $orders = [], int $limit = null, int $offset = null): array;
+
+/**
+ * Search ID of record(s) by criteria.
+ *
+ * @return int[]
+ */
+public function search(string $modelName, ?DomainInterface $criteria = null, array $orders = [], int $limit = null, int $offset = null): array;
+
+/**
+ * Find ONE record by ID.
+ *
+ * @throws RecordNotFoundException when the record was not found
+ */
+public function read(string $modelName, int $id, array $fields = []): array;
+
+/**
+ * Find ONE record by ID.
+ */
+public function find(string $modelName, int $id, array $fields = []): ?array;
+
+/**
+ * Find ONE record by criteria.
+ */
+public function findOneBy(string $modelName, ?DomainInterface $criteria = null, array $fields = [], array $orders = [], int $offset = null): ?array;
+
+/**
+ * Find all records.
+ *
+ * @return array[]
+ */
+public function findAll(string $modelName, array $fields = [], array $orders = [], int $limit = null, int $offset = null): array;
+
+/**
+ * Find record(s) by criteria.
+ *
+ * @return array[]
+ */
+public function findBy(string $modelName, ?DomainInterface $criteria = null, array $fields = [], array $orders = [], int $limit = null, int $offset = null): array;
+
+/**
+ * Check if a record exists.
+ */
+public function exists(string $modelName, int $id): bool;
+
+/**
+ * Count number of all records for the model.
+ */
+public function countAll(string $modelName): int;
+
+/**
+ * Count number of records for a model and criteria.
+ */
+public function count(string $modelName, ?DomainInterface $criteria = null): int;
+```
+
+For ```$criteria``` in select/search queries and ```$data``` for data writing context, please read the section 
+[Expression builder](#expression-builder).
+
+Schema
+------
+
+You can get the schema of your Odoo database by calling the getter method
+```RecordManager::getSchema()```:
+
+```php
+/** @var \Ang3\Component\Odoo\DBAL\Schema\Schema $schema */
+$schema = $recordManager->getSchema();
+```
+
+The schema helps you to get all model names or get metadata of a model.
+
+### Get all model names
+
+```php
+/** @var string[] $modelNames */
+$modelNames = $schema->getModelNames();
+```
+
+### Get model metadata
+
+```php
+/** @var \Ang3\Component\Odoo\DBAL\Schema\Model $model */
+$model = $schema->getModel('res.company');
+```
+
+An exception of type ```Ang3\Component\Odoo\DBAL\Schema\SchemaException``` is thrown if the model
+does not exist.
+
+Query builder
 -------------
 
-For all these methods, the parameter ```$data``` can contain *collection field operations*.
+It helps you to create queries easily by chaining helpers methods (like Doctrine for SQL databases).
 
-Please see the section [Expression builder](#expression-builder) to manage *collection fields* easily.
-
-**Create a record**
+### Create a query builder
 
 ```php
-$data = [
-    'field_name' => 'value'
-];
-
-$recordId = $client->create('model_name', $data); // int
+/** @var string|null $modelName */
+$queryBuilder = $recordManager->createQueryBuilder($modelName);
 ```
 
-The method returns the ID of the created record.
+The variable ```$modelName``` represents the target model of your query (clause ```from```).
 
-**Update a record**
+### Build your query
+
+Here is a complete list of helper methods available in ```QueryBuilder```:
 
 ```php
-$ids = [1,2,3]; // Can be a value of type int|array<int>
+/**
+ * Defines the query of type "SELECT" with selected fields.
+ * No fields selected = all fields returned.
+ *
+ * @param array|string|null $fields
+ */
+public function select($fields = null): self;
 
-$data = [
-    'field_name' => 'value'
-];
+/**
+ * Defines the query of type "SEARCH".
+ */
+public function search(): self;
 
-$client->update('model_name', $ids, $data); // void
+/**
+ * Defines the query of type "INSERT".
+ */
+public function insert(): self;
+
+/**
+ * Defines the query of type "UPDATE" with ids of records to update.
+ *
+ * @param int[] $ids
+ */
+public function update(array $ids): self;
+
+/**
+ * Defines the query of type "DELETE" with ids of records to delete.
+ */
+public function delete(array $ids): self;
+
+/**
+ * Adds a field to select.
+ *
+ * @throws LogicException when the type of the query is not "SELECT".
+ */
+public function addSelect(string $fieldName): self;
+
+/**
+ * Gets selected fields.
+ */
+public function getSelect(): array;
+
+/**
+ * Sets the target model name.
+ */
+public function from(string $modelName): self;
+
+/**
+ * Gets the target model name of the query.
+ */
+public function getFrom(): ?string;
+
+/**
+ * Sets target IDs in case of query of type "UPDATE" or "DELETE".
+ *
+ * @throws LogicException when the type of the query is not "UPDATE" nor "DELETE".
+ */
+public function setIds(array $ids): self;
+
+/**
+ * Adds target ID in case of query of type "UPDATE" or "DELETE".
+ *
+ * @throws LogicException when the type of the query is not "UPDATE" nor "DELETE".
+ */
+public function addId(int $id): self;
+
+/**
+ * Sets field values in case of query of type "INSERT" or "UPDATE".
+ *
+ * @throws LogicException when the type of the query is not "INSERT" nor "UPDATE".
+ */
+public function setValues(array $values = []): self;
+
+/**
+ * Set a field value in case of query of type "INSERT" or "UPDATE".
+ *
+ * @param mixed $value
+ *
+ * @throws LogicException when the type of the query is not "INSERT" nor "UPDATE".
+ */
+public function set(string $fieldName, $value): self;
+
+/**
+ * Gets field values set in case of query of type "INSERT" or "UPDATE".
+ */
+public function getValues(): array;
+
+/**
+ * Sets criteria for queries of type "SELECT" and "SEARCH".
+ *
+ * @throws LogicException when the type of the query is not "SELECT" not "SEARCH".
+ */
+public function where(?DomainInterface $domain = null): self;
+
+/**
+ * Takes the WHERE clause and adds a node with logical operator AND.
+ *
+ * @throws LogicException when the type of the query is not "SELECT" nor "SEARCH".
+ */
+public function andWhere(DomainInterface $domain): self;
+
+/**
+ * Takes the WHERE clause and adds a node with logical operator OR.
+ *
+ * @throws LogicException when the type of the query is not "SELECT" nor "SEARCH".
+ */
+public function orWhere(DomainInterface $domain): self;
+
+/**
+ * Gets the WHERE clause.
+ */
+public function getWhere(): ?DomainInterface;
+
+/**
+ * Sets orders.
+ */
+public function setOrders(array $orders = []): self;
+
+/**
+ * Clears orders and adds one.
+ */
+public function orderBy(string $fieldName, bool $isAsc = true): self;
+
+/**
+ * Adds order.
+ *
+ * @throws LogicException when the query type is not valid.
+ */
+public function addOrderBy(string $fieldName, bool $isAsc = true): self;
+
+/**
+ * Gets ordered fields.
+ */
+public function getOrders(): array;
+
+/**
+ * Sets the max results of the query (limit).
+ */
+public function setMaxResults(?int $maxResults): self;
+
+/**
+ * Gets the max results of the query.
+ */
+public function getMaxResults(): ?int;
+
+/**
+ * Sets the first results of the query (offset).
+ */
+public function setFirstResult(?int $firstResult): self;
+
+/**
+ * Gets the first results of the query.
+ */
+public function getFirstResult(): ?int;
 ```
 
-The method returns ```void```.
-
-Search records
---------------
-
-**Read records**
-
-Get a list of records by ID.
+Then, build your query like below:
 
 ```php
-$ids = [1,2,3]; // Can be a value of type int|array<int>
-$records = $client->read('model_name', $ids);
+$query = $queryBuilder->getQuery();
 ```
 
-The method returns an array of records of type ```array<array>```.
+Your query is an instance of ```Ang3\Component\Odoo\Query\OrmQuery```.
 
-**Find a record by ID**
+### Execute your query
+
+You can get/count results or execute insert/update/delete by differents ways depending on the query type.
 
 ```php
-$id = 1; // Must be an integer
-$record = $client->find('model_name', $id, $options = []);
+/**
+ * Counts the number of records from parameters.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @throws QueryException on invalid query method.
+ */
+public function count(): int;
+
+/**
+ * Gets just ONE scalar result.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @return bool|int|float|string
+ *
+ * @throws NoUniqueResultException on no unique result
+ * @throws NoResultException       on no result
+ * @throws QueryException          on invalid query method.
+ */
+public function getSingleScalarResult();
+
+/**
+ * Gets one or NULL scalar result.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @return bool|int|float|string|null
+ *
+ * @throws NoUniqueResultException on no unique result
+ * @throws QueryException          on invalid query method.
+ */
+public function getOneOrNullScalarResult();
+
+/**
+ * Gets a list of scalar result.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @throws QueryException on invalid query method.
+ *
+ * @return array<bool|int|float|string>
+ */
+public function getScalarResult(): array;
+
+/**
+ * Gets one row.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @throws NoUniqueResultException on no unique result
+ * @throws NoResultException       on no result
+ * @throws QueryException          on invalid query method.
+ */
+public function getSingleResult(): array;
+
+/**
+ * Gets one or NULL row.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @throws NoUniqueResultException on no unique result
+ * @throws QueryException          on invalid query method.
+ */
+public function getOneOrNullResult(): ?array;
+
+/**
+ * Gets all result rows.
+ * Allowed methods: SEARCH, SEARCH_READ.
+ *
+ * @throws QueryException on invalid query method.
+ */
+public function getResult(): array;
+
+/**
+ * Execute the query.
+ * Allowed methods: all.
+ *
+ * @return mixed
+ */
+public function execute();
 ```
 
-The method returns the record as ```array```, or ```NULL``` if the record was not found.
+Repositories
+============
 
----
+Sometimes, you would want to keep your queries in memory to reuse it in your code. To do it, you should use 
+a repository. A repository is a class that helps you to isolate queries for a dedicated model.
 
-For each method below, the value of the parameter ```$criteria``` can be ```NULL```, 
-an array or a *domain expression*.
-
-Please see the section [Expression builder](#expression-builder) to build *domain expressions*.
-
-**Find ONE record by criteria and options**
+For example, let's create the repository for your companies and define a query to get all french companies:
 
 ```php
-$record = $client->findOneBy('model_name', $criteria = null, $options = []);
+namespace App\Odoo\Repository;
+
+use Ang3\Component\Odoo\DBAL\RecordManager;
+use Ang3\Component\Odoo\DBAL\Repository\RecordRepository;
+
+class CompanyRepository extends RecordRepository
+{
+    public function __construct(RecordManager $recordManager)
+    {
+        parent::__construct($recordManager, 'res.company');
+    }
+
+    public function findFrenchCompanies(): array
+    {
+        return $this
+            ->createQueryBuilder()
+            ->select('name')
+            ->where($this->expr()->eq('country_id.code', 'FR'))
+            ->getQuery()
+            ->getResult();
+    }
+}
 ```
 
-The method returns the record as ```array```, or ```NULL``` if the record was not found.
+Note that Odoo will always return the record ID in the result, even if you didn't select it explicitly.
 
-**Find All records with options**
+Each repository is registered inside the record manager on construct.
+That's why you can retrieve your repository directly from the record manager:
 
 ```php
-$record = $client->findAll('model_name', $options = []);
+/** @var \App\Odoo\Repository\CompanyRepository $companyRepository */
+$companyRepository = $recordManager->getRepository('res.company');
 ```
 
-The method returns the record as ```array```, or ```NULL``` if the record was not found.
-
-**Find records by criteria and options**
-
-```php
-$records = $client->findBy('model_name', $criteria = null, $options = []);
-```
-
-The method returns an array of records of type ```array<array>```.
-
-**Search ONE record ID by criteria and options**
-
-```php
-$recordId = $client->searchOne('model_name', $criteria = null, $options = []);
-```
-
-The method returns a list of ID of type ```int|null```.
-
-**Search all record IDs by options**
-
-```php
-$recordIds = $client->searchAll('model_name', $options = []);
-```
-
-The method returns a list of ID of type ```array<int>```.
-
-**Search record(s)**
-
-Get a list of ID for matched record(s).
-
-```php
-$recordIds = $client->search('model_name', $criteria = null, $options = []);
-```
-
-The method returns a list of ID of type ```array<int>```.
-
-**Check if a record exists by ID**
-
-```php
-$id = 1; // Must be an integer
-$recordExists = $client->exists('model_name', $id); // bool
-```
-
-The method returns a value of type ```bool```.
-
-**Count records by criteria**
-
-```php
-$nbRecords = $client->count('model_name', $criteria = null);
-```
-
-The method returns a value of type ```int```.
-
-Delete records
---------------
-
-You can delete many records at one time.
-
-```php
-$ids = [1,2,3]; // Can be a value of type int|array<int>
-$client->delete('model_name', $ids);
-```
-
-The method returns ```void```.
+If no repository exists for a model, the default repository ```Ang3\Component\Odoo\DBAL\Repository\RecordRepository``` 
+is used. Last but not least, all repositories are stored into the related record manager to avoid creating multiple 
+instances of same repository.
 
 Expression builder
-====================
+==================
 
-There are two kinds of expressions : ```domains``` for criteria 
+There are two kinds of expressions : ```domains``` for criteria
 and ```collection operations``` in data writing context.
-Odoo has its own array format for those expressions. 
-The aim of the expression builder is to provide some 
+Odoo has its own array format for those expressions.
+The aim of the expression builder is to provide some
 helper methods to simplify your programmer's life.
 
-Get the expression builder
---------------------------
-
-Here is an example of how to build an object of type ```ExpressionBuilder``` from a client:
+Here is an example of how to get a builder from a client or record manager:
 
 ```php
-$expr = $client->getExpressionBuilder();
-// Or $expr = $client->expr();
+$expr = $clientOrRecordManager->expr();
+// or $expr = $clientOrRecordManager->getExpressionBuilder();
 ```
 
 You can still use the expression builder as standalone by creating a new instance:
 
 ```php
-use Ang3\Component\Odoo\Expression\ExpressionBuilder;
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 
 $expr = new ExpressionBuilder();
 ```
@@ -273,34 +597,32 @@ $expr = new ExpressionBuilder();
 Domains
 -------
 
-For all **search** queries (```search```, ```findBy```, ```findOneBy``` and ```count```), 
-Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains) 
+For all **select/search/count** queries,
+Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains)
 with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
 
-It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
+It could be quickly ugly to do a complex domain, but don't worry the builder makes all
 for you. :-)
 
-Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```. 
+Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```.
 The only one method of this interface is ```toArray()``` to get a normalized array of the expression.
 
 To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
 
 ```php
-// $client instanceof Client
-
 // Get the expression builder
-$expr = $client->expr();
+$expr = $recordManager->expr();
 
-$result = $client->findBy('model_name', $expr->andX( // Logical node "AND"
+$result = $recordManager->findBy('model_name', $expr->andX( // Logical node "AND"
 	$expr->gte('id', 10), // id >= 10
 	$expr->lte('id', 100), // id <= 10
-), $options = []);
+));
 ```
 
 Of course, you can nest logical nodes:
 
 ```php
-$result = $client->findBy('model_name', $expr->andX(
+$result = $recordManager->findBy('model_name', $expr->andX(
     $expr->orX(
         $expr->eq('A', 1),
         $expr->eq('B', 1)
@@ -310,10 +632,10 @@ $result = $client->findBy('model_name', $expr->andX(
         $expr->eq('D', 1),
         $expr->eq('E', 1)
     )
-), $options = []);
+));
 ```
 
-Internally, the client formats automatically all domains by calling the special builder 
+Internally, the client formats automatically all domains by calling the special builder
 method ```normalizeDomains()```.
 
 Here is a complete list of helper methods available in ```ExpressionBuilder``` for domain expressions:
@@ -416,20 +738,21 @@ public function notIn(string $fieldName, array $values = []): Comparison;
 Collection operations
 ---------------------
 
-In data writing context, Odoo allows you to manage ***toMany** collection fields with special commands. 
-Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) 
+In data writing context with queries of type **insert/update**, Odoo allows you to manage ***toMany** collection
+fields with special commands.
+
+Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format)
 to known what we are talking about.
 
-The expression builder provides helper methods to build a well-formed *operation command*: 
-each operation method returns the operation as an array.
+The expression builder provides helper methods to build a well-formed *operation command*:
+each operation method returns an instance of ```Ang3\Component\Odoo\DBAL\Expression\CollectionOperation```.
+Like domains, the only one method of this interface is ```toArray()``` to get a normalized array of the expression.
 
 To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
 
 ```php
-// $client instanceof Client
-
 // Get the expression builder
-$expr = $client->expr();
+$expr = $recordManager->expr();
 
 // Prepare data for a new record
 $data = [
@@ -443,11 +766,11 @@ $data = [
     ]
 ];
 
-$result = $client->create('model_name', $data);
+$result = $recordManager->create('model_name', $data);
 ```
 
-Internally, the client formats automatically the whole query parameters for all writing methods 
-(```create``` and ```update```) by calling the special builder 
+Internally, the client formats automatically the whole query parameters for all writing methods
+(```create``` and ```update```) by calling the special builder
 method ```normalizeData()```.
 
 Here is a complete list of helper methods available in ```ExpressionBuilder``` for operation expressions:
@@ -456,128 +779,55 @@ Here is a complete list of helper methods available in ```ExpressionBuilder``` f
 /**
  * Adds a new record created from data.
  */
-public function createRecord(array $data): array;
+public function createRecord(array $data): CollectionOperation;
 
 /**
  * Updates an existing record of id $id with data.
- * /!\ Can not be used in record insert query.
+ * /!\ Can not be used in record CREATE query.
  */
-public function updateRecord(int $id, array $data): array;
+public function updateRecord(int $id, array $data): CollectionOperation;
 
 /**
  * Adds an existing record of id $id to the collection.
  */
-public function addRecord(int $id): array;
+public function addRecord(int $id): CollectionOperation;
 
 /**
  * Removes the record of id $id from the collection, but does not delete it.
- * /!\ Can not be used in record insert query.
+ * /!\ Can not be used in record CREATE query.
  */
-public function removeRecord(int $id): array;
+public function removeRecord(int $id): CollectionOperation;
 
 /**
  * Removes the record of id $id from the collection, then deletes it from the database.
- * /!\ Can not be used in record insert query.
+ * /!\ Can not be used in record CREATE query.
  */
-public function deleteRecord(int $id): array;
+public function deleteRecord(int $id): CollectionOperation;
 
 /**
  * Replaces all existing records in the collection by the $ids list,
  * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
  */
-public function replaceRecords(array $ids = []): array;
+public function replaceRecords(array $ids = []): CollectionOperation;
 
 /**
  * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
- * /!\ Can not be used in record insert query.
+ * /!\ Can not be used in record CREATE query.
  */
-public function clearRecords(): array;
+public function clearRecords(): CollectionOperation;
 ```
 
-Upgrades & updates
-==================
+Data support
+------------
 
-### v6.1.3 (last stable)
+- Scalar values are unchanged
+- Arrays recursive conversion
+- Objects of type ```\DateTimeInterface``` are automatically formatted into string in UTC timezone
+- Iterable/generator are fetched into an array
+- Non-iterable values are automatically casted to string
+  (so any non-supported objects must define the method ```__toString()```)
 
-- [Issue 6](https://github.com/Ang3/php-odoo-api-client/issues/6) - Fixed methods ```read()``` for integers or arrays.
+Resources
+=========
 
-### v6.1.2
-
-- Fixed methods when argument ```$criteria``` can be NULL
-    - Fixed methods ```search*()```
-
-### v6.1.1
-
-- Fixed logging.
-- Deleted useless files and updated ```.gitignore```
-
-### v6.1.0
-
-- Replaced package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord) by 
-[ang3/php-xmlrpc-client](https://packagist.org/packages/ang3/php-xmlrpc-client).
-- Implemented interface ```Ang3\Component\Odoo\Exception\ExceptionInterface``` for all client exceptions.
-
-### v6.0.1
-
-- Removed dependency of package [ang3/php-dev-binaries](https://packagist.org/packages/ang3/php-dev-binaries).
-
-### v6.0.0
-
-- Added methods ```searchOne``` and ```searchAll```.
-- Back to package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord).
-- Removed XML-RPC client.
-- Removed remote exception.
-- Removed trace back feature.
-
-### v5.1.2
-
-- Fixed logging messages.
-
-### v5.1.1
-
-- Fixed method ```findAll```.
-- Updated endpoint logging level to ```debug``` and added client logging with level ```info```
-
-### v5.1.0
-
-- Added method ```findAll```.
-- Fixed empty array result issue.
-
-### v5.0.6
-
-- Catched remote type exception when the method returns no value.
-- Fixed composer dev dependencies
-- Updated travis configuration
-- Updated ```README.md```
-
-### v5.0.5
-
-- Fixed method ```Client::create()```.
-
-### v5.0.4
-
-- Added method ```Client::exists()```.
-
-### From 4.* to 5.*
-
-What you have to do:
-- Create the client with the constructor ```new Client(array $config)``` instead of calling static method ```Client::createFromConfig(array $config)```.
-- Replace usages of the method ```searchAndRead``` by the method ```findBy```.
-
-Logs:
-- Replaced package [darkaonline/ripcord](https://packagist.org/packages/DarkaOnLine/Ripcord) to [phpxmlrpc/phpxmlrpc](https://github.com/gggeek/phpxmlrpc).
-- Created XML-RPC client.
-- Deleted static method ```Client::createFromConfig(array $config)```.
-- Renamed ORM method ```searchAndRead(...)``` to ```findBy(...)```.
-- Added ORM methods ```find(...)``` to ```findOneBy(...)```.
-- Added expression builder support.
-
-### From 3.* to 4.*
-
-- Updated namespace ```Ang3\Component\Odoo\Client``` to ```Ang3\Component\Odoo```.
-
-### From 2.* to 3.*
-
-- Updated namespace ```Ang3\Component\OdooApiClient``` to ```Ang3\Component\Odoo\Client```.
-
-That's it!
+- [CHANGELOG.md](CHANGELOG.md)

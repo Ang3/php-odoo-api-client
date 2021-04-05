@@ -2,16 +2,20 @@
 
 namespace Ang3\Component\Odoo;
 
+use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilderAwareTrait;
+use Ang3\Component\Odoo\DBAL\Query\OrmQuery;
+use Ang3\Component\Odoo\DBAL\RecordManager;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
-use Ang3\Component\Odoo\Expression\DomainInterface;
-use Ang3\Component\Odoo\Expression\ExpressionBuilder;
-use Ang3\Component\XmlRpc\Exception\RequestException;
+use Ang3\Component\Odoo\Exception\RequestException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 class Client
 {
+    use ExpressionBuilderAwareTrait;
+
     /**
      * Endpoints.
      */
@@ -19,53 +23,62 @@ class Client
     public const ENDPOINT_OBJECT = 'xmlrpc/2/object';
 
     /**
-     * ORM methods.
+     * Special commands.
      */
-    const CREATE = 'create';
-    const READ = 'read';
-    const UPDATE = 'write';
-    const DELETE = 'unlink';
-    const FIND = 'search_read';
-    const SEARCH = 'search';
-    const COUNT = 'search_count';
     const LIST_FIELDS = 'fields_get';
 
     /**
+     * URL of the database.
+     *
      * @var string
      */
     private $url;
 
     /**
+     * Name of the database.
+     *
      * @var string
      */
     private $database;
 
     /**
+     * Username of internal user.
+     *
      * @var string
      */
     private $username;
 
     /**
+     * Password of internal user.
+     *
      * @var string
      */
     private $password;
 
     /**
+     * COMMON endpoint.
+     *
      * @var Endpoint
      */
     private $commonEndpoint;
 
     /**
+     * OBJECT endpoint.
+     *
      * @var Endpoint
      */
     private $objectEndpoint;
 
     /**
-     * @var ExpressionBuilder
+     * ORM record manager.
+     *
+     * @var RecordManager
      */
-    private $expressionBuilder;
+    private $recordManager;
 
     /**
+     * Optional logger.
+     *
      * @var LoggerInterface|null
      */
     private $logger;
@@ -81,7 +94,7 @@ class Client
         $this->database = $database;
         $this->username = $username;
         $this->password = $password;
-        $this->expressionBuilder = new ExpressionBuilder();
+        $this->recordManager = new RecordManager($this);
         $this->logger = $logger;
         $this->initEndpoints();
     }
@@ -117,6 +130,8 @@ class Client
     /**
      * Create a new record.
      *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
+     *
      * @throws InvalidArgumentException when $data is empty
      * @throws RequestException         when request failed
      *
@@ -128,11 +143,13 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        return (int) $this->call($modelName, self::CREATE, [$data]);
+        return (int) $this->call($modelName, OrmQuery::CREATE, [$data]);
     }
 
     /**
      * Read records.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -142,11 +159,13 @@ class Client
     {
         $ids = [is_int($ids) ? [$ids] : (array) $ids];
 
-        return (array) $this->call($modelName, self::READ, $ids, $options);
+        return (array) $this->call($modelName, OrmQuery::READ, $ids, $options);
     }
 
     /**
      * Update a record(s).
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -158,11 +177,13 @@ class Client
             return;
         }
 
-        $this->call($modelName, self::UPDATE, [(array) $ids, $data]);
+        $this->call($modelName, OrmQuery::WRITE, [(array) $ids, $data]);
     }
 
     /**
      * Delete record(s).
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -170,28 +191,32 @@ class Client
      */
     public function delete(string $modelName, $ids): void
     {
-        $this->call($modelName, self::DELETE, [(array) $ids]);
+        $this->call($modelName, OrmQuery::UNLINK, [(array) $ids]);
     }
 
     /**
      * Search one ID of record by criteria and options.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function searchOne(string $modelName, $criteria = null, $options = []): ?int
+    public function searchOne(string $modelName, $criteria = null, array $options = []): ?int
     {
         $options['limit'] = 1;
 
-        $result = $this->search($modelName, $this->expressionBuilder->normalizeDomains($criteria), $options);
+        $result = $this->search($modelName, $this->expr()->normalizeDomains($criteria), $options);
 
         return array_shift($result);
     }
 
     /**
      * Search all ID of record(s) with options.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
@@ -201,12 +226,14 @@ class Client
     public function searchAll(string $modelName, array $options = []): array
     {
         return array_column($this->findBy($modelName, null, array_merge($options, [
-            'fields' => ['id']
+            'fields' => ['id'],
         ])), 'id');
     }
 
     /**
      * Find ID of record(s) by criteria and options.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -221,11 +248,13 @@ class Client
             unset($options['fields']);
         }
 
-        return (array) $this->call($modelName, self::SEARCH, $this->expressionBuilder->normalizeDomains($criteria), $options);
+        return (array) $this->call($modelName, OrmQuery::SEARCH, $this->expr()->normalizeDomains($criteria), $options);
     }
 
     /**
      * Find ONE record by ID and options.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws RequestException when request failed
      */
@@ -236,6 +265,8 @@ class Client
 
     /**
      * Find ONE record by criteria and options.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -252,6 +283,8 @@ class Client
     /**
      * Find all record(s) with options.
      *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
+     *
      * @throws RequestException when request failed
      *
      * @return array<int, array>
@@ -264,6 +297,8 @@ class Client
     /**
      * Find record(s) by criteria and options.
      *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
+     *
      * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
@@ -273,21 +308,38 @@ class Client
      */
     public function findBy(string $modelName, $criteria = null, array $options = []): array
     {
-        return (array) $this->call($modelName, self::FIND, $this->expressionBuilder->normalizeDomains($criteria), $options);
+        return (array) $this->call($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
     }
 
     /**
      * Check if a record exists.
      *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
+     *
      * @throws RequestException when request failed
      */
     public function exists(string $modelName, int $id): bool
     {
-        return 1 === $this->count($modelName, $this->expressionBuilder->normalizeDomains($this->expressionBuilder->eq('id', $id)));
+        return 1 === $this->count($modelName, $this->expr()->normalizeDomains($this->expr()->eq('id', $id)));
+    }
+
+    /**
+     * Count all records for a model.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
+     *
+     * @throws InvalidArgumentException when $criteria value is not valid
+     * @throws RequestException         when request failed
+     */
+    public function countAll(string $modelName): int
+    {
+        return (int) $this->count($modelName);
     }
 
     /**
      * Count number of records for a model and criteria.
+     *
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -296,13 +348,13 @@ class Client
      */
     public function count(string $modelName, $criteria = null): int
     {
-        return (int) $this->call($modelName, self::COUNT, $this->expressionBuilder->normalizeDomains($criteria));
+        return (int) $this->call($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
     }
 
     /**
      * List model fields.
      *
-     * @throws RequestException when request failed
+     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager schema instead.
      */
     public function listFields(string $modelName, array $options = []): array
     {
@@ -310,14 +362,12 @@ class Client
     }
 
     /**
-     * @throws RequestException when request failed
-     *
      * @return mixed
      */
     public function call(string $name, string $method, array $parameters = [], array $options = [])
     {
         $loggerContext = [
-            'request_id' => uniqid('xmlrpc-request-', true),
+            'request_id' => uniqid('rpc', true),
             'name' => $name,
             'method' => $method,
             'parameters' => $parameters,
@@ -325,7 +375,7 @@ class Client
         ];
 
         if ($this->logger) {
-            $this->logger->info('Calling method {name}::{method}', $loggerContext);
+            $this->logger->debug('Calling method {name}::{method}', $loggerContext);
         }
 
         $result = $this->objectEndpoint->call('execute_kw', [
@@ -355,7 +405,6 @@ class Client
 
     /**
      * @throws AuthenticationException when authentication failed
-     * @throws RequestException        when endpoint request failed
      */
     public function authenticate(): int
     {
@@ -381,11 +430,6 @@ class Client
         $user = preg_replace('([^a-zA-Z0-9_])', '_', $this->username);
 
         return sprintf('%s.%s.%s', sha1($this->url), $database, $user);
-    }
-
-    public function expr(): ExpressionBuilder
-    {
-        return $this->expressionBuilder;
     }
 
     public function getUrl(): string
@@ -447,9 +491,9 @@ class Client
         return $this->objectEndpoint;
     }
 
-    public function getExpressionBuilder(): ExpressionBuilder
+    public function getRecordManager(): RecordManager
     {
-        return $this->expressionBuilder;
+        return $this->recordManager;
     }
 
     public function getLogger(): ?LoggerInterface
@@ -460,7 +504,6 @@ class Client
     public function setLogger(?LoggerInterface $logger): self
     {
         $this->logger = $logger;
-        $this->initEndpoints();
 
         return $this;
     }
