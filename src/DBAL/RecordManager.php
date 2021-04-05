@@ -4,7 +4,7 @@ namespace Ang3\Component\Odoo\DBAL;
 
 use Ang3\Component\Odoo\Client;
 use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
-use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilderAwareTrait;
 use Ang3\Component\Odoo\DBAL\Query\NativeQuery;
 use Ang3\Component\Odoo\DBAL\Query\OrmQuery;
 use Ang3\Component\Odoo\DBAL\Query\QueryBuilder;
@@ -15,6 +15,8 @@ use Ang3\Component\Odoo\DBAL\Schema\Schema;
 
 class RecordManager
 {
+    use ExpressionBuilderAwareTrait;
+
     /**
      * @var Client
      */
@@ -271,10 +273,5 @@ class RecordManager
     public function getRepositories(): array
     {
         return $this->repositories;
-    }
-
-    public function getExpressionBuilder(): ExpressionBuilder
-    {
-        return $this->client->expr();
     }
 }

@@ -577,10 +577,11 @@ Odoo has its own array format for those expressions.
 The aim of the expression builder is to provide some
 helper methods to simplify your programmer's life.
 
-Here is an example of how to get a builder from a client:
+Here is an example of how to get a builder from a client or record manager:
 
 ```php
-$expr = $client->getExpressionBuilder();
+$expr = $clientOrRecordManager->expr();
+// or $expr = $clientOrRecordManager->getExpressionBuilder();
 ```
 
 You can still use the expression builder as standalone by creating a new instance:
@@ -590,12 +591,6 @@ use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 
 $expr = new ExpressionBuilder();
 ```
-
-**Supported domain and data values** (by priority)
-
-1. Objects of type ```\DateTimeInterface``` are automatically formatted into string in UTC timezone.
-2. Iterable/generator
-3. Non-iterable objects are automatically casted to string, but your object must define the method ```__toString()```
 
 Domains
 -------
@@ -819,6 +814,16 @@ public function replaceRecords(array $ids = []): CollectionOperation;
  */
 public function clearRecords(): CollectionOperation;
 ```
+
+Data support
+------------
+
+- Scalar values are unchanged
+- Arrays recursive conversion
+- Objects of type ```\DateTimeInterface``` are automatically formatted into string in UTC timezone
+- Iterable/generator are fetched into an array
+- Non-iterable values are automatically casted to string
+  (so any non-supported objects must define the method ```__toString()```)
 
 That's it!
 

@@ -3,10 +3,9 @@
 namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
-use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilderAwareTrait;
 use Ang3\Component\Odoo\DBAL\Query\OrmQuery;
 use Ang3\Component\Odoo\DBAL\RecordManager;
-use Ang3\Component\Odoo\DBAL\Schema\Schema;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RequestException;
@@ -15,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class Client
 {
+    use ExpressionBuilderAwareTrait;
+
     /**
      * Endpoints.
      */
@@ -76,11 +77,6 @@ class Client
     private $recordManager;
 
     /**
-     * @var ExpressionBuilder
-     */
-    private $expressionBuilder;
-
-    /**
      * Optional logger.
      *
      * @var LoggerInterface|null
@@ -99,7 +95,6 @@ class Client
         $this->username = $username;
         $this->password = $password;
         $this->recordManager = new RecordManager($this);
-        $this->expressionBuilder = new ExpressionBuilder();
         $this->logger = $logger;
         $this->initEndpoints();
     }
@@ -511,11 +506,6 @@ class Client
         $this->logger = $logger;
 
         return $this;
-    }
-
-    public function expr(): ExpressionBuilder
-    {
-        return new ExpressionBuilder();
     }
 
     /**
