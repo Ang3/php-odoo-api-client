@@ -6,6 +6,7 @@ use Ang3\Component\Odoo\DBAL\Expression\ConversionException;
 use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
 use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\DBAL\RecordManager;
+use InvalidArgumentException;
 
 class QueryBuilder
 {
@@ -419,7 +420,7 @@ class QueryBuilder
     public function getQuery(): OrmQuery
     {
         $from = $this->from;
-        if (!$from) {
+        if (null === $from) {
             throw new QueryException('Missing FROM clause (model name).');
         }
 
@@ -440,7 +441,7 @@ class QueryBuilder
                 $method = OrmQuery::UNLINK;
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('The query type "%s" is not valid.', $this->type));
+                throw new InvalidArgumentException(sprintf('The query type "%s" is not valid.', $this->type));
         }
 
         $query = new OrmQuery($this->recordManager, $from, $method);

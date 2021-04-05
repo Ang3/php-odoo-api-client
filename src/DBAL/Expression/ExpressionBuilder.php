@@ -2,23 +2,13 @@
 
 namespace Ang3\Component\Odoo\DBAL\Expression;
 
+use DateTime;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 
 class ExpressionBuilder
 {
-    /**
-     * Odoo operations key.
-     */
-    public const CREATE = 0;
-    public const UPDATE = 1;
-    public const DELETE = 2;
-    public const REMOVE = 3;
-    public const ADD = 4;
-    public const CLEAR = 5;
-    public const REPLACE = 6;
-
     /**
      * Create a logical operation "AND".
      */
@@ -320,7 +310,7 @@ class ExpressionBuilder
 
             if ($value instanceof DateTimeInterface) {
                 try {
-                    $date = new \DateTime(sprintf('@%s', $value->getTimestamp()));
+                    $date = new DateTime(sprintf('@%s', $value->getTimestamp()));
                 } catch (Exception $e) {
                     throw new ConversionException(sprintf('Failed to convert date from timestamp "%d"', $value->getTimestamp()), 0, $e);
                 }

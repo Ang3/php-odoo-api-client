@@ -11,6 +11,7 @@ use Ang3\Component\Odoo\DBAL\Query\QueryBuilder;
 use Ang3\Component\Odoo\DBAL\Query\QueryInterface;
 use Ang3\Component\Odoo\DBAL\Repository\RecordNotFoundException;
 use Ang3\Component\Odoo\DBAL\Repository\RecordRepository;
+use Ang3\Component\Odoo\DBAL\Schema\Schema;
 
 class RecordManager
 {
@@ -20,19 +21,19 @@ class RecordManager
     private $client;
 
     /**
+     * @var Schema
+     */
+    private $schema;
+
+    /**
      * @var RecordRepository[]
      */
     private $repositories = [];
 
-    /**
-     * @var ExpressionBuilder
-     */
-    private $expressionBuilder;
-
     public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->expressionBuilder = new ExpressionBuilder();
+        $this->schema = new Schema($client);
     }
 
     /**
@@ -262,6 +263,11 @@ class RecordManager
         return $this->client;
     }
 
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
     public function getRepositories(): array
     {
         return $this->repositories;
@@ -269,6 +275,6 @@ class RecordManager
 
     public function getExpressionBuilder(): ExpressionBuilder
     {
-        return $this->expressionBuilder;
+        return $this->client->expr();
     }
 }

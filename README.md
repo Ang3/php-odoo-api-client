@@ -14,11 +14,11 @@ you call your odoo instance and manage records easily.
 
 - Authentication ```<7.0```
 - Basic XML-RPC calls ```<7.0```
-- Database Abstraction Layer (DBAL)
-  - Record manager ```>=7.0```
-  - Repositories ```>=7.0```
-  - Query builder ```>=7.0```
-  - Expression builder  ```<7.0```
+- Expression builder  ```<7.0```
+- Database Abstraction Layer (DBAL) ```>=7.0```
+  - Record manager 
+  - Repositories`
+  - Query builder
 
 **Good to know**
 
@@ -27,27 +27,6 @@ The ORM (Object relational mapper) is in development:
 
 If you are in Symfony application you should be interested in the bundle 
 [ang3/odoo-bundle](https://github.com/Ang3/odoo-bundle) (client and ORM integration - need tests).
-
-Summary
-=======
-
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Basic usage](#basic-usage)
-- [Database Abstraction Layer (DBAL)](#dbal-database-abstraction-layer)
-    - [Record manager](#record-manager) - Manage records easily with ORM built-in methods
-        - [Built-in ORM methods](#built-in-orm-methods)
-    - [Expression builder](#expression-builder) - Build domains and collection operations
-        - [Domains](#domains) - Build Odoo domain expressions
-        - [Collection operations](#collection-operations) - Build Odoo collection field operations
-    - [Query builder](#query-builder) - Build your query easily
-        - [Create a query builder](#create-a-query-builder)
-        - [Build your query](#build-your-query)
-        - [Execute your query](#execute-your-query)
-    - [Repositories](#search-records) - Keep your requests inside repositories
-        - [Get a repository](#get-a-repository)
-        - [Create custom repository](#get-a-repository)
-- [Updates log](#updates-log)
 
 Requirements
 ============
@@ -125,7 +104,8 @@ ORM methods of the client like explained in the
 > [dedicated documentation](https://github.com/Ang3/php-odoo-api-client/tree/v6.1.3):
 be aware that these client ORM methods are deprecated since version ```7.0```.
 
-### Record manager
+Record manager
+--------------
 
 The client provides a record manager to manage records of your Odoo models.
 
@@ -246,262 +226,38 @@ public function count(string $modelName, ?DomainInterface $criteria = null): int
 For ```$criteria``` in select/search queries and ```$data``` for data writing context, please read the section 
 [Expression builder](#expression-builder).
 
-Expression builder
-==================
+Schema
+------
 
-There are two kinds of expressions : ```domains``` for criteria 
-and ```collection operations``` in data writing context.
-Odoo has its own array format for those expressions. 
-The aim of the expression builder is to provide some 
-helper methods to simplify your programmer's life.
-
-Here is an example of how to get a builder from a client:
+You can get the schema of your Odoo database by calling the getter method
+```RecordManager::getSchema()```:
 
 ```php
-$expr = $recordManager->getExpressionBuilder();
+/** @var \Ang3\Component\Odoo\DBAL\Schema\Schema $schema */
+$schema = $recordManager->getSchema();
 ```
 
-You can still use the expression builder as standalone by creating a new instance:
+The schema helps you to get all model names or get metadata of a model.
+
+### Get all model names
 
 ```php
-use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
-
-$expr = new ExpressionBuilder();
+/** @var string[] $modelNames */
+$modelNames = $schema->getModelNames();
 ```
 
-**Supported domain and data values** (by priority)
-
-1. Objects of type ```\DateTimeInterface``` are automatically formatted into string in UTC timezone.
-2. Iterable/generator
-3. Non-iterable objects are automatically casted to string, but your object must define the method ```__toString()```
-
-Domains
--------
-
-For all **select/search/count** queries, 
-Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains) 
-with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
-
-It could be quickly ugly to do a complex domain, but don't worry the builder makes all 
-for you. :-)
-
-Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```. 
-The only one method of this interface is ```toArray()``` to get a normalized array of the expression.
-
-To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
+### Get model metadata
 
 ```php
-// Get the expression builder
-$expr = $recordManager->expr();
-
-$result = $recordManager->findBy('model_name', $expr->andX( // Logical node "AND"
-	$expr->gte('id', 10), // id >= 10
-	$expr->lte('id', 100), // id <= 10
-));
+/** @var \Ang3\Component\Odoo\DBAL\Schema\Model $model */
+$model = $schema->getModel('res.company');
 ```
 
-Of course, you can nest logical nodes:
-
-```php
-$result = $recordManager->findBy('model_name', $expr->andX(
-    $expr->orX(
-        $expr->eq('A', 1),
-        $expr->eq('B', 1)
-    ),
-    $expr->orX(
-        $expr->eq('C', 1),
-        $expr->eq('D', 1),
-        $expr->eq('E', 1)
-    )
-));
-```
-
-Internally, the client formats automatically all domains by calling the special builder 
-method ```normalizeDomains()```.
-
-Here is a complete list of helper methods available in ```ExpressionBuilder``` for domain expressions:
-
-```php
-/**
- * Create a logical operation "AND".
- */
-public function andX(DomainInterface ...$domains): CompositeDomain;
-
-/**
- * Create a logical operation "OR".
- */
-public function orX(DomainInterface ...$domains): CompositeDomain;
-
-/**
- * Create a logical operation "NOT".
- */
-public function notX(DomainInterface ...$domains): CompositeDomain;
-
-/**
- * Check if the field is EQUAL TO the value.
- *
- * @param mixed $value
- */
-public function eq(string $fieldName, $value): Comparison;
-
-/**
- * Check if the field is NOT EQUAL TO the value.
- *
- * @param mixed $value
- */
-public function neq(string $fieldName, $value): Comparison;
-
-/**
- * Check if the field is UNSET OR EQUAL TO the value.
- *
- * @param mixed $value
- */
-public function ueq(string $fieldName, $value): Comparison;
-
-/**
- * Check if the field is LESS THAN the value.
- *
- * @param mixed $value
- */
-public function lt(string $fieldName, $value): Comparison;
-
-/**
- * Check if the field is LESS THAN OR EQUAL the value.
- *
- * @param mixed $value
- */
-public function lte(string $fieldName, $value): Comparison;
-
-/**
- * Check if the field is GREATER THAN the value.
- *
- * @param mixed $value
- */
-public function gt(string $fieldName, $value): Comparison;
-
-/**
- * Check if the field is GREATER THAN OR EQUAL the value.
- *
- * @param mixed $value
- */
-public function gte(string $fieldName, $value): Comparison;
-
-/**
- * Check if the variable is LIKE the value.
- *
- * An underscore _ in the pattern stands for (matches) any single character
- * A percent sign % matches any string of zero or more characters.
- *
- * If $strict is set to FALSE, the value pattern is "%value%" (automatically wrapped into signs %).
- *
- * @param mixed $value
- */
-public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Comparison;
-
-/**
- * Check if the field is IS NOT LIKE the value.
- *
- * @param mixed $value
- */
-public function notLike(string $fieldName, $value, bool $caseSensitive = true): Comparison;
-
-/**
- * Check if the field is IN values list.
- */
-public function in(string $fieldName, array $values = []): Comparison;
-
-/**
- * Check if the field is NOT IN values list.
- */
-public function notIn(string $fieldName, array $values = []): Comparison;
-```
-
-Collection operations
----------------------
-
-In data writing context with queries of type **insert/update**, Odoo allows you to manage ***toMany** collection 
-fields with special commands.
-
-Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format) 
-to known what we are talking about.
-
-The expression builder provides helper methods to build a well-formed *operation command*: 
-each operation method returns an instance of ```Ang3\Component\Odoo\DBAL\Expression\CollectionOperation```.
-Like domains, the only one method of this interface is ```toArray()``` to get a normalized array of the expression.
-
-To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
-
-```php
-// Get the expression builder
-$expr = $recordManager->expr();
-
-// Prepare data for a new record
-$data = [
-    'foo' => 'bar',
-    'bar_ids' => [ // Field of type "manytoMany"
-        $expr->addRecord(3), // Add the record of ID 3 to the set
-        $expr->createRecord([  // Create a new sub record and add it to the set
-            'bar' => 'baz'
-            // ...
-        ])
-    ]
-];
-
-$result = $recordManager->create('model_name', $data);
-```
-
-Internally, the client formats automatically the whole query parameters for all writing methods 
-(```create``` and ```update```) by calling the special builder 
-method ```normalizeData()```.
-
-Here is a complete list of helper methods available in ```ExpressionBuilder``` for operation expressions:
-
-```php
-/**
- * Adds a new record created from data.
- */
-public function createRecord(array $data): CollectionOperation;
-
-/**
- * Updates an existing record of id $id with data.
- * /!\ Can not be used in record CREATE query.
- */
-public function updateRecord(int $id, array $data): CollectionOperation;
-
-/**
- * Adds an existing record of id $id to the collection.
- */
-public function addRecord(int $id): CollectionOperation;
-
-/**
- * Removes the record of id $id from the collection, but does not delete it.
- * /!\ Can not be used in record CREATE query.
- */
-public function removeRecord(int $id): CollectionOperation;
-
-/**
- * Removes the record of id $id from the collection, then deletes it from the database.
- * /!\ Can not be used in record CREATE query.
- */
-public function deleteRecord(int $id): CollectionOperation;
-
-/**
- * Replaces all existing records in the collection by the $ids list,
- * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
- */
-public function replaceRecords(array $ids = []): CollectionOperation;
-
-/**
- * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
- * /!\ Can not be used in record CREATE query.
- */
-public function clearRecords(): CollectionOperation;
-```
+An exception of type ```Ang3\Component\Odoo\DBAL\Schema\SchemaException``` is thrown if the model
+does not exist.
 
 Query builder
-=============
-
-The query builder was added in version ```7.0```.
+-------------
 
 It helps you to create queries easily by chaining helpers methods (like Doctrine for SQL databases).
 
@@ -811,6 +567,258 @@ $companyRepository = $recordManager->getRepository('res.company');
 If no repository exists for a model, the default repository ```Ang3\Component\Odoo\DBAL\Repository\RecordRepository``` 
 is used. Last but not least, all repositories are stored into the related record manager to avoid creating multiple 
 instances of same repository.
+
+Expression builder
+==================
+
+There are two kinds of expressions : ```domains``` for criteria
+and ```collection operations``` in data writing context.
+Odoo has its own array format for those expressions.
+The aim of the expression builder is to provide some
+helper methods to simplify your programmer's life.
+
+Here is an example of how to get a builder from a client:
+
+```php
+$expr = $client->getExpressionBuilder();
+```
+
+You can still use the expression builder as standalone by creating a new instance:
+
+```php
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
+
+$expr = new ExpressionBuilder();
+```
+
+**Supported domain and data values** (by priority)
+
+1. Objects of type ```\DateTimeInterface``` are automatically formatted into string in UTC timezone.
+2. Iterable/generator
+3. Non-iterable objects are automatically casted to string, but your object must define the method ```__toString()```
+
+Domains
+-------
+
+For all **select/search/count** queries,
+Odoo is waiting for an array of [domains](https://www.odoo.com/documentation/13.0/reference/orm.html#search-domains)
+with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT```).
+
+It could be quickly ugly to do a complex domain, but don't worry the builder makes all
+for you. :-)
+
+Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```.
+The only one method of this interface is ```toArray()``` to get a normalized array of the expression.
+
+To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
+
+```php
+// Get the expression builder
+$expr = $recordManager->expr();
+
+$result = $recordManager->findBy('model_name', $expr->andX( // Logical node "AND"
+	$expr->gte('id', 10), // id >= 10
+	$expr->lte('id', 100), // id <= 10
+));
+```
+
+Of course, you can nest logical nodes:
+
+```php
+$result = $recordManager->findBy('model_name', $expr->andX(
+    $expr->orX(
+        $expr->eq('A', 1),
+        $expr->eq('B', 1)
+    ),
+    $expr->orX(
+        $expr->eq('C', 1),
+        $expr->eq('D', 1),
+        $expr->eq('E', 1)
+    )
+));
+```
+
+Internally, the client formats automatically all domains by calling the special builder
+method ```normalizeDomains()```.
+
+Here is a complete list of helper methods available in ```ExpressionBuilder``` for domain expressions:
+
+```php
+/**
+ * Create a logical operation "AND".
+ */
+public function andX(DomainInterface ...$domains): CompositeDomain;
+
+/**
+ * Create a logical operation "OR".
+ */
+public function orX(DomainInterface ...$domains): CompositeDomain;
+
+/**
+ * Create a logical operation "NOT".
+ */
+public function notX(DomainInterface ...$domains): CompositeDomain;
+
+/**
+ * Check if the field is EQUAL TO the value.
+ *
+ * @param mixed $value
+ */
+public function eq(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the field is NOT EQUAL TO the value.
+ *
+ * @param mixed $value
+ */
+public function neq(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the field is UNSET OR EQUAL TO the value.
+ *
+ * @param mixed $value
+ */
+public function ueq(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the field is LESS THAN the value.
+ *
+ * @param mixed $value
+ */
+public function lt(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the field is LESS THAN OR EQUAL the value.
+ *
+ * @param mixed $value
+ */
+public function lte(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the field is GREATER THAN the value.
+ *
+ * @param mixed $value
+ */
+public function gt(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the field is GREATER THAN OR EQUAL the value.
+ *
+ * @param mixed $value
+ */
+public function gte(string $fieldName, $value): Comparison;
+
+/**
+ * Check if the variable is LIKE the value.
+ *
+ * An underscore _ in the pattern stands for (matches) any single character
+ * A percent sign % matches any string of zero or more characters.
+ *
+ * If $strict is set to FALSE, the value pattern is "%value%" (automatically wrapped into signs %).
+ *
+ * @param mixed $value
+ */
+public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Comparison;
+
+/**
+ * Check if the field is IS NOT LIKE the value.
+ *
+ * @param mixed $value
+ */
+public function notLike(string $fieldName, $value, bool $caseSensitive = true): Comparison;
+
+/**
+ * Check if the field is IN values list.
+ */
+public function in(string $fieldName, array $values = []): Comparison;
+
+/**
+ * Check if the field is NOT IN values list.
+ */
+public function notIn(string $fieldName, array $values = []): Comparison;
+```
+
+Collection operations
+---------------------
+
+In data writing context with queries of type **insert/update**, Odoo allows you to manage ***toMany** collection
+fields with special commands.
+
+Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/reference/orm.html#openerp-models-relationals-format)
+to known what we are talking about.
+
+The expression builder provides helper methods to build a well-formed *operation command*:
+each operation method returns an instance of ```Ang3\Component\Odoo\DBAL\Expression\CollectionOperation```.
+Like domains, the only one method of this interface is ```toArray()``` to get a normalized array of the expression.
+
+To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
+
+```php
+// Get the expression builder
+$expr = $recordManager->expr();
+
+// Prepare data for a new record
+$data = [
+    'foo' => 'bar',
+    'bar_ids' => [ // Field of type "manytoMany"
+        $expr->addRecord(3), // Add the record of ID 3 to the set
+        $expr->createRecord([  // Create a new sub record and add it to the set
+            'bar' => 'baz'
+            // ...
+        ])
+    ]
+];
+
+$result = $recordManager->create('model_name', $data);
+```
+
+Internally, the client formats automatically the whole query parameters for all writing methods
+(```create``` and ```update```) by calling the special builder
+method ```normalizeData()```.
+
+Here is a complete list of helper methods available in ```ExpressionBuilder``` for operation expressions:
+
+```php
+/**
+ * Adds a new record created from data.
+ */
+public function createRecord(array $data): CollectionOperation;
+
+/**
+ * Updates an existing record of id $id with data.
+ * /!\ Can not be used in record CREATE query.
+ */
+public function updateRecord(int $id, array $data): CollectionOperation;
+
+/**
+ * Adds an existing record of id $id to the collection.
+ */
+public function addRecord(int $id): CollectionOperation;
+
+/**
+ * Removes the record of id $id from the collection, but does not delete it.
+ * /!\ Can not be used in record CREATE query.
+ */
+public function removeRecord(int $id): CollectionOperation;
+
+/**
+ * Removes the record of id $id from the collection, then deletes it from the database.
+ * /!\ Can not be used in record CREATE query.
+ */
+public function deleteRecord(int $id): CollectionOperation;
+
+/**
+ * Replaces all existing records in the collection by the $ids list,
+ * Equivalent to using the command "clear" followed by a command "add" for each id in $ids.
+ */
+public function replaceRecords(array $ids = []): CollectionOperation;
+
+/**
+ * Removes all records from the collection, equivalent to using the command "remove" on every record explicitly.
+ * /!\ Can not be used in record CREATE query.
+ */
+public function clearRecords(): CollectionOperation;
+```
 
 That's it!
 
