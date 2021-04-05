@@ -21,8 +21,7 @@
         "php": "^7.2",
         "ext-json": "*",
         "psr/log": "~1.0",
-        "ang3/php-xmlrpc-client": "^1.0.2",
-        "symfony/cache": "^5.2"
+        "ang3/php-xmlrpc-client": "^1.0.2"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
