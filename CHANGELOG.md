@@ -5,7 +5,8 @@ CHANGELOG
 ---
 
 * Marked client ORM built-in methods as deprecated (no BC)
-* Added record manager that allows to manage models
+* Added RemoteException with message and XML trace.
+* Added record manager that allows to manage models.
 * Added record repository that allows to execute and isolate queries for a dedicated model.
 * Added query builder and ORM query that allows to create queries easily in OOP context.
 * Added objects and iterable support for the expression builder.
