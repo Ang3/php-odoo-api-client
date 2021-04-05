@@ -2,7 +2,7 @@
 
 namespace Ang3\Component\Odoo\Tests\Expression;
 
-use Ang3\Component\Odoo\Expression\Comparison;
+use Ang3\Component\Odoo\DBAL\Expression\Comparison;
 use Ang3\Component\Odoo\Expression\CompositeDomain;
 use Ang3\Component\Odoo\Tests\AbstractTest;
 
