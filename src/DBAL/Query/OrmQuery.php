@@ -115,6 +115,10 @@ class OrmQuery extends AbstractQuery implements QueryInterface
     {
         $result = $this->getResult();
 
+        if($this->method === self::SEARCH) {
+            return $result;
+        }
+
         $selectedFields = $this->options['fields'] ?? [];
         if(count($selectedFields) > 1) {
             throw new QueryException('More than one field selected.');
