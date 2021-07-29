@@ -201,6 +201,8 @@ class QueryBuilder
      */
     public function setIds(array $ids): self
     {
+        $this->ids = [];
+
         foreach ($ids as $id) {
             $this->addId($id);
         }
