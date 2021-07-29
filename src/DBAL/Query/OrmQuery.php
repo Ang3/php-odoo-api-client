@@ -100,7 +100,14 @@ class OrmQuery extends AbstractQuery implements QueryInterface
             throw new NoUniqueResultException();
         }
 
-        return array_shift($result);
+        $selectedFields = $this->options['fields'] ?? [];
+        if(count($selectedFields) > 1) {
+            throw new QueryException('More than one field selected.');
+        }
+
+        $selectedFieldName = $selectedFields[0] ?? 'id';
+
+        return $result[$selectedFieldName] ?? null;
     }
 
     /**
