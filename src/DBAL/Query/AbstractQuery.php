@@ -105,7 +105,7 @@ abstract class AbstractQuery implements QueryInterface
      * @param mixed $value
      * @return $this
      */
-    public function addOption(string $name, mixed $value)
+    public function addOption(string $name, $value)
     {
         $this->options[$name] = $value;
 
