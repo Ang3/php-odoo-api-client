@@ -102,7 +102,7 @@ abstract class AbstractQuery implements QueryInterface
      * Add an option on the query.
      *
      * @param mixed $value
-     * 
+     *
      * @return $this
      */
     public function addOption(string $name, $value)

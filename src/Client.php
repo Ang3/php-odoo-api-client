@@ -25,7 +25,7 @@ class Client
     /**
      * Special commands.
      */
-    const LIST_FIELDS = 'fields_get';
+    public const LIST_FIELDS = 'fields_get';
 
     /**
      * URL of the database.

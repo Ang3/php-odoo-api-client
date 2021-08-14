@@ -108,10 +108,6 @@ class Model
             $model = $this->schema->getModel($targetModel);
         }
 
-        if (!isset($field)) {
-            throw SchemaException::fieldNotFound($fieldName, $this);
-        }
-
         return $field;
     }
 

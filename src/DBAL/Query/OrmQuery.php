@@ -7,13 +7,13 @@ class OrmQuery extends AbstractQuery implements QueryInterface
     /**
      * Query ORM methods.
      */
-    const CREATE = 'create';
-    const WRITE = 'write';
-    const READ = 'read';
-    const UNLINK = 'unlink';
-    const SEARCH_READ = 'search_read';
-    const SEARCH = 'search';
-    const SEARCH_COUNT = 'search_count';
+    public const CREATE = 'create';
+    public const WRITE = 'write';
+    public const READ = 'read';
+    public const UNLINK = 'unlink';
+    public const SEARCH_READ = 'search_read';
+    public const SEARCH = 'search';
+    public const SEARCH_COUNT = 'search_count';
 
     /**
      * List of query ORM methods.
@@ -115,12 +115,12 @@ class OrmQuery extends AbstractQuery implements QueryInterface
     {
         $result = $this->getResult();
 
-        if($this->method === self::SEARCH) {
+        if (self::SEARCH === $this->method) {
             return $result;
         }
 
         $selectedFields = $this->options['fields'] ?? [];
-        if(count($selectedFields) > 1) {
+        if (count($selectedFields) > 1) {
             throw new QueryException('More than one field selected.');
         }
 
