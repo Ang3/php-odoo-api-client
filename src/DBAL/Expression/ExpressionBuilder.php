@@ -257,7 +257,7 @@ class ExpressionBuilder
             throw new InvalidArgumentException(sprintf('Expected $criteria value of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
-        return $this->formatValue($criteria);
+        return $this->formatValue(array_values($criteria));
     }
 
     /**
