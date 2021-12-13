@@ -281,22 +281,14 @@ class ExpressionBuilder
             return $value;
         }
 
-        if (is_iterable($value)) {
+        if (is_iterable($value) || is_array($value)) {
             $values = [];
 
             foreach ($value as $key => $aValue) {
-                $values[] = $aValue;
+                $values[$key] = $this->formatValue($aValue);
             }
 
-            $value = $values;
-        }
-
-        if (is_array($value)) {
-            foreach ($value as $key => $aValue) {
-                $value[$key] = $this->formatValue($aValue);
-            }
-
-            return $value;
+            return $values;
         }
 
         if (is_object($value)) {
