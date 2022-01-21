@@ -281,7 +281,7 @@ class ExpressionBuilder
             return $value;
         }
 
-        if (is_iterable($value) || is_array($value)) {
+        if (is_array($value) || is_iterable($value)) {
             $values = [];
 
             foreach ($value as $key => $aValue) {

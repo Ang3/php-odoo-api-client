@@ -130,8 +130,6 @@ class Client
     /**
      * Create a new record.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws InvalidArgumentException when $data is empty
      * @throws RequestException         when request failed
      *
@@ -149,8 +147,6 @@ class Client
     /**
      * Read records.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param array|int $ids
      *
      * @throws RequestException when request failed
@@ -164,8 +160,6 @@ class Client
 
     /**
      * Update a record(s).
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -183,8 +177,6 @@ class Client
     /**
      * Delete record(s).
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param array|int $ids
      *
      * @throws RequestException when request failed
@@ -196,8 +188,6 @@ class Client
 
     /**
      * Search one ID of record by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -216,8 +206,6 @@ class Client
     /**
      * Search all ID of record(s) with options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      *
@@ -232,8 +220,6 @@ class Client
 
     /**
      * Find ID of record(s) by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -254,8 +240,6 @@ class Client
     /**
      * Find ONE record by ID and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws RequestException when request failed
      */
     public function find(string $modelName, int $id, array $options = []): ?array
@@ -265,8 +249,6 @@ class Client
 
     /**
      * Find ONE record by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -283,8 +265,6 @@ class Client
     /**
      * Find all record(s) with options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws RequestException when request failed
      *
      * @return array<int, array>
@@ -296,8 +276,6 @@ class Client
 
     /**
      * Find record(s) by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -314,8 +292,6 @@ class Client
     /**
      * Check if a record exists.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws RequestException when request failed
      */
     public function exists(string $modelName, int $id): bool
@@ -326,20 +302,16 @@ class Client
     /**
      * Count all records for a model.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
     public function countAll(string $modelName): int
     {
-        return (int) $this->count($modelName);
+        return $this->count($modelName);
     }
 
     /**
      * Count number of records for a model and criteria.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
