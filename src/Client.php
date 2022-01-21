@@ -182,7 +182,7 @@ class Client
      */
     public function delete(string $modelName, $ids): void
     {
-        $ids = is_array($ids) ? $ids : [ (int) $ids ];
+        $ids = is_array($ids) ? $ids : [(int) $ids];
         $this->call($modelName, OrmQuery::UNLINK, [$ids]);
     }
 
