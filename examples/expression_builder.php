@@ -8,7 +8,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Ang3\Component\Odoo\Expression\ExpressionBuilder;
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 
 $expr = new ExpressionBuilder();
 
