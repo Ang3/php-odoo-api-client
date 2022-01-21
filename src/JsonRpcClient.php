@@ -10,9 +10,6 @@ class JsonRpcClient {
         $this->url = $url;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function call($method, $params = []) {
         $content = json_encode([
             'jsonrpc' => '2.0',
