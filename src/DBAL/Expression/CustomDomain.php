@@ -2,6 +2,8 @@
 
 namespace Ang3\Component\Odoo\DBAL\Expression;
 
+use ArrayIterator;
+
 class CustomDomain implements DomainInterface
 {
     /**
@@ -12,6 +14,11 @@ class CustomDomain implements DomainInterface
     public function __construct(array $data = [])
     {
         $this->data = $data;
+    }
+
+    public function getIterator(): ArrayIterator
+    {
+        return new ArrayIterator($this->toArray());
     }
 
     public function toArray(): array

@@ -4,7 +4,7 @@ namespace Ang3\Component\Odoo\DBAL\Expression;
 
 use Generator;
 
-class CompositeDomain implements DomainInterface, \IteratorAggregate
+class CompositeDomain implements DomainInterface
 {
     /**
      * Logical operators.

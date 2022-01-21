@@ -42,7 +42,7 @@ class QueryBuilder
     private $from;
 
     /**
-     * @var array
+     * @var int[]
      */
     private $ids = [];
 
@@ -128,26 +128,28 @@ class QueryBuilder
     /**
      * Defines the query of type "UPDATE" with ids of records to update.
      *
-     * @param int[] $ids
+     * @param int[]|int $ids
      */
-    public function update(array $ids): self
+    public function update($ids): self
     {
         $this->type = self::UPDATE;
         $this->select = [];
 
-        return $this->setIds($ids);
+        return $this->setIds(is_array($ids) ? $ids : [(int) $ids]);
     }
 
     /**
      * Defines the query of type "DELETE" with ids of records to delete.
+     *
+     * @param int[]|int $ids
      */
-    public function delete(array $ids): self
+    public function delete($ids): self
     {
         $this->type = self::DELETE;
         $this->select = [];
         $this->values = [];
 
-        return $this->setIds($ids);
+        return $this->setIds(is_array($ids) ? $ids : [(int) $ids]);
     }
 
     /**
@@ -226,6 +228,14 @@ class QueryBuilder
         }
 
         return $this;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getIds(): array
+    {
+        return $this->ids;
     }
 
     /**
