@@ -23,18 +23,18 @@ class Endpoint
     public function __construct(string $url)
     {
         $this->url = $url;
-        $this->client = new XmlRpcClient($url);
+        $this->client = new JsonRpcClient($url);
     }
 
     /**
+     * @return mixed
      * @throws RequestException when request failed
      *
-     * @return mixed
      */
-    public function call(string $method, array $args = [])
+    public function call(string $service, $method, array $args = [])
     {
         try {
-            return $this->client->call($method, $args);
+            return $this->client->call("call", ["service" => $service, "method" => $method, "args" => $args]);
         } catch (XmlRpcRemoteException $exception) {
             if (preg_match('#cannot marshal None unless allow_none is enabled#', $exception->getMessage())) {
                 return null;
