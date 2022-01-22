@@ -136,7 +136,9 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        return (int) $this->execute($modelName, OrmQuery::CREATE, [$data]);
+        $result = $this->execute($modelName, OrmQuery::CREATE, [[$data]]);
+
+        return (int) array_shift($result);
     }
 
     /**
@@ -166,7 +168,8 @@ class Client
             return;
         }
 
-        $this->execute($modelName, OrmQuery::WRITE, [(array) $ids, $data]);
+        $ids = is_array($ids) ? $ids : [(int) $ids];
+        $this->execute($modelName, OrmQuery::WRITE, [$ids, $data]);
     }
 
     /**
@@ -225,7 +228,7 @@ class Client
             unset($options['fields']);
         }
 
-        return (array) $this->execute($modelName, OrmQuery::SEARCH, $this->expr()->normalizeDomains($criteria), $options);
+        return (array) $this->execute($modelName, OrmQuery::SEARCH, [$this->expr()->normalizeDomains($criteria)], $options);
     }
 
     /**
@@ -275,9 +278,7 @@ class Client
      */
     public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
     {
-        $parameters = $this->expr()->normalizeDomains($criteria);
-
-        return (array) $this->execute($modelName, OrmQuery::SEARCH_READ, $parameters, $options);
+        return (array) $this->execute($modelName, OrmQuery::SEARCH_READ, [$this->expr()->normalizeDomains($criteria)], $options);
     }
 
     /**
@@ -311,7 +312,7 @@ class Client
      */
     public function count(string $modelName, iterable $criteria = null): int
     {
-        return $this->execute($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
+        return $this->execute($modelName, OrmQuery::SEARCH_COUNT, [$this->expr()->normalizeDomains($criteria)]);
     }
 
     /**
@@ -335,7 +336,7 @@ class Client
             $this->password,
             $name,
             $method,
-            [$parameters],
+            $parameters,
             $options
         );
     }
@@ -377,17 +378,21 @@ class Client
             $this->logger->info('JSON RPC request #{request_id} - {service}::{method} (uid: #{uid})', $context);
         }
 
-        $response = $this->httpClient->request('POST', '', [
-            'json' => [
-                'jsonrpc' => '2.0',
-                'method' => 'call',
-                'params' => [
-                    'service' => $service,
-                    'method' => $method,
-                    'args' => $arguments,
-                ],
-                'id' => uniqid('odoo_request'),
+        $data = [
+            'jsonrpc' => '2.0',
+            'method' => 'call',
+            'params' => [
+                'service' => $service,
+                'method' => $method,
+                'args' => $arguments,
             ],
+            'id' => uniqid('odoo_request'),
+        ];
+
+        dump($data);
+
+        $response = $this->httpClient->request('POST', '', [
+            'json' => $data,
         ]);
 
         $result = $response->getContent();
