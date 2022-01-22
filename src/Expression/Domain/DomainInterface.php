@@ -1,6 +1,6 @@
 <?php
 
-namespace Ang3\Component\Odoo\DBAL\Expression;
+namespace Ang3\Component\Odoo\Expression\Domain;
 
 use IteratorAggregate;
 

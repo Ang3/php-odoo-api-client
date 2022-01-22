@@ -2,13 +2,11 @@
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilderAwareTrait;
-use Ang3\Component\Odoo\DBAL\Query\OrmQuery;
-use Ang3\Component\Odoo\DBAL\RecordManager;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
+use Ang3\Component\Odoo\Expression\ExpressionBuilder;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -16,13 +14,22 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Client
 {
-    use ExpressionBuilderAwareTrait;
-
     /**
      * Services.
      */
     public const SERVICE_COMMON = 'common';
     public const SERVICE_OBJECT = 'object';
+
+    /**
+     * Query ORM methods.
+     */
+    public const CREATE = 'create';
+    public const WRITE = 'write';
+    public const READ = 'read';
+    public const UNLINK = 'unlink';
+    public const SEARCH_READ = 'search_read';
+    public const SEARCH = 'search';
+    public const SEARCH_COUNT = 'search_count';
 
     /**
      * Special commands.
@@ -63,11 +70,9 @@ class Client
     private $httpClient;
 
     /**
-     * ORM record manager.
-     *
-     * @var RecordManager
+     * @var ExpressionBuilder
      */
-    private $recordManager;
+    private $expressionBuilder;
 
     /**
      * Optional logger.
@@ -90,7 +95,7 @@ class Client
         $this->httpClient = HttpClient::create([
             'base_uri' => "$url/jsonrpc",
         ]);
-        $this->recordManager = new RecordManager($this);
+        $this->expressionBuilder = new ExpressionBuilder();
         $this->logger = $logger;
     }
 
@@ -136,7 +141,7 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        $result = $this->execute($modelName, OrmQuery::CREATE, [[$data]]);
+        $result = $this->execute($modelName, self::CREATE, [[$data]]);
 
         return (int) array_shift($result);
     }
@@ -152,7 +157,7 @@ class Client
     {
         $ids = [is_int($ids) ? [$ids] : (array) $ids];
 
-        return (array) $this->execute($modelName, OrmQuery::READ, [$ids], $options);
+        return (array) $this->execute($modelName, self::READ, [[$ids]], $options);
     }
 
     /**
@@ -169,7 +174,7 @@ class Client
         }
 
         $ids = is_array($ids) ? $ids : [(int) $ids];
-        $this->execute($modelName, OrmQuery::WRITE, [$ids, $data]);
+        $this->execute($modelName, self::WRITE, [$ids, $data]);
     }
 
     /**
@@ -182,7 +187,7 @@ class Client
     public function delete(string $modelName, $ids): void
     {
         $ids = is_array($ids) ? $ids : [(int) $ids];
-        $this->execute($modelName, OrmQuery::UNLINK, [$ids]);
+        $this->execute($modelName, self::UNLINK, [$ids]);
     }
 
     /**
@@ -228,7 +233,7 @@ class Client
             unset($options['fields']);
         }
 
-        return (array) $this->execute($modelName, OrmQuery::SEARCH, [$this->expr()->normalizeDomains($criteria)], $options);
+        return (array) $this->execute($modelName, self::SEARCH, [$this->expressionBuilder->normalizeDomains($criteria)], $options);
     }
 
     /**
@@ -278,7 +283,7 @@ class Client
      */
     public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
     {
-        return (array) $this->execute($modelName, OrmQuery::SEARCH_READ, [$this->expr()->normalizeDomains($criteria)], $options);
+        return (array) $this->execute($modelName, self::SEARCH_READ, [$this->expressionBuilder->normalizeDomains($criteria)], $options);
     }
 
     /**
@@ -312,7 +317,7 @@ class Client
      */
     public function count(string $modelName, iterable $criteria = null): int
     {
-        return $this->execute($modelName, OrmQuery::SEARCH_COUNT, [$this->expr()->normalizeDomains($criteria)]);
+        return $this->execute($modelName, self::SEARCH_COUNT, [$this->expressionBuilder->normalizeDomains($criteria)]);
     }
 
     /**
@@ -330,7 +335,9 @@ class Client
      */
     public function execute(string $name, string $method, array $parameters = [], array $options = [])
     {
-        return $this->request(self::SERVICE_OBJECT, 'execute_kw',
+        return $this->request(
+            self::SERVICE_OBJECT,
+            'execute_kw',
             $this->database,
             $this->authenticate(),
             $this->password,
@@ -352,7 +359,9 @@ class Client
     public function authenticate(): int
     {
         if (null === $this->uid) {
-            $this->uid = $this->request(self::SERVICE_COMMON, 'login',
+            $this->uid = $this->request(
+                self::SERVICE_COMMON,
+                'login',
                 $this->database,
                 $this->username,
                 $this->password
@@ -469,9 +478,9 @@ class Client
         return $this;
     }
 
-    public function getRecordManager(): RecordManager
+    public function getExpressionBuilder(): ExpressionBuilder
     {
-        return $this->recordManager;
+        return $this->expressionBuilder;
     }
 
     public function getLogger(): ?LoggerInterface

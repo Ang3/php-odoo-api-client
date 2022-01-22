@@ -1,7 +1,12 @@
 <?php
 
-namespace Ang3\Component\Odoo\DBAL\Expression;
+namespace Ang3\Component\Odoo\Expression;
 
+use Ang3\Component\Odoo\Expression\Domain\Comparison;
+use Ang3\Component\Odoo\Expression\Domain\CompositeDomain;
+use Ang3\Component\Odoo\Expression\Domain\DomainInterface;
+use Ang3\Component\Odoo\Expression\Exception\ConversionException;
+use Ang3\Component\Odoo\Expression\Operation\CollectionOperation;
 use DateTime;
 use DateTimeInterface;
 use Exception;

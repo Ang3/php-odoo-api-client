@@ -1,10 +1,10 @@
 <?php
 
-namespace Ang3\Component\Odoo\DBAL\Expression;
+namespace Ang3\Component\Odoo\Expression\Operation;
 
 use InvalidArgumentException;
 
-class CollectionOperation
+class CollectionOperation implements OperationInterface
 {
     /**
      * Operations key.
