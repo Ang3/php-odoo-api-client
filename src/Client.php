@@ -11,16 +11,19 @@ use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class Client
 {
     use ExpressionBuilderAwareTrait;
 
     /**
-     * Endpoints.
+     * Services.
      */
-    public const ENDPOINT_COMMON = 'xmlrpc/2/common';
-    public const ENDPOINT_OBJECT = 'xmlrpc/2/object';
+    public const SERVICE_COMMON = 'common';
+    public const SERVICE_OBJECT = 'object';
 
     /**
      * Special commands.
@@ -56,18 +59,9 @@ class Client
     private $password;
 
     /**
-     * COMMON endpoint.
-     *
-     * @var Endpoint
+     * @var HttpClientInterface
      */
-    private $commonEndpoint;
-
-    /**
-     * OBJECT endpoint.
-     *
-     * @var Endpoint
-     */
-    private $objectEndpoint;
+    private $httpClient;
 
     /**
      * ORM record manager.
@@ -94,9 +88,11 @@ class Client
         $this->database = $database;
         $this->username = $username;
         $this->password = $password;
+        $this->httpClient = HttpClient::create([
+            'base_uri' => "$url/jsonrpc"
+        ]);
         $this->recordManager = new RecordManager($this);
         $this->logger = $logger;
-        $this->initEndpoints();
     }
 
     /**
@@ -130,8 +126,6 @@ class Client
     /**
      * Create a new record.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws InvalidArgumentException when $data is empty
      * @throws RequestException         when request failed
      *
@@ -143,13 +137,11 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        return (int) $this->call($modelName, OrmQuery::CREATE, [$data]);
+        return (int) $this->execute($modelName, OrmQuery::CREATE, [$data]);
     }
 
     /**
      * Read records.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -159,13 +151,11 @@ class Client
     {
         $ids = [is_int($ids) ? [$ids] : (array) $ids];
 
-        return (array) $this->call($modelName, OrmQuery::READ, $ids, $options);
+        return (array) $this->execute($modelName, OrmQuery::READ, $ids, $options);
     }
 
     /**
      * Update a record(s).
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -177,13 +167,11 @@ class Client
             return;
         }
 
-        $this->call($modelName, OrmQuery::WRITE, [(array) $ids, $data]);
+        $this->execute($modelName, OrmQuery::WRITE, [(array) $ids, $data]);
     }
 
     /**
      * Delete record(s).
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -191,13 +179,11 @@ class Client
      */
     public function delete(string $modelName, $ids): void
     {
-        $this->call($modelName, OrmQuery::UNLINK, [(array) $ids]);
+        $this->execute($modelName, OrmQuery::UNLINK, [(array) $ids]);
     }
 
     /**
      * Search one ID of record by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -216,8 +202,6 @@ class Client
     /**
      * Search all ID of record(s) with options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      *
@@ -233,8 +217,6 @@ class Client
     /**
      * Find ID of record(s) by criteria and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
@@ -248,13 +230,11 @@ class Client
             unset($options['fields']);
         }
 
-        return (array) $this->call($modelName, OrmQuery::SEARCH, $this->expr()->normalizeDomains($criteria), $options);
+        return (array) $this->execute($modelName, OrmQuery::SEARCH, $this->expr()->normalizeDomains($criteria), $options);
     }
 
     /**
      * Find ONE record by ID and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws RequestException when request failed
      */
@@ -265,8 +245,6 @@ class Client
 
     /**
      * Find ONE record by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param DomainInterface|array|null $criteria
      *
@@ -283,8 +261,6 @@ class Client
     /**
      * Find all record(s) with options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws RequestException when request failed
      *
      * @return array<int, array>
@@ -297,8 +273,6 @@ class Client
     /**
      * Find record(s) by criteria and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
@@ -308,13 +282,11 @@ class Client
      */
     public function findBy(string $modelName, $criteria = null, array $options = []): array
     {
-        return (array) $this->call($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
+        return (array) $this->execute($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
     }
 
     /**
      * Check if a record exists.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws RequestException when request failed
      */
@@ -325,8 +297,6 @@ class Client
 
     /**
      * Count all records for a model.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
@@ -339,8 +309,6 @@ class Client
     /**
      * Count number of records for a model and criteria.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
@@ -348,7 +316,7 @@ class Client
      */
     public function count(string $modelName, $criteria = null): int
     {
-        return (int) $this->call($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
+        return (int) $this->execute($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
     }
 
     /**
@@ -358,49 +326,30 @@ class Client
      */
     public function listFields(string $modelName, array $options = []): array
     {
-        return (array) $this->call($modelName, self::LIST_FIELDS, [], $options);
+        return (array) $this->execute($modelName, self::LIST_FIELDS, [], $options);
     }
 
     /**
      * @return mixed
      */
-    public function call(string $name, string $method, array $parameters = [], array $options = [])
+    public function execute(string $name, string $method, array $parameters = [], array $options = [])
     {
-        $loggerContext = [
-            'request_id' => uniqid('rpc', true),
-            'name' => $name,
-            'method' => $method,
-            'parameters' => $parameters,
-            'options' => $options,
-        ];
-
-        if ($this->logger) {
-            $this->logger->debug('Calling method {name}::{method}', $loggerContext);
-        }
-
-        $result = $this->objectEndpoint->call('execute_kw', [
+        return $this->request(self::SERVICE_OBJECT, 'execute', [
             $this->database,
             $this->authenticate(),
             $this->password,
             $name,
             $method,
             $parameters,
-            $options,
+            $options
         ]);
-
-        if ($this->logger) {
-            $loggedResult = is_scalar($result) ? $result : json_encode($result);
-            $this->logger->debug(sprintf('Request result: %s', $loggedResult), [
-                'request_id' => $loggerContext['request_id'],
-            ]);
-        }
-
-        return $result;
     }
 
-    public function version(): array
+    public function version()
     {
-        return $this->commonEndpoint->call('version');
+        $data = $this->request(self::SERVICE_COMMON, 'version');
+
+        return $data['result'];
     }
 
     /**
@@ -409,12 +358,12 @@ class Client
     public function authenticate(): int
     {
         if (null === $this->uid) {
-            $this->uid = $this->commonEndpoint->call('authenticate', [
+            $data = $this->request(self::SERVICE_COMMON, 'login', [
                 $this->database,
                 $this->username,
-                $this->password,
-                [],
+                $this->password
             ]);
+            $this->uid = $data['result'];
 
             if (!$this->uid || !is_int($this->uid)) {
                 throw new AuthenticationException();
@@ -422,6 +371,41 @@ class Client
         }
 
         return $this->uid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function request(string $service, string $method, array $parameters = [])
+    {
+        $context['request_id'] = uniqid('rpc', true);
+        if ($this->logger) {
+            $this->logger->info('JSON RPC request #{request_id} - {service}::{method} (uid: #{uid})', $context);
+        }
+
+        $response = $this->httpClient->request('POST', '', [
+            'json' => [
+                'jsonrpc' => "2.0",
+                'method' => 'call',
+                'params' => [
+                    'service' => $service,
+                    'method' => $method,
+                    'args' => $parameters
+                ],
+                'id' => uniqid('odoo_request'),
+            ]
+        ]);
+
+        $result = $response->getContent();
+
+        if ($this->logger) {
+            $loggedResult = is_scalar($result) ? $result : json_encode($result);
+            $this->logger->debug(sprintf('Request result: %s', $loggedResult), [
+                'request_id' => $context['request_id'],
+            ]);
+        }
+
+        return json_decode($result, true);
     }
 
     public function getIdentifier(): string
@@ -440,7 +424,6 @@ class Client
     public function setUrl(string $url): self
     {
         $this->url = $url;
-        $this->initEndpoints();
 
         return $this;
     }
@@ -481,16 +464,6 @@ class Client
         return $this;
     }
 
-    public function getCommonEndpoint(): Endpoint
-    {
-        return $this->commonEndpoint;
-    }
-
-    public function getObjectEndpoint(): Endpoint
-    {
-        return $this->objectEndpoint;
-    }
-
     public function getRecordManager(): RecordManager
     {
         return $this->recordManager;
@@ -506,14 +479,5 @@ class Client
         $this->logger = $logger;
 
         return $this;
-    }
-
-    /**
-     * @internal
-     */
-    private function initEndpoints(): void
-    {
-        $this->commonEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_COMMON);
-        $this->objectEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_OBJECT);
     }
 }

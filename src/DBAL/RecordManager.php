@@ -254,10 +254,10 @@ class RecordManager
         $options = $query->getOptions();
 
         if (!$options) {
-            return $this->client->call($query->getName(), $query->getMethod(), $query->getParameters());
+            return $this->client->execute($query->getName(), $query->getMethod(), $query->getParameters());
         }
 
-        return $this->client->call($query->getName(), $query->getMethod(), $query->getParameters(), $options);
+        return $this->client->execute($query->getName(), $query->getMethod(), $query->getParameters(), $options);
     }
 
     public function getClient(): Client

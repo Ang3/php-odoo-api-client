@@ -36,7 +36,7 @@ class Schema
 
         if (!isset($this->loadedModels[$modelName])) {
             $expr = $this->client->expr();
-            $modelData = $this->client->call(self::IR_MODEL, OrmQuery::SEARCH_READ, $expr->normalizeDomains($expr->eq('model', $modelName)));
+            $modelData = $this->client->execute(self::IR_MODEL, OrmQuery::SEARCH_READ, $expr->normalizeDomains($expr->eq('model', $modelName)));
             $this->loadedModels[$modelName] = $this->createModel($modelData[0]);
         }
 
@@ -56,7 +56,7 @@ class Schema
     public function getModelNames(): array
     {
         if (!$this->modelNames) {
-            $this->modelNames = array_column($this->client->call(self::IR_MODEL, OrmQuery::SEARCH_READ, [[]], [
+            $this->modelNames = array_column($this->client->execute(self::IR_MODEL, OrmQuery::SEARCH_READ, [[]], [
                 'fields' => ['model'],
             ]), 'model');
         }
@@ -70,7 +70,7 @@ class Schema
     private function createModel(array $modelData): Model
     {
         $expr = $this->client->expr();
-        $fields = $this->client->call(
+        $fields = $this->client->execute(
             self::IR_MODEL_FIELDS,
             OrmQuery::SEARCH_READ,
             $expr->normalizeDomains($expr->eq('model_id', $modelData['id']))
@@ -81,7 +81,7 @@ class Schema
             $selectionsIds = array_filter($fieldData['selection_ids'] ?? []);
 
             if (!empty($selectionsIds)) {
-                $choices = $this->client->call(
+                $choices = $this->client->execute(
                     self::IR_MODEL_FIELD_SELECTION,
                     OrmQuery::SEARCH_READ,
                     $expr->normalizeDomains($expr->eq('field_id', $fieldData['id']))

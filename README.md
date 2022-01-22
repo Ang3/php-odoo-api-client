@@ -87,7 +87,7 @@ from the static method ```createFromConfig()```.
 Then, make your call:
 
 ```php
-$result = $client->call($name, $method, $parameters = [], $options = []);
+$result = $client->execute($name, $method, $parameters = [], $options = []);
 ```
 
 Exceptions:
