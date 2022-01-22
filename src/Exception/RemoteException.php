@@ -2,22 +2,21 @@
 
 namespace Ang3\Component\Odoo\Exception;
 
-use Ang3\Component\XmlRpc\Exception\RemoteException as XmlRemoteException;
-
 class RemoteException extends RequestException
 {
     /**
      * @var array
      */
-    protected $xmlTrace = [];
+    protected $remoteTrace = [];
 
-    public static function create(XmlRemoteException $remoteException): self
+    public static function create(array $payload): self
     {
-        $errorCode = $remoteException->getCode();
-        $errorMessage = $remoteException->getMessage();
+        $errorCode = $payload['error']['code'];
+        $errorMessage = $payload['error']['message'];
+        $remoteTrace = trim($payload['error']['data']['debug']);
 
-        if (preg_match('#Traceback \(most recent call last\)#', $errorMessage)) {
-            $messages = array_filter(explode("\n", $errorMessage));
+        if (preg_match('#'.preg_quote('Traceback (most recent call last):').'#', $remoteTrace)) {
+            $messages = array_filter(explode("\n", $remoteTrace));
 
             foreach ($messages as $key => $message) {
                 $messages[$key] = trim($message);
@@ -46,7 +45,7 @@ class RemoteException extends RequestException
             }
 
             $exception = new self(implode("\n", $messageParts), $errorCode);
-            $exception->xmlTrace = array_reverse($trace);
+            $exception->remoteTrace = array_reverse($trace);
 
             return $exception;
         }
@@ -54,8 +53,8 @@ class RemoteException extends RequestException
         return new self($errorMessage, $errorCode);
     }
 
-    public function getXmlTrace(): array
+    public function getRemoteTrace(): array
     {
-        return $this->xmlTrace;
+        return $this->remoteTrace;
     }
 }

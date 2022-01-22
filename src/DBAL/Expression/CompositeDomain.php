@@ -129,8 +129,6 @@ class CompositeDomain implements DomainInterface
                 if (!$domains[$key]) {
                     unset($domains[$key]);
                 }
-
-                continue;
             }
         }
 

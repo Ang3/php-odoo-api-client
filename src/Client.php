@@ -7,12 +7,12 @@ use Ang3\Component\Odoo\DBAL\Query\OrmQuery;
 use Ang3\Component\Odoo\DBAL\RecordManager;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
+use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class Client
 {
@@ -88,7 +88,7 @@ class Client
         $this->username = $username;
         $this->password = $password;
         $this->httpClient = HttpClient::create([
-            'base_uri' => "$url/jsonrpc"
+            'base_uri' => "$url/jsonrpc",
         ]);
         $this->recordManager = new RecordManager($this);
         $this->logger = $logger;
@@ -123,7 +123,7 @@ class Client
     }
 
     /**
-     * Create a new record.
+     * Creates a new record and returns the new ID.
      *
      * @throws InvalidArgumentException when $data is empty
      * @throws RequestException         when request failed
@@ -150,7 +150,7 @@ class Client
     {
         $ids = [is_int($ids) ? [$ids] : (array) $ids];
 
-        return (array) $this->execute($modelName, OrmQuery::READ, $ids, $options);
+        return (array) $this->execute($modelName, OrmQuery::READ, [$ids], $options);
     }
 
     /**
@@ -275,7 +275,9 @@ class Client
      */
     public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
     {
-        return (array) $this->execute($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
+        $parameters = $this->expr()->normalizeDomains($criteria);
+
+        return (array) $this->execute($modelName, OrmQuery::SEARCH_READ, $parameters, $options);
     }
 
     /**
@@ -307,7 +309,7 @@ class Client
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function count(string $modelName, iterable $criteria = null)
+    public function count(string $modelName, iterable $criteria = null): int
     {
         return $this->execute($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
     }
@@ -327,24 +329,20 @@ class Client
      */
     public function execute(string $name, string $method, array $parameters = [], array $options = [])
     {
-        return $this->request(self::SERVICE_OBJECT, 'execute', [
+        return $this->request(self::SERVICE_OBJECT, 'execute_kw',
             $this->database,
             $this->authenticate(),
             $this->password,
             $name,
             $method,
-            [
-                $parameters,
-                $options
-            ]
-        ]);
+            [$parameters],
+            $options
+        );
     }
 
-    public function version()
+    public function version(): array
     {
-        $data = $this->request(self::SERVICE_COMMON, 'version');
-
-        return $data['result'];
+        return $this->request(self::SERVICE_COMMON, 'version');
     }
 
     /**
@@ -353,12 +351,11 @@ class Client
     public function authenticate(): int
     {
         if (null === $this->uid) {
-            $data = $this->request(self::SERVICE_COMMON, 'login', [
+            $this->uid = $this->request(self::SERVICE_COMMON, 'login',
                 $this->database,
                 $this->username,
                 $this->password
-            ]);
-            $this->uid = $data['result'];
+            );
 
             if (!$this->uid || !is_int($this->uid)) {
                 throw new AuthenticationException();
@@ -369,9 +366,11 @@ class Client
     }
 
     /**
+     * @param mixed[] $arguments
+     *
      * @return mixed
      */
-    public function request(string $service, string $method, array $parameters = [])
+    public function request(string $service, string $method, ...$arguments)
     {
         $context['request_id'] = uniqid('rpc', true);
         if ($this->logger) {
@@ -380,27 +379,33 @@ class Client
 
         $response = $this->httpClient->request('POST', '', [
             'json' => [
-                'jsonrpc' => "2.0",
+                'jsonrpc' => '2.0',
                 'method' => 'call',
                 'params' => [
                     'service' => $service,
                     'method' => $method,
-                    'args' => $parameters
+                    'args' => $arguments,
                 ],
                 'id' => uniqid('odoo_request'),
-            ]
+            ],
         ]);
 
         $result = $response->getContent();
 
         if ($this->logger) {
-            $loggedResult = is_scalar($result) ? $result : json_encode($result);
+            $loggedResult = $result;
             $this->logger->debug(sprintf('Request result: %s', $loggedResult), [
                 'request_id' => $context['request_id'],
             ]);
         }
 
-        return json_decode($result, true);
+        $payload = json_decode($result, true);
+
+        if (is_array($payload['error'] ?? null)) {
+            throw RemoteException::create($payload);
+        }
+
+        return $payload['result'];
     }
 
     public function getIdentifier(): string
