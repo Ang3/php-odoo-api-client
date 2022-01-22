@@ -236,28 +236,30 @@ class ExpressionBuilder
     }
 
     /**
-     * @param DomainInterface|array|null $criteria
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws ConversionException      on data conversion failure
      */
-    public function normalizeDomains($criteria = null): array
+    public function normalizeDomains(iterable $criteria = null): array
     {
         if (!$criteria) {
             return [[]];
         }
 
-        if ($criteria instanceof DomainInterface) {
-            $criteriaArray = $this->formatValue($criteria->toArray());
+        if (is_array($criteria)) {
+            $normalizedCriteria = $this->andX();
 
-            return $criteria instanceof CompositeDomain ? [$criteriaArray] : [[$criteriaArray]];
+            foreach ($criteria as $fieldName => $value) {
+                $normalizedCriteria->add($this->eq($fieldName, $this->formatValue($value)));
+            }
+
+            $criteria = $normalizedCriteria;
         }
 
-        if (!is_array($criteria)) {
-            throw new InvalidArgumentException(sprintf('Expected $criteria value of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
+        if (!$criteria instanceof DomainInterface) {
+            throw new InvalidArgumentException(sprintf('Expected parameter #1 of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
-        return $this->formatValue($criteria);
+        return $criteria instanceof CompositeDomain ? [$this->formatValue($criteria->toArray())] : [[$this->formatValue($criteria->toArray())]];
     }
 
     /**
@@ -281,22 +283,14 @@ class ExpressionBuilder
             return $value;
         }
 
-        if (is_iterable($value)) {
+        if (is_array($value) || is_iterable($value)) {
             $values = [];
 
             foreach ($value as $key => $aValue) {
-                $values[] = $aValue;
+                $values[$key] = $this->formatValue($aValue);
             }
 
-            $value = $values;
-        }
-
-        if (is_array($value)) {
-            foreach ($value as $key => $aValue) {
-                $value[$key] = $this->formatValue($aValue);
-            }
-
-            return $value;
+            return $values;
         }
 
         if (is_object($value)) {
