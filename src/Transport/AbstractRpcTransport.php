@@ -16,7 +16,7 @@ abstract class AbstractRpcTransport implements TransportInterface
                 'method' => $method,
                 'args' => $arguments,
             ],
-            'id' => uniqid('odoo_request'),
+            'id' => uniqid('odoo_jsonrpc'),
         ];
     }
 
