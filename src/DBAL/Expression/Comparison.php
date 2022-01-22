@@ -2,6 +2,8 @@
 
 namespace Ang3\Component\Odoo\DBAL\Expression;
 
+use ArrayIterator;
+
 class Comparison implements DomainInterface
 {
     /**
@@ -72,6 +74,11 @@ class Comparison implements DomainInterface
     public function __clone()
     {
         $this->value = is_object($this->value) ? clone $this->value : $this->value;
+    }
+
+    public function getIterator(): ArrayIterator
+    {
+        return new ArrayIterator($this->toArray());
     }
 
     public function toArray(): array

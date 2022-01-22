@@ -2,7 +2,6 @@
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
 use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilderAwareTrait;
 use Ang3\Component\Odoo\DBAL\Query\OrmQuery;
 use Ang3\Component\Odoo\DBAL\RecordManager;
@@ -148,8 +147,6 @@ class Client
     /**
      * Create a new record.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws InvalidArgumentException when $data is empty
      * @throws RequestException         when request failed
      *
@@ -167,8 +164,6 @@ class Client
     /**
      * Read records.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param array|int $ids
      *
      * @throws RequestException when request failed
@@ -182,8 +177,6 @@ class Client
 
     /**
      * Update a record(s).
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @param array|int $ids
      *
@@ -201,40 +194,32 @@ class Client
     /**
      * Delete record(s).
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @param array|int $ids
      *
      * @throws RequestException when request failed
      */
     public function delete(string $modelName, $ids): void
     {
-        $this->call($modelName, OrmQuery::UNLINK, [(array) $ids]);
+        $ids = is_array($ids) ? $ids : [(int) $ids];
+        $this->call($modelName, OrmQuery::UNLINK, [$ids]);
     }
 
     /**
      * Search one ID of record by criteria and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
-     * @param DomainInterface|array|null $criteria
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function searchOne(string $modelName, $criteria = null, array $options = []): ?int
+    public function searchOne(string $modelName, iterable $criteria = null, array $options = []): ?int
     {
         $options['limit'] = 1;
-
-        $result = $this->search($modelName, $this->expr()->normalizeDomains($criteria), $options);
+        $result = $this->search($modelName, $criteria, $options);
 
         return array_shift($result);
     }
 
     /**
      * Search all ID of record(s) with options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
@@ -243,24 +228,20 @@ class Client
      */
     public function searchAll(string $modelName, array $options = []): array
     {
-        return array_column($this->findBy($modelName, null, array_merge($options, [
-            'fields' => ['id'],
-        ])), 'id');
+        $options['fields'] = ['id'];
+
+        return array_column($this->findBy($modelName, null, $options), 'id');
     }
 
     /**
      * Find ID of record(s) by criteria and options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
-     * @param DomainInterface|array|null $criteria
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      *
      * @return array<int>
      */
-    public function search(string $modelName, $criteria = null, array $options = []): array
+    public function search(string $modelName, iterable $criteria = null, array $options = []): array
     {
         if (array_key_exists('fields', $options)) {
             unset($options['fields']);
@@ -272,26 +253,22 @@ class Client
     /**
      * Find ONE record by ID and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws RequestException when request failed
      */
     public function find(string $modelName, int $id, array $options = []): ?array
     {
-        return $this->findOneBy($modelName, $this->expr()->eq('id', $id), $options);
+        return $this->findOneBy($modelName, [
+            'id' => $id,
+        ], $options);
     }
 
     /**
      * Find ONE record by criteria and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
-     * @param DomainInterface|array|null $criteria
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function findOneBy(string $modelName, $criteria = null, array $options = []): ?array
+    public function findOneBy(string $modelName, iterable $criteria = null, array $options = []): ?array
     {
         $result = $this->findBy($modelName, $criteria, $options);
 
@@ -300,8 +277,6 @@ class Client
 
     /**
      * Find all record(s) with options.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws RequestException when request failed
      *
@@ -315,16 +290,12 @@ class Client
     /**
      * Find record(s) by criteria and options.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
-     * @param DomainInterface|array|null $criteria
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      *
      * @return array<int, array>
      */
-    public function findBy(string $modelName, $criteria = null, array $options = []): array
+    public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
     {
         return (array) $this->call($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
     }
@@ -332,39 +303,33 @@ class Client
     /**
      * Check if a record exists.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
      * @throws RequestException when request failed
      */
     public function exists(string $modelName, int $id): bool
     {
-        return 1 === $this->count($modelName, $this->expr()->normalizeDomains($this->expr()->eq('id', $id)));
+        return 1 === $this->count($modelName, [
+            'id' => $id,
+        ]);
     }
 
     /**
      * Count all records for a model.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
      *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
     public function countAll(string $modelName): int
     {
-        return (int) $this->count($modelName);
+        return $this->count($modelName);
     }
 
     /**
      * Count number of records for a model and criteria.
      *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager instead.
-     *
-     * @param DomainInterface|array|null $criteria
-     *
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      */
-    public function count(string $modelName, $criteria = null): int
+    public function count(string $modelName, iterable $criteria = null): int
     {
         return (int) $this->call($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
     }
