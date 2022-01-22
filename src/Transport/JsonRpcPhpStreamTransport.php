@@ -28,16 +28,7 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
 
     public function request(string $service, string $method, array $arguments = []): array
     {
-        $payload = json_encode([
-            'jsonrpc' => '2.0',
-            'method' => 'call',
-            'params' => [
-                'service' => $service,
-                'method' => $method,
-                'args' => $arguments,
-            ],
-            'id' => uniqid('odoo_request'),
-        ]);
+        $payload = json_encode($this->normalizeRpcData($service, $method, $arguments));
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new RequestException(sprintf('Failed to encode data to JSON: %s', json_last_error_msg()));
