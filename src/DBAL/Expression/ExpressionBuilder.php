@@ -259,7 +259,7 @@ class ExpressionBuilder
             throw new InvalidArgumentException(sprintf('Expected parameter #1 of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
-        return [[$this->formatValue($criteria->toArray())]];
+        return $criteria instanceof CompositeDomain ? [$this->formatValue($criteria->toArray())] : [[$this->formatValue($criteria->toArray())]];
     }
 
     /**
