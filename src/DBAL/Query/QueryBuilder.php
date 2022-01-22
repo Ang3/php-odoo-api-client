@@ -458,28 +458,33 @@ class QueryBuilder
 
         $query = new OrmQuery($this->recordManager, $from, $method);
 
-        if (in_array($this->type, [self::SELECT, self::SEARCH])) {
-            $parameters = $this->expr()->normalizeDomains($this->where);
-        } elseif (self::DELETE === $this->type) {
-            if (!$this->ids) {
-                throw new QueryException('You must set indexes for queries of type "DELETE".');
-            }
-
-            $parameters = [$this->ids];
-        } else {
-            if (!$this->values) {
-                throw new QueryException('You must set values for queries of type "INSERT" and "UPDATE".');
-            }
-
-            $parameters = $this->expr()->normalizeData($this->values);
-
-            if (self::UPDATE === $this->type) {
+        switch ($this->type) {
+            case self::SEARCH:
+            case self::SELECT:
+                $parameters = $this->expr()->normalizeDomains($this->where);
+                break;
+            case self::DELETE:
                 if (!$this->ids) {
-                    throw new QueryException('You must set indexes for queries of type "UPDATE".');
+                    throw new QueryException('You must set indexes for queries of type "DELETE".');
                 }
 
-                $parameters = [$this->ids, $parameters];
-            }
+                $parameters = [$this->ids];
+                break;
+            default:
+                if (!$this->values) {
+                    throw new QueryException('You must set values for queries of type "INSERT" or "UPDATE".');
+                }
+
+                $parameters = $this->expr()->normalizeData($this->values);
+
+                if (self::UPDATE === $this->type) {
+                    if (!$this->ids) {
+                        throw new QueryException('You must set indexes for queries of type "UPDATE".');
+                    }
+
+                    $parameters = [$this->ids, $parameters];
+                }
+                break;
         }
 
         $query->setParameters($parameters);
