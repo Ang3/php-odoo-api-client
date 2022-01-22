@@ -72,7 +72,7 @@ use Ang3\Component\Odoo\Client;
 $client = new Client('<host>', '<database>', '<username>', '<password>', $logger = null);
 
 // Option 2 : by calling the static method ::createFromConfig() with configuration as array
-$client = Client::createFromConfig([
+$client = Client::create([
     'url' => '<host>',
     'database' => '<database>',
     'username' => '<user>',

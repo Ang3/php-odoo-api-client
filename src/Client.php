@@ -7,10 +7,10 @@ use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
+use Ang3\Component\Odoo\Transport\JsonRpcPhpNativeStreamTransport;
+use Ang3\Component\Odoo\Transport\TransportInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Client
 {
@@ -37,37 +37,14 @@ class Client
     public const LIST_FIELDS = 'fields_get';
 
     /**
-     * URL of the database.
-     *
-     * @var string
+     * @var Connection
      */
-    private $url;
+    private $connection;
 
     /**
-     * Name of the database.
-     *
-     * @var string
+     * @var TransportInterface
      */
-    private $database;
-
-    /**
-     * Username of internal user.
-     *
-     * @var string
-     */
-    private $username;
-
-    /**
-     * Password of internal user.
-     *
-     * @var string
-     */
-    private $password;
-
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
+    private $transport;
 
     /**
      * @var ExpressionBuilder
@@ -86,16 +63,11 @@ class Client
      */
     private $uid;
 
-    public function __construct(string $url, string $database, string $username, string $password, LoggerInterface $logger = null)
+    public function __construct(Connection $connection, TransportInterface $transport = null, LoggerInterface $logger = null)
     {
-        $this->url = $url;
-        $this->database = $database;
-        $this->username = $username;
-        $this->password = $password;
-        $this->httpClient = HttpClient::create([
-            'base_uri' => "$url/jsonrpc",
-        ]);
+        $this->connection = $connection;
         $this->expressionBuilder = new ExpressionBuilder();
+        $this->transport = $transport ?: new JsonRpcPhpNativeStreamTransport($this->connection);
         $this->logger = $logger;
     }
 
@@ -107,24 +79,9 @@ class Client
      *
      * @throws MissingConfigParameterException when a required parameter is missing
      */
-    public static function createFromConfig(array $config, LoggerInterface $logger = null): self
+    public static function create(array $config, TransportInterface $transport = null, LoggerInterface $logger = null): self
     {
-        $getParam = static function ($config, $paramName, $paramKey) {
-            $value = $config[$paramName] ?? $config[$paramKey] ?? null;
-
-            if (null === $value) {
-                throw new MissingConfigParameterException(sprintf('Missing config parameter name "%s" or parameter key %d', $paramName, $paramKey));
-            }
-
-            return $value;
-        };
-
-        $url = $getParam($config, 'url', 0);
-        $database = $getParam($config, 'database', 1);
-        $username = $getParam($config, 'username', 2);
-        $password = $getParam($config, 'password', 3);
-
-        return new self($url, $database, $username, $password, $logger);
+        return new self(Connection::create($config), $transport, $logger);
     }
 
     /**
@@ -135,7 +92,7 @@ class Client
      *
      * @return int the ID of the new record
      */
-    public function create(string $modelName, array $data): int
+    public function insert(string $modelName, array $data): int
     {
         if (!$data) {
             throw new InvalidArgumentException('Data cannot be empty');
@@ -155,9 +112,9 @@ class Client
      */
     public function read(string $modelName, $ids, array $options = []): array
     {
-        $ids = [is_int($ids) ? [$ids] : (array) $ids];
+        $ids = is_int($ids) ? [$ids] : (array) $ids;
 
-        return (array) $this->execute($modelName, self::READ, [[$ids]], $options);
+        return (array) $this->execute($modelName, self::READ, [$ids], $options);
     }
 
     /**
@@ -338,9 +295,9 @@ class Client
         return $this->request(
             self::SERVICE_OBJECT,
             'execute_kw',
-            $this->database,
+            $this->connection->getDatabase(),
             $this->authenticate(),
-            $this->password,
+            $this->connection->getPassword(),
             $name,
             $method,
             $parameters,
@@ -362,9 +319,9 @@ class Client
             $this->uid = $this->request(
                 self::SERVICE_COMMON,
                 'login',
-                $this->database,
-                $this->username,
-                $this->password
+                $this->connection->getDatabase(),
+                $this->connection->getUsername(),
+                $this->connection->getPassword()
             );
 
             if (!$this->uid || !is_int($this->uid)) {
@@ -376,7 +333,7 @@ class Client
     }
 
     /**
-     * @param mixed[] $arguments
+     * @param mixed ...$arguments
      *
      * @return mixed
      */
@@ -387,33 +344,14 @@ class Client
             $this->logger->info('JSON RPC request #{request_id} - {service}::{method} (uid: #{uid})', $context);
         }
 
-        $data = [
-            'jsonrpc' => '2.0',
-            'method' => 'call',
-            'params' => [
-                'service' => $service,
-                'method' => $method,
-                'args' => $arguments,
-            ],
-            'id' => uniqid('odoo_request'),
-        ];
-
-        dump($data);
-
-        $response = $this->httpClient->request('POST', '', [
-            'json' => $data,
-        ]);
-
-        $result = $response->getContent();
+        $payload = $this->transport->request($service, $method, $arguments);
 
         if ($this->logger) {
-            $loggedResult = $result;
+            $loggedResult = json_encode($payload);
             $this->logger->debug(sprintf('Request result: %s', $loggedResult), [
                 'request_id' => $context['request_id'],
             ]);
         }
-
-        $payload = json_decode($result, true);
 
         if (is_array($payload['error'] ?? null)) {
             throw RemoteException::create($payload);
@@ -422,60 +360,14 @@ class Client
         return $payload['result'];
     }
 
-    public function getIdentifier(): string
+    public function getConnection(): Connection
     {
-        $database = preg_replace('([^a-zA-Z0-9_])', '_', $this->database);
-        $user = preg_replace('([^a-zA-Z0-9_])', '_', $this->username);
-
-        return sprintf('%s.%s.%s', sha1($this->url), $database, $user);
+        return $this->connection;
     }
 
-    public function getUrl(): string
+    public function setConnection(Connection $connection): void
     {
-        return $this->url;
-    }
-
-    public function setUrl(string $url): self
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    public function getDatabase(): string
-    {
-        return $this->database;
-    }
-
-    public function setDatabase(string $database): self
-    {
-        $this->database = $database;
-
-        return $this;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
+        $this->connection = $connection;
     }
 
     public function getExpressionBuilder(): ExpressionBuilder
