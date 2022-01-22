@@ -9,7 +9,7 @@ use Ang3\Component\Odoo\Exception\RequestException;
  * @author Joanis ROUANET <https://github.com/Ang3>
  * @author Jules Sayer <https://github.com/Wilders>
  */
-class JsonRpcPhpNativeStreamTransport extends AbstractRpcTransport
+class JsonRpcPhpStreamTransport extends AbstractRpcTransport
 {
     /**
      * JSON-RPC endpoint.

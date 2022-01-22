@@ -7,7 +7,7 @@ use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Expression\ExpressionBuilder;
-use Ang3\Component\Odoo\Transport\JsonRpcPhpNativeStreamTransport;
+use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
 use Ang3\Component\Odoo\Transport\TransportInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -67,7 +67,7 @@ class Client
     {
         $this->connection = $connection;
         $this->expressionBuilder = new ExpressionBuilder();
-        $this->transport = $transport ?: new JsonRpcPhpNativeStreamTransport($this->connection);
+        $this->transport = $transport ?: new JsonRpcPhpStreamTransport($this->connection);
         $this->logger = $logger;
     }
 
