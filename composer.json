@@ -2,7 +2,7 @@
     "name": "ang3/php-odoo-api-client",
     "type": "component",
     "description": "Odoo API client",
-    "keywords": ["odoo", "api", "client", "domain", "operation", "dbal", "query", "builder", "repository", "builder", "12", "13"],
+    "keywords": ["odoo", "api", "client", "domain", "operation", "builder", "json"],
     "license": "MIT",
     "authors": [
         {
