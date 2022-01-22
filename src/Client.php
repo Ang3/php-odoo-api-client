@@ -12,6 +12,32 @@ use Ang3\Component\Odoo\Exception\RequestException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * After multiple search through Odoo forums, documentation and pastebins, I found that Odoo JSON RPC requests wait for :
+ * {
+ * "jsonrpc": "2.0",
+ * "method": "call",
+ * "id": "rpc61eb4703a66c38.90127030",
+ * "params": {
+ * "service": "object",
+ * "method": "execute",
+ * "args": [
+ * "__DATABASE__",
+ * __USERID__,
+ * "__PASWORD__",
+ * "__MODEL__",
+ * "__METHOD",
+ * [__DOMAIN__],
+ * [__FIELDS__],
+ * __LIMIT,
+ * __OFFSET,
+ * "__ORDER__",
+ * __CONTEXT_OBJECT__
+ * ]
+ * }
+ * }
+ */
+
 class Client
 {
     use ExpressionBuilderAwareTrait;
@@ -19,8 +45,7 @@ class Client
     /**
      * Endpoints.
      */
-    public const ENDPOINT_COMMON = 'xmlrpc/2/common';
-    public const ENDPOINT_OBJECT = 'xmlrpc/2/object';
+    public const ENDPOINT = 'jsonrpc';
 
     /**
      * Special commands.
@@ -60,14 +85,7 @@ class Client
      *
      * @var Endpoint
      */
-    private $commonEndpoint;
-
-    /**
-     * OBJECT endpoint.
-     *
-     * @var Endpoint
-     */
-    private $objectEndpoint;
+    private $endpoint;
 
     /**
      * ORM record manager.
@@ -96,7 +114,7 @@ class Client
         $this->password = $password;
         $this->recordManager = new RecordManager($this);
         $this->logger = $logger;
-        $this->initEndpoints();
+        $this->initEndpoint();
     }
 
     /**
@@ -378,7 +396,7 @@ class Client
             $this->logger->debug('Calling method {name}::{method}', $loggerContext);
         }
 
-        $result = $this->objectEndpoint->call('execute_kw', [
+        $result = $this->endpoint->call('object', 'execute', [
             $this->database,
             $this->authenticate(),
             $this->password,
@@ -400,7 +418,7 @@ class Client
 
     public function version(): array
     {
-        return $this->commonEndpoint->call('version');
+        return $this->endpoint->call('common', 'version');
     }
 
     /**
@@ -409,12 +427,7 @@ class Client
     public function authenticate(): int
     {
         if (null === $this->uid) {
-            $this->uid = $this->commonEndpoint->call('authenticate', [
-                $this->database,
-                $this->username,
-                $this->password,
-                [],
-            ]);
+            $this->uid = $this->endpoint->call('common', 'login', [$this->database, $this->username, $this->password]);
 
             if (!$this->uid || !is_int($this->uid)) {
                 throw new AuthenticationException();
@@ -440,7 +453,7 @@ class Client
     public function setUrl(string $url): self
     {
         $this->url = $url;
-        $this->initEndpoints();
+        $this->initEndpoint();
 
         return $this;
     }
@@ -483,12 +496,7 @@ class Client
 
     public function getCommonEndpoint(): Endpoint
     {
-        return $this->commonEndpoint;
-    }
-
-    public function getObjectEndpoint(): Endpoint
-    {
-        return $this->objectEndpoint;
+        return $this->endpoint;
     }
 
     public function getRecordManager(): RecordManager
@@ -511,9 +519,8 @@ class Client
     /**
      * @internal
      */
-    private function initEndpoints(): void
+    private function initEndPoint(): void
     {
-        $this->commonEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_COMMON);
-        $this->objectEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_OBJECT);
+        $this->endpoint = new Endpoint($this->url.'/'.self::ENDPOINT);
     }
 }
