@@ -18,7 +18,7 @@ class JsonRpcClient {
             'params' => $params
         ]);
 
-        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => $content]]);
+        $context = stream_context_create(['timeout' => 120, 'http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => $content]]);
 
         $request = file_get_contents($this->getUrl(), false, $context);
 
