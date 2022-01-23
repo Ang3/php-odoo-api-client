@@ -279,15 +279,7 @@ class ExpressionBuilder
             return $this->normalizeDomains();
         }
 
-        if ($criteria instanceof CompositeDomain) {
-            dump($criteriaArray);
-
-            return $criteriaArray;
-        }
-
-        dump([$criteriaArray]);
-
-        return [$criteriaArray];
+        return $criteria instanceof CompositeDomain ? $criteriaArray : [$criteriaArray];
     }
 
     /**
