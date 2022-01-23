@@ -21,9 +21,9 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
      */
     private $connection;
 
-    public function __construct(Connection $credentials)
+    public function __construct(Connection $connection)
     {
-        $this->connection = $credentials;
+        $this->connection = $connection;
     }
 
     public function request(string $service, string $method, array $arguments = []): array

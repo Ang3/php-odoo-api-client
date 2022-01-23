@@ -7,8 +7,10 @@ use Ang3\Component\Odoo\Expression\Domain\CompositeDomain;
 use Ang3\Component\Odoo\Expression\Domain\DomainInterface;
 use Ang3\Component\Odoo\Expression\Exception\ConversionException;
 use Ang3\Component\Odoo\Expression\Operation\CollectionOperation;
+use Ang3\Component\Odoo\Expression\Operation\OperationInterface;
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 
@@ -324,7 +326,7 @@ class ExpressionBuilder
                 return $this->formatValue($value->toArray());
             }
 
-            if ($value instanceof CollectionOperation) {
+            if ($value instanceof OperationInterface) {
                 return $this->formatValue($value->toArray());
             }
 
@@ -335,9 +337,9 @@ class ExpressionBuilder
                     throw new ConversionException(sprintf('Failed to convert date from timestamp "%d"', $value->getTimestamp()), 0, $e);
                 }
 
-                $date->setTimezone(new \DateTimeZone('UTC'));
-
-                return $date->format('Y-m-d H:i:s');
+                return $date
+                    ->setTimezone(new DateTimeZone('UTC'))
+                    ->format('Y-m-d H:i:s');
             }
         }
 
