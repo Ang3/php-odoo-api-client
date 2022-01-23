@@ -54,6 +54,9 @@ of the Composer documentation.
 Basic usage
 -----------
 
+First, import the client with a `use` statement and create a client instance statically 
+with your config:
+
 ```php
 <?php
 

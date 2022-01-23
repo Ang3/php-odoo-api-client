@@ -137,7 +137,8 @@ use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
  * Create a new record.
  *
  * @return int the ID of the new record
- */public function create(string $modelName, array $data): int;
+ */
+public function create(string $modelName, array $data): int;
 
 /**
  * Update record(s).
