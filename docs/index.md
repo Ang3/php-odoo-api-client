@@ -20,7 +20,7 @@ Getting started
 Software requirements
 ---------------------
 
-PHP version 7.2 or newer to develop using PhpSpreadsheet. Other requirements, such as PHP extensions, are enforced by
+PHP version 7.2 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
 composer. See the `require` section of ::composer.json
 for details.
 
