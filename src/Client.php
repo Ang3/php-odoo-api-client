@@ -365,11 +365,6 @@ class Client
         return $this->connection;
     }
 
-    public function setConnection(Connection $connection): void
-    {
-        $this->connection = $connection;
-    }
-
     public function getExpressionBuilder(): ExpressionBuilder
     {
         return $this->expressionBuilder;
