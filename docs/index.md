@@ -21,7 +21,7 @@ Software requirements
 ---------------------
 
 PHP version 7.2 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
-composer. See the `require` section of ::composer.json
+composer. See the `require` section of [composer.json file](../composer.json)
 for details.
 
 The installation of the PHP extension `php-curl` is recommended
