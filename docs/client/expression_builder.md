@@ -7,7 +7,7 @@ Odoo has its own array format for those expressions.
 The aim of the expression builder is to provide some
 helper methods to simplify your programmer's life.
 
-Here is an example of how to get a builder from a client or record manager:
+Here is an example of how to get a builder from the client:
 
 ```php
 $expr = $client->getExpressionBuilder();
@@ -38,9 +38,9 @@ To illustrate how to work with it, here is an example using ```ExpressionBuilder
 
 ```php
 // Get the expression builder
-$expr = $recordManager->expr();
+$expr = $client->expr();
 
-$result = $recordManager->findBy('model_name', $expr->andX( // Logical node "AND"
+$result = $client->findBy('model_name', $expr->andX( // Logical node "AND"
 	$expr->gte('id', 10), // id >= 10
 	$expr->lte('id', 100), // id <= 10
 ));
@@ -49,7 +49,7 @@ $result = $recordManager->findBy('model_name', $expr->andX( // Logical node "AND
 Of course, you can nest logical nodes:
 
 ```php
-$result = $recordManager->findBy('model_name', $expr->andX(
+$result = $client->findBy('model_name', $expr->andX(
     $expr->orX(
         $expr->eq('A', 1),
         $expr->eq('B', 1)
@@ -179,7 +179,7 @@ To illustrate how to work with operations, here is an example using ```Expressio
 
 ```php
 // Get the expression builder
-$expr = $recordManager->expr();
+$expr = $client->expr();
 
 // Prepare data for a new record
 $data = [
@@ -193,7 +193,7 @@ $data = [
     ]
 ];
 
-$result = $recordManager->create('model_name', $data);
+$result = $client->create('model_name', $data);
 ```
 
 Internally, the client formats automatically the whole query parameters for all writing methods
