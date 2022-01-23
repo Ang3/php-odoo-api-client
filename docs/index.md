@@ -24,7 +24,7 @@ PHP version 7.2 or newer to develop using PhpSpreadsheet. Other requirements, su
 composer. See the `require` section of ::composer.json
 for details.
 
-The installation of the PHP extension **php-curl** is recommended
+The installation of the PHP extension `php-curl` is recommended
 for HTTP requests. If missing, PHP native streams are used.
 
 Odoo database support
@@ -54,16 +54,17 @@ of the Composer documentation.
 Basic usage
 -----------
 
-.. code-block:: php
-    <?php
+```php
+<?php
 
-    require_once 'vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
-    use Ang3\Component\Odoo\Client;
+use Ang3\Component\Odoo\Client;
 
-    $client = Client::create([
-        'url' => '<url_of_instance>',
-        'database' => '<name_of_database>',
-        'username' => '<your_username>',
-        'password' => '<your_password>',
-    ], $logger = null);
+$client = Client::create([
+    'url' => '<url_of_instance>',
+    'database' => '<name_of_database>',
+    'username' => '<your_username>',
+    'password' => '<your_password>',
+], $logger = null);
+```
