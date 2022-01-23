@@ -9,10 +9,8 @@ Main features
 
 - Built-in ORM methods
 - Expression builder for domains and collection operations
-- Database Abstraction Layer (DBAL)
-  - Query builder
-  - Repository
-  - Schema
+- Query builder to build your queries easily
+- Repositories to work on a specific model or create reusable queries
 
 Getting started
 ===============
