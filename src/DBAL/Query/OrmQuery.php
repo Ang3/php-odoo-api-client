@@ -57,7 +57,7 @@ class OrmQuery extends AbstractQuery implements QueryInterface
         }
 
         $query = new self($this->recordManager, $this->name, self::SEARCH_COUNT);
-        $query->setParameters($this->recordManager->getExpressionBuilder()->normalizeDomains($this->parameters));
+        $query->setParameters($this->parameters);
 
         return (int) $query->execute();
     }
