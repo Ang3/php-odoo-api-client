@@ -4,8 +4,13 @@ namespace Ang3\Component\Odoo\Transport;
 
 use Ang3\Component\Odoo\Exception\RequestException;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 interface TransportInterface
 {
+    public const DEFAULT_TIMEOUT = 120;
+
     /**
      * Make a request to Odoo database.
      *

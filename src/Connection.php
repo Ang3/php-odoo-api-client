@@ -4,6 +4,9 @@ namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 class Connection
 {
     /**

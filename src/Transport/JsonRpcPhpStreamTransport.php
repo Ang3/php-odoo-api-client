@@ -21,9 +21,15 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
      */
     private $connection;
 
-    public function __construct(Connection $connection)
+    /**
+     * @var int
+     */
+    private $timeOut;
+
+    public function __construct(Connection $connection, int $timeOut = TransportInterface::DEFAULT_TIMEOUT)
     {
         $this->connection = $connection;
+        $this->timeOut = $timeOut;
     }
 
     public function request(string $service, string $method, array $arguments = []): array
@@ -37,7 +43,7 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
         $context = stream_context_create([
             'http' => [
                 'method' => 'POST',
-                'timeout' => 120,
+                'timeout' => $this->timeOut,
                 'header' => 'Content-Type: application/json',
                 'content' => $payload,
             ],
@@ -56,6 +62,6 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
             throw new RequestException(sprintf('Failed to decode JSON data: %s', json_last_error_msg()));
         }
 
-        return $data;
+        return (array) $data;
     }
 }

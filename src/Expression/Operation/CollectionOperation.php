@@ -4,6 +4,9 @@ namespace Ang3\Component\Odoo\Expression\Operation;
 
 use InvalidArgumentException;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 class CollectionOperation implements OperationInterface
 {
     /**

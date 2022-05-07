@@ -4,6 +4,9 @@ namespace Ang3\Component\Odoo\Transport;
 
 use Ang3\Component\Odoo\Exception\RemoteException;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 abstract class AbstractRpcTransport implements TransportInterface
 {
     public function normalizeRpcData(string $service, string $method, array $arguments = []): array

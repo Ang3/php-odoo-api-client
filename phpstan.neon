@@ -5,4 +5,6 @@ parameters:
   paths:
     - %currentWorkingDirectory%/src
   ignoreErrors:
-  	#- '#(.*) expects class-string\<T of object\>\|T of object, (.*) given$#'
+  	- '#Method Ang3\\Component\\Odoo\\Client\:\:findBy\(\) should return array<array> but returns array\.#'
+  	- '#Cannot cast mixed to int\.#'
+  	- '#Cannot cast mixed to string\.#'

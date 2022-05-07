@@ -4,6 +4,9 @@ namespace Ang3\Component\Odoo\Expression\Domain;
 
 use Generator;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 class CompositeDomain implements DomainInterface
 {
     /**

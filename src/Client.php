@@ -12,6 +12,9 @@ use Ang3\Component\Odoo\Transport\TransportInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 class Client
 {
     /**
@@ -98,7 +101,8 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        $result = $this->execute($modelName, self::CREATE, [[$data]]);
+        /** @var int[] $result */
+        $result = (array) $this->execute($modelName, self::CREATE, [[$data]]);
 
         return (int) array_shift($result);
     }
@@ -190,7 +194,10 @@ class Client
             unset($options['fields']);
         }
 
-        return (array) $this->execute($modelName, self::SEARCH, [$this->expressionBuilder->normalizeDomains($criteria)], $options);
+        /** @var int[] $result */
+        $result = (array) $this->execute($modelName, self::SEARCH, [$this->expressionBuilder->normalizeDomains($criteria)], $options);
+
+        return $result;
     }
 
     /**
@@ -236,7 +243,7 @@ class Client
      * @throws InvalidArgumentException when $criteria value is not valid
      * @throws RequestException         when request failed
      *
-     * @return array<int, array>
+     * @return array[]
      */
     public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
     {
@@ -274,13 +281,11 @@ class Client
      */
     public function count(string $modelName, iterable $criteria = null): int
     {
-        return $this->execute($modelName, self::SEARCH_COUNT, [$this->expressionBuilder->normalizeDomains($criteria)]);
+        return (int) $this->execute($modelName, self::SEARCH_COUNT, [$this->expressionBuilder->normalizeDomains($criteria)]);
     }
 
     /**
      * List model fields.
-     *
-     * @deprecated since version 7.0 and will be removed in 8.0, use the record manager schema instead.
      */
     public function listFields(string $modelName, array $options = []): array
     {
@@ -307,7 +312,7 @@ class Client
 
     public function version(): array
     {
-        return $this->request(self::SERVICE_COMMON, 'version');
+        return (array) $this->request(self::SERVICE_COMMON, 'version');
     }
 
     /**
@@ -316,7 +321,7 @@ class Client
     public function authenticate(): int
     {
         if (null === $this->uid) {
-            $this->uid = $this->request(
+            $this->uid = (int) $this->request(
                 self::SERVICE_COMMON,
                 'login',
                 $this->connection->getDatabase(),
@@ -324,7 +329,7 @@ class Client
                 $this->connection->getPassword()
             );
 
-            if (!$this->uid || !is_int($this->uid)) {
+            if (!$this->uid) {
                 throw new AuthenticationException();
             }
         }

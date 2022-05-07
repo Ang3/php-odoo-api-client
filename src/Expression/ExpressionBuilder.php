@@ -14,6 +14,9 @@ use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 class ExpressionBuilder
 {
     /**
@@ -273,6 +276,7 @@ class ExpressionBuilder
             throw new InvalidArgumentException(sprintf('Expected parameter #1 of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
         }
 
+        /** @var array $criteriaArray */
         $criteriaArray = $this->formatValue($criteria->toArray());
 
         if (!$criteriaArray) {
@@ -287,7 +291,7 @@ class ExpressionBuilder
      */
     public function normalizeData(array $data = []): array
     {
-        return $this->formatValue($data);
+        return (array) $this->formatValue($data);
     }
 
     /**
@@ -335,10 +339,6 @@ class ExpressionBuilder
             }
         }
 
-        try {
-            return (string) $value;
-        } catch (Exception $e) {
-            throw new ConversionException(sprintf('Failed to convert value of type "%s" to string.', gettype($value)), 0, $e);
-        }
+        return (string) $value;
     }
 }
