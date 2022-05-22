@@ -344,9 +344,16 @@ class Client
      */
     public function request(string $service, string $method, ...$arguments)
     {
-        $context['request_id'] = uniqid('rpc', true);
+        $context = [
+            'service' => $service,
+            'method' => $method,
+            'uid' => (int) $this->uid,
+            'arguments' => $arguments,
+            'request_id' => uniqid('rpc', true),
+        ];
+
         if ($this->logger) {
-            $this->logger->info('JSON RPC request #{request_id} started - {service}::{method} (uid: #{uid})', $context);
+            $this->logger->info('JSON RPC request #{request_id} started - {service}::{method}({arguments}) (uid: #{uid})', $context);
         }
 
         $runtime = microtime(true);
