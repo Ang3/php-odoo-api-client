@@ -363,7 +363,7 @@ class Client
         if ($this->logger) {
             $this->logger->info('JSON RPC request #{request_id} finished - Runtime: {runtime}s.', [
                 'request_id' => $context['request_id'],
-                'runtime' => number_format($runtime * 1E3, 3, '.', ' '),
+                'runtime' => number_format($runtime, 3, '.', ' '),
             ]);
 
             $this->logger->debug('JSON RPC payload debug.', [
