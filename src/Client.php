@@ -346,15 +346,22 @@ class Client
     {
         $context['request_id'] = uniqid('rpc', true);
         if ($this->logger) {
-            $this->logger->info('JSON RPC request #{request_id} - {service}::{method} (uid: #{uid})', $context);
+            $this->logger->info('JSON RPC request #{request_id} started - {service}::{method} (uid: #{uid})', $context);
         }
 
+        $runtime = microtime(true);
         $payload = $this->transport->request($service, $method, $arguments);
+        $runtime = microtime(true) - $runtime;
 
         if ($this->logger) {
-            $loggedResult = json_encode($payload);
-            $this->logger->debug(sprintf('Request result: %s', $loggedResult), [
+            $this->logger->info('JSON RPC request #{request_id} finished - Runtime: %ss.', [
                 'request_id' => $context['request_id'],
+                'runtime' => number_format($runtime * 1E3, 3, '.', ' '),
+            ]);
+
+            $this->logger->debug('JSON RPC payload debug.', [
+                'request_id' => $context['request_id'],
+                'payload' => $payload,
             ]);
         }
 
