@@ -116,7 +116,7 @@ class RecordRepository
      */
     public function search(?DomainInterface $criteria = null, array $orders = [], int $limit = null, int $offset = null): array
     {
-        /** @var int[] $result */
+        /* @var int[] $result */
         return $this
             ->createQueryBuilder()
             ->search()

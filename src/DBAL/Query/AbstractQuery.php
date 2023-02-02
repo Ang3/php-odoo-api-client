@@ -22,8 +22,7 @@ abstract class AbstractQuery implements QueryInterface
         protected readonly RecordManager $recordManager,
         protected string $name,
         protected string $method
-    )
-    {
+    ) {
     }
 
     public function getName(): string

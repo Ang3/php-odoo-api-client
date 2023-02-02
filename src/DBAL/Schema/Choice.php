@@ -17,8 +17,7 @@ class Choice
         private readonly string $name,
         private readonly string $value,
         private readonly ?int $id = null
-    )
-    {
+    ) {
     }
 
     public function getId(): ?int
