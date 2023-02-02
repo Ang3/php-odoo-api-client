@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Transport;
 
 use Ang3\Component\Odoo\Connection;
@@ -16,20 +25,11 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
      */
     public const ENDPOINT_JSON_RPC = 'jsonrpc';
 
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var int
-     */
-    private $timeOut;
-
-    public function __construct(Connection $connection, int $timeOut = TransportInterface::DEFAULT_TIMEOUT)
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly int $timeOut = TransportInterface::DEFAULT_TIMEOUT
+    )
     {
-        $this->connection = $connection;
-        $this->timeOut = $timeOut;
     }
 
     public function request(string $service, string $method, array $arguments = []): array

@@ -1,24 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Tests\Expression;
 
 use Ang3\Component\Odoo\DBAL\Expression\CompositeDomain;
 use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
-use ReflectionException;
 
 /**
  * @coversDefaultClass \Ang3\Component\Odoo\DBAL\Expression\CompositeDomain
+ *
+ * @internal
  */
-class CompositeDomainTest extends AbstractDomainTest
+final class CompositeDomainTest extends AbstractDomainTest
 {
     /**
-     * @covers ::setOperation
-     * @covers ::getOperator
      * @covers ::add
-     * @covers ::remove
+     * @covers ::getOperator
      * @covers ::has
+     * @covers ::remove
+     * @covers ::setOperation
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function testAccessorsAndMutators(): void
     {
@@ -120,6 +130,7 @@ class CompositeDomainTest extends AbstractDomainTest
 
     /**
      * @covers ::toArray
+     *
      * @dataProvider provideToArrayDataSet
      *
      * @param mixed $expectedResult
@@ -127,7 +138,7 @@ class CompositeDomainTest extends AbstractDomainTest
     public function testToArray(string $operator, array $domains = [], $expectedResult = null, string $message = ''): void
     {
         $domain = new CompositeDomain($operator, $domains);
-        $this->assertEquals($expectedResult, $domain->toArray(), $message);
+        static::assertSame($expectedResult, $domain->toArray(), $message);
     }
 
     /**
@@ -138,7 +149,8 @@ class CompositeDomainTest extends AbstractDomainTest
         $fakeDomain = $this->createMock(DomainInterface::class);
         $fakeDomain
             ->method('toArray')
-            ->willReturn(is_array($expression) ? $expression : (array) $expression);
+            ->willReturn(\is_array($expression) ? $expression : (array) $expression)
+        ;
 
         return $fakeDomain;
     }

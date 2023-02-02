@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Tests;
 
 use Ang3\Component\Odoo\Tests\Utils\ObjectTester;
 use Ang3\Component\Odoo\Tests\Utils\Reflector;
 use PHPUnit\Framework\TestCase;
-use ReflectionException;
 
-/**
- * @abstract
- */
 abstract class AbstractTest extends TestCase
 {
     /**
@@ -23,7 +28,7 @@ abstract class AbstractTest extends TestCase
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     protected function createObjectTester(object $object): ObjectTester
     {

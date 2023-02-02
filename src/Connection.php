@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
@@ -9,25 +18,10 @@ use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
  */
 class Connection
 {
-    /**
-     * @var string
-     */
-    private $url;
-
-    /**
-     * @var string
-     */
-    private $database;
-
-    /**
-     * @var string
-     */
-    private $username;
-
-    /**
-     * @var string
-     */
-    private $password;
+    private string $url;
+    private string $database;
+    private string $username;
+    private string $password;
 
     public function __construct(string $url, string $database, string $username, string $password)
     {

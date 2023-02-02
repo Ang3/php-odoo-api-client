@@ -28,12 +28,12 @@ for HTTP requests. If missing, PHP native streams are used.
 Odoo database support
 ---------------------
 
-| Odoo series | Compatibility | Comment |
-| --- | --- | --- |
-| Newer | Unknown | Needs feedbacks |
-| v13.0 | Yes | Some Odoo model names changed (e.g account.invoice > account.move) |
-| v12.0 | Yes | First tested version |
-| Older | Unknown | Needs feedbacks |
+| Odoo series | Compatibility | Comment                                                            |
+|-------------|---------------|--------------------------------------------------------------------|
+| Newer       | Unknown       | Needs feedbacks                                                    |
+| v13.0       | Yes           | Some Odoo model names changed (e.g account.invoice > account.move) |
+| v12.0       | Yes           | First tested version                                               |
+| Older       | Unknown       | Needs feedbacks                                                    |
 
 Installation
 ------------

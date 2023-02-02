@@ -7,7 +7,6 @@
     "authors": [
         {
             "name": "Joanis ROUANET",
-            "email": "joanis.ang3@gmail.com",
             "homepage": "https://github.com/Ang3"
         }
     ],
@@ -18,16 +17,11 @@
         }
     },
     "require": {
-        "php": ">=7.2",
+        "php": ">=8.1",
         "ext-json": "*",
         "psr/log": "^1.1||^2.0||3.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "roave/security-advisories": "dev-master",
-        "symfony/var-dumper": ">=3.4",
-        "symfony/phpunit-bridge": ">=3.4",
-        "symfony/property-info": ">=3.4",
-        "symfony/inflector": ">=3.4"
+        "symfony/test-pack": "^1.0"
     }
 }

@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Tests\Utils;
 
 class Debugger
@@ -11,7 +20,7 @@ class Debugger
      */
     public function debugType($value): string
     {
-        return is_object($value) ? sprintf('instance of %s', get_class($value)) : gettype($value);
+        return \is_object($value) ? sprintf('instance of %s', $value::class) : \gettype($value);
     }
 
     /**

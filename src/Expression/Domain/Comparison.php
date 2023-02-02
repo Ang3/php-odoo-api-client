@@ -1,8 +1,15 @@
 <?php
 
-namespace Ang3\Component\Odoo\Expression\Domain;
+declare(strict_types=1);
 
-use ArrayIterator;
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Component\Odoo\Expression\Domain;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
@@ -31,7 +38,7 @@ class Comparison implements DomainInterface
     /**
      * @var string[]
      */
-    private static $operators = [
+    private static array $operators = [
         self::UNSET_OR_EQUAL_TO,
         self::EQUAL_TO,
         self::NOT_EQUAL_TO,
@@ -49,39 +56,18 @@ class Comparison implements DomainInterface
         self::NOT_IN,
     ];
 
-    /**
-     * @var string
-     */
-    private $fieldName;
-
-    /**
-     * @var string
-     */
-    private $operator;
-
-    /**
-     * @var mixed
-     */
-    private $value;
-
-    /**
-     * @param mixed $value
-     */
-    public function __construct(string $fieldName, string $operator, $value)
+    public function __construct(private string $fieldName, private string $operator, private mixed $value)
     {
-        $this->fieldName = $fieldName;
-        $this->operator = $operator;
-        $this->value = $value;
     }
 
     public function __clone()
     {
-        $this->value = is_object($this->value) ? clone $this->value : $this->value;
+        $this->value = \is_object($this->value) ? clone $this->value : $this->value;
     }
 
-    public function getIterator(): ArrayIterator
+    public function getIterator(): \ArrayIterator
     {
-        return new ArrayIterator($this->toArray());
+        return new \ArrayIterator($this->toArray());
     }
 
     public function toArray(): array
@@ -121,18 +107,12 @@ class Comparison implements DomainInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setValue($value): self
+    public function setValue(mixed $value): self
     {
         $this->value = $value;
 

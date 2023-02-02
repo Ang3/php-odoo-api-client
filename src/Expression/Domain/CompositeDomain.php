@@ -1,8 +1,15 @@
 <?php
 
-namespace Ang3\Component\Odoo\Expression\Domain;
+declare(strict_types=1);
 
-use Generator;
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Component\Odoo\Expression\Domain;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
@@ -19,26 +26,17 @@ class CompositeDomain implements DomainInterface
     /**
      * @var string[]
      */
-    private static $operators = [
+    private static array $operators = [
         self::AND,
         self::OR,
         self::NOT,
     ];
 
     /**
-     * @var string
+     * @param DomainInterface[] $domains
      */
-    private $operator;
-
-    /**
-     * @var DomainInterface[]
-     */
-    private $domains = [];
-
-    public function __construct(string $operator, array $domains = [])
+    public function __construct(private string $operator, private array $domains = [])
     {
-        $this->operator = $operator;
-        $this->setDomains($domains);
     }
 
     public function __clone()
@@ -51,9 +49,9 @@ class CompositeDomain implements DomainInterface
     /**
      * {@inheritdoc}
      *
-     * @return DomainInterface[]|Generator
+     * @return DomainInterface[]|\Generator
      */
-    public function getIterator(): Generator
+    public function getIterator(): \Generator
     {
         foreach ($this->getDomains() as $key => $domain) {
             yield $key => $domain;
@@ -105,7 +103,7 @@ class CompositeDomain implements DomainInterface
     private function prepare(): ?DomainInterface
     {
         $domains = $this->domains;
-        $nbDomains = count($domains);
+        $nbDomains = \count($domains);
 
         if (0 === $nbDomains) {
             return null;
@@ -118,7 +116,7 @@ class CompositeDomain implements DomainInterface
         if (self::NOT === $this->operator) {
             $andX = new self(self::AND, $domains);
 
-            return new self($this->operator, [$andX->prepare()]);
+            return new self($this->operator, array_filter([$andX->prepare()]));
         }
 
         if (2 === $nbDomains) {
@@ -136,11 +134,11 @@ class CompositeDomain implements DomainInterface
         }
 
         $firstDomain = array_shift($domains);
-        $subDomain = new self($this->operator, $domains);
+        $subDomain = new self($this->operator, array_filter($domains));
 
-        return new self($this->operator, [
+        return new self($this->operator, array_filter([
             $firstDomain, $subDomain->prepare(),
-        ]);
+        ]));
     }
 
     public function getOperator(): string
@@ -200,16 +198,16 @@ class CompositeDomain implements DomainInterface
 
     public function has(DomainInterface $domain): bool
     {
-        return in_array($domain, $this->domains, true);
+        return \in_array($domain, $this->domains, true);
     }
 
     public function count(): int
     {
-        return count($this->domains);
+        return \count($this->domains);
     }
 
     public function isEmpty(): bool
     {
-        return 0 === count($this->domains);
+        return 0 === \count($this->domains);
     }
 }

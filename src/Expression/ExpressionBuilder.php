@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Expression;
 
 use Ang3\Component\Odoo\Expression\Domain\Comparison;
@@ -8,11 +17,6 @@ use Ang3\Component\Odoo\Expression\Domain\DomainInterface;
 use Ang3\Component\Odoo\Expression\Exception\ConversionException;
 use Ang3\Component\Odoo\Expression\Operation\CollectionOperation;
 use Ang3\Component\Odoo\Expression\Operation\OperationInterface;
-use DateTime;
-use DateTimeInterface;
-use DateTimeZone;
-use Exception;
-use InvalidArgumentException;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
@@ -45,70 +49,56 @@ class ExpressionBuilder
 
     /**
      * Check if the field is EQUAL TO the value.
-     *
-     * @param mixed $value
      */
-    public function eq(string $fieldName, $value): Comparison
+    public function eq(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::EQUAL_TO, $value);
     }
 
     /**
      * Check if the field is NOT EQUAL TO the value.
-     *
-     * @param mixed $value
      */
-    public function neq(string $fieldName, $value): Comparison
+    public function neq(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::NOT_EQUAL_TO, $value);
     }
 
     /**
      * Check if the field is UNSET OR EQUAL TO the value.
-     *
-     * @param mixed $value
      */
-    public function ueq(string $fieldName, $value): Comparison
+    public function ueq(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::UNSET_OR_EQUAL_TO, $value);
     }
 
     /**
      * Check if the field is LESS THAN the value.
-     *
-     * @param mixed $value
      */
-    public function lt(string $fieldName, $value): Comparison
+    public function lt(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::LESS_THAN, $value);
     }
 
     /**
      * Check if the field is LESS THAN OR EQUAL the value.
-     *
-     * @param mixed $value
      */
-    public function lte(string $fieldName, $value): Comparison
+    public function lte(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::LESS_THAN_OR_EQUAL, $value);
     }
 
     /**
      * Check if the field is GREATER THAN the value.
-     *
-     * @param mixed $value
      */
-    public function gt(string $fieldName, $value): Comparison
+    public function gt(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::GREATER_THAN, $value);
     }
 
     /**
      * Check if the field is GREATER THAN OR EQUAL the value.
-     *
-     * @param mixed $value
      */
-    public function gte(string $fieldName, $value): Comparison
+    public function gte(string $fieldName, mixed $value): Comparison
     {
         return new Comparison($fieldName, Comparison::GREATER_THAN_OR_EQUAL, $value);
     }
@@ -120,10 +110,8 @@ class ExpressionBuilder
      * A percent sign % matches any string of zero or more characters.
      *
      * If $strict is set to FALSE, the value pattern is "%value%" (automatically wrapped into signs %).
-     *
-     * @param mixed $value
      */
-    public function like(string $fieldName, $value, bool $strict = false, bool $caseSensitive = true): Comparison
+    public function like(string $fieldName, mixed $value, bool $strict = false, bool $caseSensitive = true): Comparison
     {
         if ($strict) {
             $operator = $caseSensitive ? Comparison::EQUAL_LIKE : Comparison::INSENSITIVE_EQUAL_LIKE;
@@ -136,10 +124,8 @@ class ExpressionBuilder
 
     /**
      * Check if the field is IS NOT LIKE the value.
-     *
-     * @param mixed $value
      */
-    public function notLike(string $fieldName, $value, bool $caseSensitive = true): Comparison
+    public function notLike(string $fieldName, mixed $value, bool $caseSensitive = true): Comparison
     {
         $operator = $caseSensitive ? Comparison::NOT_LIKE : Comparison::INSENSITIVE_NOT_LIKE;
 
@@ -148,38 +134,32 @@ class ExpressionBuilder
 
     /**
      * Check if the field is IN values list.
-     *
-     * @param bool|int|float|string|array $values
      */
-    public function in(string $fieldName, $values): Comparison
+    public function in(string $fieldName, float|array|bool|int|string $values): Comparison
     {
         return new Comparison($fieldName, Comparison::IN, $this->getValues($values));
     }
 
     /**
      * Check if the field is NOT IN values list.
-     *
-     * @param bool|int|float|string|array $values
      */
-    public function notIn(string $fieldName, $values): Comparison
+    public function notIn(string $fieldName, float|array|bool|int|string $values): Comparison
     {
         return new Comparison($fieldName, Comparison::NOT_IN, $this->getValues($values));
     }
 
     /**
      * @internal
-     *
-     * @param bool|int|float|string|array $values
      */
-    private function getValues($values): array
+    private function getValues(float|array|bool|int|string $values): array
     {
-        return is_array($values) ? $values : [$values];
+        return \is_array($values) ? $values : [$values];
     }
 
     /**
      * Adds a new record created from data.
      *
-     * @throws InvalidArgumentException when $data is empty
+     * @throws \InvalidArgumentException when $data is empty
      */
     public function createRecord(array $data): CollectionOperation
     {
@@ -190,12 +170,12 @@ class ExpressionBuilder
      * Updates an existing record of id $id with data.
      * /!\ Can not be used in record create operation.
      *
-     * @throws InvalidArgumentException when $data is empty
+     * @throws \InvalidArgumentException when $data is empty
      */
     public function updateRecord(int $id, array $data): CollectionOperation
     {
         if (!$data) {
-            throw new InvalidArgumentException('Data cannot be empty');
+            throw new \InvalidArgumentException('Data cannot be empty');
         }
 
         return CollectionOperation::update($id, $data);
@@ -246,8 +226,8 @@ class ExpressionBuilder
     }
 
     /**
-     * @throws InvalidArgumentException when $criteria value is not valid
-     * @throws ConversionException      on data conversion failure
+     * @throws \InvalidArgumentException when $criteria value is not valid
+     * @throws ConversionException       on data conversion failure
      */
     public function normalizeDomains(iterable $criteria = null): array
     {
@@ -255,13 +235,13 @@ class ExpressionBuilder
             return [];
         }
 
-        if (is_array($criteria)) {
+        if (\is_array($criteria)) {
             $normalizedCriteria = $this->andX();
 
             foreach ($criteria as $fieldName => $value) {
                 $comparison = $this->eq($fieldName, $this->formatValue($value));
 
-                if (1 === count($criteria)) {
+                if (1 === \count($criteria)) {
                     $normalizedCriteria = $comparison;
                     break;
                 }
@@ -273,7 +253,7 @@ class ExpressionBuilder
         }
 
         if (!$criteria instanceof DomainInterface) {
-            throw new InvalidArgumentException(sprintf('Expected parameter #1 of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, gettype($criteria)));
+            throw new \InvalidArgumentException(sprintf('Expected parameter #1 of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, \gettype($criteria)));
         }
 
         /** @var array $criteriaArray */
@@ -295,19 +275,17 @@ class ExpressionBuilder
     }
 
     /**
-     * @param mixed $value
+     * @internal
      *
      * @throws ConversionException on data conversion failure
-     *
-     * @return mixed
      */
-    private function formatValue($value)
+    private function formatValue(mixed $value): mixed
     {
-        if (is_scalar($value)) {
+        if (\is_scalar($value)) {
             return $value;
         }
 
-        if (is_array($value) || is_iterable($value)) {
+        if (\is_array($value) || is_iterable($value)) {
             $values = [];
 
             foreach ($value as $key => $aValue) {
@@ -317,7 +295,7 @@ class ExpressionBuilder
             return $values;
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             if ($value instanceof DomainInterface) {
                 return $this->formatValue($value->toArray());
             }
@@ -326,16 +304,17 @@ class ExpressionBuilder
                 return $this->formatValue($value->toArray());
             }
 
-            if ($value instanceof DateTimeInterface) {
+            if ($value instanceof \DateTimeInterface) {
                 try {
-                    $date = new DateTime(sprintf('@%s', $value->getTimestamp()));
-                } catch (Exception $e) {
+                    $date = new \DateTime(sprintf('@%s', $value->getTimestamp()));
+                } catch (\Exception $e) {
                     throw new ConversionException(sprintf('Failed to convert date from timestamp "%d"', $value->getTimestamp()), 0, $e);
                 }
 
                 return $date
-                    ->setTimezone(new DateTimeZone('UTC'))
-                    ->format('Y-m-d H:i:s');
+                    ->setTimezone(new \DateTimeZone('UTC'))
+                    ->format('Y-m-d H:i:s')
+                ;
             }
         }
 

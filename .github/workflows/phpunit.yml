@@ -1,0 +1,32 @@
+name: PHPUnit tests
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  tests_suite:
+    strategy:
+      matrix:
+        php_version: [ '8.1', '8.2' ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_version }}
+          extensions: json
+      - uses: actions/checkout@v3
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+      - name: Install Dependencies
+        run: |
+          composer install
+      - name: Execute PHPUnit tests
+        run: vendor/bin/phpunit

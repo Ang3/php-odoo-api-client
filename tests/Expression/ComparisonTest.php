@@ -1,24 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Tests\Expression;
 
 use Ang3\Component\Odoo\DBAL\Expression\Comparison;
-use ReflectionException;
 
 /**
  * @coversDefaultClass \Ang3\Component\Odoo\DBAL\Expression\Comparison
+ *
+ * @internal
  */
-class ComparisonTest extends AbstractDomainTest
+final class ComparisonTest extends AbstractDomainTest
 {
     /**
-     * @covers ::setFieldName
      * @covers ::getFieldName
-     * @covers ::setOperator
      * @covers ::getOperator
-     * @covers ::setValue
      * @covers ::getValue
+     * @covers ::setFieldName
+     * @covers ::setOperator
+     * @covers ::setValue
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function testAccessorsAndMutators(): void
     {
@@ -39,6 +49,6 @@ class ComparisonTest extends AbstractDomainTest
     {
         $comparison = new Comparison('foo', Comparison::EQUAL_TO, 'bar');
 
-        $this->assertEquals(['foo', '=', 'bar'], $comparison->toArray());
+        static::assertSame(['foo', '=', 'bar'], $comparison->toArray());
     }
 }
