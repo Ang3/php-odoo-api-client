@@ -9,18 +9,15 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Tests\Expression;
+namespace Ang3\Component\Odoo\Tests\DBAL\Expression;
 
-use Ang3\Component\Odoo\DBAL\Expression\Comparison;
-use Ang3\Component\Odoo\Expression\CompositeDomain;
+use Ang3\Component\Odoo\DBAL\Expression\Domain\Comparison;
+use Ang3\Component\Odoo\DBAL\Expression\Domain\CompositeDomain;
 use Ang3\Component\Odoo\Tests\AbstractTest;
 
 abstract class AbstractDomainTest extends AbstractTest
 {
-    /**
-     * @param mixed $value
-     */
-    public function createComparison(string $operator, string $fieldName, $value): Comparison
+    public function createComparison(string $operator, string $fieldName, mixed $value): Comparison
     {
         return new Comparison($operator, $fieldName, $value);
     }

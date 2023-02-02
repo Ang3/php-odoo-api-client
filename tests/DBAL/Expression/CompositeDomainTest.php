@@ -9,13 +9,13 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Tests\Expression;
+namespace Ang3\Component\Odoo\Tests\DBAL\Expression;
 
-use Ang3\Component\Odoo\DBAL\Expression\CompositeDomain;
-use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
+use Ang3\Component\Odoo\DBAL\Expression\Domain\CompositeDomain;
+use Ang3\Component\Odoo\DBAL\Expression\Domain\DomainInterface;
 
 /**
- * @coversDefaultClass \Ang3\Component\Odoo\DBAL\Expression\CompositeDomain
+ * @coversDefaultClass \Ang3\Component\Odoo\DBAL\Expression\Domain\CompositeDomain
  *
  * @internal
  */
@@ -132,19 +132,14 @@ final class CompositeDomainTest extends AbstractDomainTest
      * @covers ::toArray
      *
      * @dataProvider provideToArrayDataSet
-     *
-     * @param mixed $expectedResult
      */
-    public function testToArray(string $operator, array $domains = [], $expectedResult = null, string $message = ''): void
+    public function testToArray(string $operator, array $domains = [], mixed $expectedResult = null, string $message = ''): void
     {
         $domain = new CompositeDomain($operator, $domains);
         static::assertSame($expectedResult, $domain->toArray(), $message);
     }
 
-    /**
-     * @param mixed $expression
-     */
-    protected function createFakeDomain($expression): DomainInterface
+    protected function createFakeDomain(mixed $expression): DomainInterface
     {
         $fakeDomain = $this->createMock(DomainInterface::class);
         $fakeDomain

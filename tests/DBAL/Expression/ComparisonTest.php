@@ -9,12 +9,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Tests\Expression;
+namespace Ang3\Component\Odoo\Tests\DBAL\Expression;
 
-use Ang3\Component\Odoo\DBAL\Expression\Comparison;
+use Ang3\Component\Odoo\DBAL\Expression\Domain\Comparison;
 
 /**
- * @coversDefaultClass \Ang3\Component\Odoo\DBAL\Expression\Comparison
+ * @coversDefaultClass \Ang3\Component\Odoo\DBAL\Expression\Domain\Comparison
  *
  * @internal
  */
