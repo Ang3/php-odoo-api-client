@@ -11,7 +11,7 @@ Odoo API client using
 you call your odoo instance and manage records easily.
 
 **You are reading the documentation of version ```8.0```, if your version is older, please read
-[this documentation (6.1.3)](https://github.com/Ang3/php-odoo-api-client/tree/v7.0.6).** 
+[this documentation (7.0.6)](https://github.com/Ang3/php-odoo-api-client/tree/v7.0.6).** 
 Please see the file [UPGRADE-8.0.md](https://github.com/Ang3/php-odoo-api-client/blob/7.0/UPGRADE-8.0.md) 
 to upgrade your version easily.
 
