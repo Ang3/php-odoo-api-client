@@ -20,5 +20,7 @@ Client
 Expression builder
 ------------------
 
-- Domain classes moved from `Ang3\Component\Odoo\DBAL\Expression` to `Ang3\Component\Odoo\DBAL\Expression\Domain`
+Architecture update:
+  - Domain classes moved from `Ang3\Component\Odoo\DBAL\Expression` to `Ang3\Component\Odoo\DBAL\Expression\Domain`
+  - Operation classes moved from `Ang3\Component\Odoo\DBAL\Expression` to `Ang3\Component\Odoo\DBAL\Expression\Operation`
 - Domain expressions fixes.
