@@ -10,20 +10,21 @@ Odoo API client using
 [XML-RPC Odoo ORM External API](https://www.odoo.com/documentation/12.0/webservices/odoo.html). It allows 
 you call your odoo instance and manage records easily.
 
-**You are reading the documentation of version ```7.0```, if your version is older, please read
-[this documentation (6.1.3)](https://github.com/Ang3/php-odoo-api-client/tree/v6.1.3).** 
-Please see the file [UPGRADE-7.0.md](https://github.com/Ang3/php-odoo-api-client/blob/7.0/UPGRADE-7.0.md) 
+**You are reading the documentation of version ```8.0```, if your version is older, please read
+[this documentation (6.1.3)](https://github.com/Ang3/php-odoo-api-client/tree/v7.0.6).** 
+Please see the file [UPGRADE-8.0.md](https://github.com/Ang3/php-odoo-api-client/blob/7.0/UPGRADE-8.0.md) 
 to upgrade your version easily.
 
 **Main features**
 
-- Authentication ```<7.0```
-- Basic XML-RPC calls ```<7.0```
-- Expression builder  ```<7.0```
-- Database Abstraction Layer (DBAL) ```>=7.0```
+- Authentication `<7.0`
+- Basic JSON-RPC calls `>=8.0`
+- Expression builder  `<7.0`
+- Database Abstraction Layer (DBAL) `>=7.0`
   - Record manager 
-  - Repositories`
+  - Repositories
   - Query builder
+  - Paginator `>=8.0`
 
 **Good to know**
 
@@ -33,14 +34,14 @@ If you are in Symfony application you should be interested in the bundle
 Requirements
 ============
 
-- The PHP extension ```php-xmlrpc``` must be enabled.
+- The PHP extension ```php-json``` must be enabled for JSON RPC calls.
 
-| Odoo server | Compatibility | Comment |
-| --- | --- | --- |
-| newer | Unknown | Needs feddback |
-| v13.0 | Yes | Some Odoo model names changed (e.g account.invoice > account.move) |
-| v12.0 | Yes | First tested version |
-| < v12 | Unknown | Needs feddback |
+| Odoo server | Compatibility | Comment                                                            |
+|-------------|---------------|--------------------------------------------------------------------|
+| newer       | Unknown       | Needs feddback                                                     |
+| v13.0       | Yes           | Some Odoo model names changed (e.g account.invoice > account.move) |
+| v12.0       | Yes           | First tested version                                               |
+| < v12       | Unknown       | Needs feddback                                                     |
 
 Installation
 ============
@@ -82,7 +83,7 @@ $client = Client::create([
 
 Exceptions:
 - ```Ang3\Component\Odoo\Exception\MissingConfigParameterException``` when a required parameter is missing 
-from the static method ```createFromConfig()```.
+from the static method ```create()```.
 
 Then, make your call:
 
@@ -131,7 +132,7 @@ $recordManager = new RecordManager($myClient);
 Here is all built-in ORM methods provided by the record manager:
 
 ```php
-use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
+use Ang3\Component\Odoo\DBAL\Expression\Domain\DomainInterface;
 
 /**
  * Create a new record.
@@ -440,7 +441,7 @@ Then, build your query like below:
 $query = $queryBuilder->getQuery();
 ```
 
-Your query is an instance of ```Ang3\Component\Odoo\Query\OrmQuery```.
+Your query is an instance of ```Ang3\Component\Odoo\DBAL\Query\OrmQuery```.
 
 ### Execute your query
 
@@ -604,7 +605,7 @@ with a *polish notation* for logical operations (```AND```, ```OR``` and ```NOT`
 It could be quickly ugly to do a complex domain, but don't worry the builder makes all
 for you. :-)
 
-Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\DomainInterface```.
+Each domain builder method creates an instance of ```Ang3\Component\Odoo\Expression\Domain\DomainInterface```.
 The only one method of this interface is ```toArray()``` to get a normalized array of the expression.
 
 To illustrate how to work with it, here is an example using ```ExpressionBuilder``` helper methods:
@@ -745,7 +746,7 @@ Please read the [ORM documentation](https://www.odoo.com/documentation/13.0/refe
 to known what we are talking about.
 
 The expression builder provides helper methods to build a well-formed *operation command*:
-each operation method returns an instance of ```Ang3\Component\Odoo\DBAL\Expression\CollectionOperation```.
+each operation method returns an instance of ```Ang3\Component\Odoo\DBAL\Expression\Operation\CollectionOperation```.
 Like domains, the only one method of this interface is ```toArray()``` to get a normalized array of the expression.
 
 To illustrate how to work with operations, here is an example using ```ExpressionBuilder``` helper methods:
