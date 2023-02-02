@@ -9,11 +9,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Expression\Exception;
+namespace Ang3\Component\Odoo\DBAL\Query;
 
-/**
- * @author Joanis ROUANET <https://github.com/Ang3>
- */
-class ConversionException extends \RuntimeException
+class NoUniqueResultException extends \RuntimeException
 {
+    public function __construct()
+    {
+        parent::__construct('The query returned more than one result.');
+    }
 }

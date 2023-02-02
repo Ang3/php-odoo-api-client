@@ -8,17 +8,17 @@ Global
 
 - The PHP extension ```php-xmlrpc``` is not used anymore.
 - The PHP extension ```php-json``` is now required.
-- DBAL features was moved to the package [ang3/php-odoo-dbal](...)
-  - You must install it to be able to use query features.
+- Github workflows
 
 Client
 ------
 
 - Renamed method ```Client::create()``` to ```Client::insert()```
 - Renamed static method ```Client::createFromConfig()``` to ```Client::create()```
+- All methods fixed and tested.
 
 Expression builder
 ------------------
 
-- New folder/namespace architecture.
+- Domain classes moved from `Ang3\Component\Odoo\DBAL\Expression` to `Ang3\Component\Odoo\DBAL\Expression\Domain`
 - Domain expressions fixes.

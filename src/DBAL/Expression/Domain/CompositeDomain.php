@@ -9,7 +9,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Expression\Domain;
+namespace Ang3\Component\Odoo\DBAL\Expression\Domain;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>

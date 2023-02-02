@@ -9,12 +9,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Expression\Domain;
+namespace Ang3\Component\Odoo\DBAL\Query;
 
-/**
- * @author Joanis ROUANET <https://github.com/Ang3>
- */
-interface DomainInterface extends \IteratorAggregate
+class NoResultException extends \RuntimeException
 {
-    public function toArray(): array;
+    public function __construct()
+    {
+        parent::__construct('The query returned no result.');
+    }
 }

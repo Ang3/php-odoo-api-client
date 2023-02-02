@@ -28,8 +28,7 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
     public function __construct(
         private readonly Connection $connection,
         private readonly int $timeOut = TransportInterface::DEFAULT_TIMEOUT
-    )
-    {
+    ) {
     }
 
     public function request(string $service, string $method, array $arguments = []): array

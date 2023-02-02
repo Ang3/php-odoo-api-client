@@ -535,8 +535,7 @@ For example, let's create the repository for your companies and define a query t
 ```php
 namespace App\Odoo\Repository;
 
-use Ang3\Component\Odoo\DBAL\RecordManager;
-use Ang3\Component\Odoo\DBAL\Repository\RecordRepository;
+use Ang3\Component\Odoo\DBAL\RecordManager;use Ang3\Component\Odoo\DBAL\Repository\RecordRepository;
 
 class CompanyRepository extends RecordRepository
 {

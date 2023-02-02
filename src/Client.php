@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo;
 
+use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
-use Ang3\Component\Odoo\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
 use Ang3\Component\Odoo\Transport\TransportInterface;
 use Psr\Log\LoggerInterface;
