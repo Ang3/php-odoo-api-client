@@ -34,6 +34,9 @@ class Schema
     {
     }
 
+    /**
+     * @throws SchemaException when the model was not found
+     */
     public function getModel(string $modelName): Model
     {
         if (!$this->hasModel($modelName)) {
@@ -46,7 +49,7 @@ class Schema
             $modelData = $modelData[0] ?? null;
 
             if (!\is_array($modelData)) {
-                throw new SchemaException(sprintf('The model "%s" was not found.', $modelName));
+                throw SchemaException::modelNotFound($modelName);
             }
 
             $this->loadedModels[$modelName] = $this->createModel($modelData);
