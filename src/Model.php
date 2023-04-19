@@ -14,7 +14,7 @@ use Ang3\Component\Odoo\Interfaces\OdooModelsInterface;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-abstract class Base implements UrlRoutable, Arrayable, JsonSerializable, OdooModelsInterface
+abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, OdooModelsInterface
 {
     use ValidatesRequests;
 
@@ -95,7 +95,7 @@ abstract class Base implements UrlRoutable, Arrayable, JsonSerializable, OdooMod
 
         foreach ($this->fillable as $field) {
             $value = $this->{$field};
-            if (!($value instanceof Base))
+            if (!($value instanceof Model))
                 $attributes[$field] = is_array($value) ? $value[0] : $value;
         }
 

@@ -4,7 +4,7 @@ namespace Ang3\Component\Odoo\Interfaces;
 
 use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
 
-interface OdooModelsInterface
+interface ModelInterface
 {
     public function __get($key);
 
