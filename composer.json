@@ -9,6 +9,10 @@
             "name": "Joanis ROUANET",
             "email": "joanis.ang3@gmail.com",
             "homepage": "https://github.com/Ang3"
+        },
+        {
+            "name": "Matis CHASTIN",
+            "email": "matis.chastin@apitech-solution.com"
         }
     ],
     "autoload": {
@@ -21,13 +25,15 @@
         "php": ">=7.2",
         "ext-json": "*",
         "ang3/php-xmlrpc-client": "^1.0.2",
-        "psr/log": "^1.1"
+        "psr/log": "^1.1",
+        "phpxmlrpc/polyfill-xmlrpc": "1.0-rc1",
+        "laravel/framework": "^9.19"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
         "roave/security-advisories": "dev-master",
         "phpstan/phpstan": "^0.12.94",
-        "symfony/var-dumper": "^3.4 || ^4.0 || ^5.0",
+        "symfony/var-dumper": "^6.2.8",
         "symfony/phpunit-bridge": "^3.4 || ^4.0 || ^5.0",
         "symfony/property-info": "^3.4 || ^4.0 || ^5.0",
         "symfony/inflector": "^3.4 || ^4.0 || ^5.0"
