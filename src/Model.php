@@ -10,11 +10,11 @@ use Ang3\Component\Odoo\Client;
 use Ang3\Component\Odoo\DBAL\Expression\CompositeDomain;
 use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\DBAL\RecordManager;
-use Ang3\Component\Odoo\Interfaces\OdooModelsInterface;
+use Ang3\Component\Odoo\Interfaces\ModelInterface;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, OdooModelsInterface
+abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelInterface
 {
     use ValidatesRequests;
 
