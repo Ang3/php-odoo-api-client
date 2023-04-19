@@ -1,5 +1,5 @@
 {
-    "name": "ang3/php-odoo-api-client",
+    "name": "apitech-solution/php-odoo-api-client",
     "type": "component",
     "description": "Odoo API client",
     "keywords": ["odoo", "api", "client", "domain", "operation", "dbal", "query", "builder", "repository", "builder", "12", "13"],
