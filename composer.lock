@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e599517102a622dab24b1043037a71d",
+    "content-hash": "9444817b479fb094f9b4156d694efbf0",
     "packages": [
         {
             "name": "ang3/php-xmlrpc-client",

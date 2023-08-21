@@ -11,12 +11,15 @@ use Ang3\Component\Odoo\DBAL\Expression\CompositeDomain;
 use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\DBAL\RecordManager;
 use Ang3\Component\Odoo\Interfaces\ModelInterface;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelInterface
 {
-    use ValidatesRequests;
+    use ValidatesRequests,
+        HasRelationships;
 
     protected $model;
 
@@ -36,8 +39,6 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
 
     private RecordManager $rm;
 
-    private string $relationIsLoaded = '';
-
     public function __construct()
     {
         $this->client = new Client(getenv('ODOO_URL'), getenv('ODOO_DATABASE'), getenv('ODOO_USER'), getenv('ODOO_PWD'));
@@ -54,8 +55,13 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
     {
         if (!isset($this->{$key}))
             if (method_exists($this, $key)) {
-                $this->relationIsLoaded = $key;
-                return $this->{$key}();
+                if ($this->relationLoaded($key))
+                    return $this->getRelation($key);
+                else {
+                    $value = $this->{$key}();
+                    $this->setRelation($key, $value);
+                }
+                return $value;
             } else
                 return null;
         return $this->{$key};
@@ -202,7 +208,7 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
         $this->options = [];
     }
 
-    public function get(): array
+    public function get(): Collection
     {
         $collection = [];
 
@@ -212,7 +218,7 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
             $model->fillable = [];
             $collection[] = $model->addAttributes($d);
         }
-        return $collection;
+        return new Collection($collection);
     }
 
     public static function where(DomainInterface $condition): self
@@ -286,29 +292,23 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
 
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
-        $relations = $this->{$related};
+        $relations = collect();
         if (is_null($relations)) {
             $model = new $related();
             $foreignKey = $foreignKey ?? str_replace('.', '_', $model->model) . '_id';
             $localKey = is_array($this->{$localKey}) ? $this->{$localKey}[0] : $this->{$localKey} ?? $this->id;
             $relations = $related::where((new ExpressionBuilder())->eq($foreignKey, $localKey))->get();
         }
-        $this->{$related} = $relations;
-        return $this->{$related};
+        return $relations;
     }
 
     public function belongsTo($related, $foreignKey = null, $localKey = null)
     {
-        $relationIsLoaded = $this->relationIsLoaded;
-        $this->relationIsLoaded = '';
-
         $model = new $related();
         $foreignKey = $foreignKey ?? str_replace('.', '_', $model->model) . '_id';
         $localKey = is_array($this->{$localKey}) ? $this->{$localKey}[0] : $this->{$localKey} ?? $this->id;
         $relation = $model->findBy($foreignKey, $localKey);
 
-        if ($relationIsLoaded)
-            $this->{$relationIsLoaded} = $relation;
         return $relation;
     }
 
