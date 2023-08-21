@@ -3,6 +3,7 @@
 namespace Ang3\Component\Odoo\Interfaces;
 
 use Ang3\Component\Odoo\DBAL\Expression\DomainInterface;
+use Illuminate\Support\Collection;
 
 interface ModelInterface
 {
@@ -10,7 +11,7 @@ interface ModelInterface
 
     public function __set(string $key, mixed $value);
 
-    public function get() : array;
+    public function get(): Collection;
 
     public static function where(DomainInterface $condition): self;
 
