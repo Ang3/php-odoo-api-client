@@ -4,7 +4,7 @@
     "description": "Odoo API client",
     "keywords": ["odoo", "api", "client", "domain", "operation", "dbal", "query", "builder", "repository", "builder", "12", "13"],
     "license": "MIT",
-    "version": "7.0.1",
+    "version": "7.0.2",
     "authors": [
         {
             "name": "Joanis ROUANET",
