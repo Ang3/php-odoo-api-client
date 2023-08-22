@@ -25,7 +25,7 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
 
     protected $routeKey;
 
-    protected ?int $id = null;
+    public ?int $id = null;
 
     protected $fillable = [];
 
