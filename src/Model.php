@@ -13,6 +13,7 @@ use Ang3\Component\Odoo\DBAL\RecordManager;
 use Ang3\Component\Odoo\Interfaces\ModelInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -273,7 +274,7 @@ abstract class Model implements UrlRoutable, Arrayable, JsonSerializable, ModelI
         $data = $this->getOneOrNullResult();
 
         if (is_null($data))
-            throw new NotFoundHttpException($this->model . ' not found');
+            throw (new ModelNotFoundException())->setModel($this->model, $id);
         return $this->addAttributes($data);
     }
 
