@@ -11,17 +11,11 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\Transport;
 
+use Ang3\Component\Odoo\Exception\ExceptionInterface;
+
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
  */
-interface TransportInterface
+class TransportException extends \RuntimeException implements ExceptionInterface
 {
-    public const DEFAULT_TIMEOUT = 120;
-
-    /**
-     * Make a request to Odoo database.
-     *
-     * @throws TransportException on transport errors
-     */
-    public function request(string $service, string $method, array $arguments = []): array;
 }

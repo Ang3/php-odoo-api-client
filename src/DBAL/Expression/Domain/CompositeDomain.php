@@ -39,6 +39,17 @@ class CompositeDomain implements DomainInterface
     {
     }
 
+    public static function criteria(array $criteria = []): self
+    {
+        $domains = [];
+
+        foreach ($criteria as $fieldName => $value) {
+            $domains[] = new Comparison($fieldName, Comparison::EQUAL_TO, $value);
+        }
+
+        return new self(self::AND, $domains);
+    }
+
     public function __clone()
     {
         foreach ($this->domains as $key => $domain) {
@@ -73,7 +84,7 @@ class CompositeDomain implements DomainInterface
         $domain = $this->prepare();
 
         if (!($domain instanceof self)) {
-            return $domain ? $domain->toArray() : [];
+            return $domain ? [$domain->toArray()] : [];
         }
 
         $result = [$domain->getOperator()];

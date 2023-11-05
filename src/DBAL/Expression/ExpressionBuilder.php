@@ -232,38 +232,20 @@ class ExpressionBuilder
     public function normalizeDomains(iterable $criteria = null): array
     {
         if (!$criteria) {
-            return [];
+            return [[]];
         }
 
         if (\is_array($criteria)) {
-            $normalizedCriteria = $this->andX();
-
-            foreach ($criteria as $fieldName => $value) {
-                $comparison = $this->eq($fieldName, $this->formatValue($value));
-
-                if (1 === \count($criteria)) {
-                    $normalizedCriteria = $comparison;
-                    break;
-                }
-
-                $normalizedCriteria->add($comparison);
-            }
-
-            $criteria = $normalizedCriteria;
+            $criteria = CompositeDomain::criteria($criteria);
         }
 
         if (!$criteria instanceof DomainInterface) {
             throw new \InvalidArgumentException(sprintf('Expected parameter #1 of type %s|array<%s|array>, %s given', DomainInterface::class, DomainInterface::class, \gettype($criteria)));
         }
 
-        /** @var array $criteriaArray */
         $criteriaArray = $this->formatValue($criteria->toArray());
 
-        if (!$criteriaArray) {
-            return $this->normalizeDomains();
-        }
-
-        return $criteria instanceof CompositeDomain ? $criteriaArray : [$criteriaArray];
+        return $criteria instanceof CompositeDomain ? [$criteriaArray] : [[$criteriaArray]];
     }
 
     /**

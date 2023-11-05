@@ -2,9 +2,10 @@ parameters:
   inferPrivatePropertyTypeFromConstructor: true
   checkGenericClassInNonGenericObjectType: false
   checkMissingIterableValueType: false
+  treatPhpDocTypesAsCertain: false
   paths:
     - %currentWorkingDirectory%/src
   ignoreErrors:
-  	- '#Method .* should return array<\w+> but returns array\.#'
+  	- '#Method .* should return array<int> but returns array<bool\|float\|int\|string>\.#'
   	- '#Cannot cast mixed to int\.#'
   	- '#Cannot cast mixed to string\.#'

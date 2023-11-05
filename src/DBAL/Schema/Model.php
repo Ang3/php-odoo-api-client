@@ -67,7 +67,7 @@ class Model
     {
         try {
             $this->getField($fieldName);
-        } catch (SchemaException $exception) {
+        } catch (SchemaException) {
             return false;
         }
 
@@ -75,12 +75,18 @@ class Model
     }
 
     /**
-     * @throws SchemaException when the field was not found
+     * @throws \InvalidArgumentException when the field name is empty
+     * @throws SchemaException           when the field was not found
      */
     public function getField(string $fieldName): Field
     {
         $model = $this;
         $fields = explode('.', $fieldName);
+
+        if (!$fields) {
+            throw new \InvalidArgumentException('Empty field name.');
+        }
+
         $lastKey = \count($fields) - 1;
 
         foreach ($fields as $key => $subFieldName) {

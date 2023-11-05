@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Ang3\Component\Odoo\Transport;
 
 use Ang3\Component\Odoo\Connection;
-use Ang3\Component\Odoo\Exception\RequestException;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
@@ -36,7 +35,7 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
         $payload = json_encode($this->normalizeRpcData($service, $method, $arguments));
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new RequestException(sprintf('Failed to encode data to JSON: %s', json_last_error_msg()));
+            throw new TransportException(sprintf('Failed to encode data to JSON: %s', json_last_error_msg()));
         }
 
         $context = stream_context_create([
@@ -52,13 +51,13 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
         $request = file_get_contents($url, false, $context);
 
         if (false === $request) {
-            throw new RequestException('Unable to connect to Odoo.');
+            throw new TransportException('JSON RPC request failed - Unable to get stream contents.');
         }
 
         $data = json_decode($request, true);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new RequestException(sprintf('Failed to decode JSON data: %s', json_last_error_msg()));
+            throw new TransportException(sprintf('Failed to decode JSON data: %s', json_last_error_msg()));
         }
 
         return (array) $data;

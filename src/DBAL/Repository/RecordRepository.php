@@ -11,16 +11,29 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\DBAL\Repository;
 
+use Ang3\Component\Odoo\DBAL\Expression\Domain\CompositeDomain;
 use Ang3\Component\Odoo\DBAL\Expression\Domain\DomainInterface;
 use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\DBAL\Query\QueryBuilder;
 use Ang3\Component\Odoo\DBAL\RecordManager;
+use Ang3\Component\Odoo\DBAL\Schema\Model;
 
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
 class RecordRepository
 {
     public function __construct(private RecordManager $recordManager, private readonly string $modelName)
     {
         $recordManager->addRepository($this);
+    }
+
+    /**
+     * Gets the model metadata from the schema.
+     */
+    public function getMetadata(): Model
+    {
+        return $this->recordManager->getSchema()->getModel($this->modelName);
     }
 
     /**
@@ -88,12 +101,12 @@ class RecordRepository
     /**
      * Search one ID of record by criteria.
      */
-    public function searchOne(?DomainInterface $criteria): ?int
+    public function searchOne(DomainInterface|array|null $criteria): ?int
     {
         return (int) $this
             ->createQueryBuilder()
             ->search()
-            ->where($criteria)
+            ->where($this->normalizeCriteria($criteria))
             ->getQuery()
             ->getOneOrNullScalarResult()
         ;
@@ -114,13 +127,12 @@ class RecordRepository
      *
      * @return int[]
      */
-    public function search(?DomainInterface $criteria = null, array $orders = [], int $limit = null, int $offset = null): array
+    public function search(DomainInterface|array|null $criteria = null, array $orders = [], int $limit = null, int $offset = null): array
     {
-        /* @var int[] $result */
         return $this
             ->createQueryBuilder()
             ->search()
-            ->where($criteria)
+            ->where($this->normalizeCriteria($criteria))
             ->setOrders($orders)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
@@ -156,7 +168,7 @@ class RecordRepository
     /**
      * Find ONE record by criteria.
      */
-    public function findOneBy(?DomainInterface $criteria = null, array $fields = [], array $orders = [], int $offset = null): ?array
+    public function findOneBy(DomainInterface|array|null $criteria = null, array $fields = [], array $orders = [], int $offset = null): ?array
     {
         $result = $this->findBy($criteria, $fields, $orders, 1, $offset);
 
@@ -178,12 +190,12 @@ class RecordRepository
      *
      * @return array[]
      */
-    public function findBy(?DomainInterface $criteria = null, array $fields = [], array $orders = [], int $limit = null, int $offset = null): array
+    public function findBy(DomainInterface|array|null $criteria = null, array $fields = [], array $orders = [], int $limit = null, int $offset = null): array
     {
         return $this
             ->createQueryBuilder()
             ->select($fields)
-            ->where($criteria)
+            ->where($this->normalizeCriteria($criteria))
             ->setOrders($orders)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
@@ -211,12 +223,12 @@ class RecordRepository
     /**
      * Count number of records for a model and criteria.
      */
-    public function count(?DomainInterface $criteria = null): int
+    public function count(DomainInterface|array|null $criteria = null): int
     {
         return $this
             ->createQueryBuilder()
             ->select()
-            ->where($criteria)
+            ->where($this->normalizeCriteria($criteria))
             ->getQuery()
             ->count()
         ;
@@ -250,5 +262,10 @@ class RecordRepository
     public function expr(): ExpressionBuilder
     {
         return $this->recordManager->getExpressionBuilder();
+    }
+
+    public function normalizeCriteria(DomainInterface|array|null $criteria = null): ?DomainInterface
+    {
+        return \is_array($criteria) ? CompositeDomain::criteria($criteria) : $criteria;
     }
 }

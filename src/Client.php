@@ -12,11 +12,15 @@ declare(strict_types=1);
 namespace Ang3\Component\Odoo;
 
 use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
+use Ang3\Component\Odoo\Enum\OdooMethod;
+use Ang3\Component\Odoo\Enum\OdooService;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
+use Ang3\Component\Odoo\Metadata\Version;
 use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
+use Ang3\Component\Odoo\Transport\TransportException;
 use Ang3\Component\Odoo\Transport\TransportInterface;
 use Psr\Log\LoggerInterface;
 
@@ -25,28 +29,6 @@ use Psr\Log\LoggerInterface;
  */
 class Client
 {
-    /**
-     * Services.
-     */
-    public const SERVICE_COMMON = 'common';
-    public const SERVICE_OBJECT = 'object';
-
-    /**
-     * Query ORM methods.
-     */
-    public const CREATE = 'create';
-    public const WRITE = 'write';
-    public const READ = 'read';
-    public const UNLINK = 'unlink';
-    public const SEARCH_READ = 'search_read';
-    public const SEARCH = 'search';
-    public const SEARCH_COUNT = 'search_count';
-
-    /**
-     * Special commands.
-     */
-    public const LIST_FIELDS = 'fields_get';
-
     private TransportInterface $transport;
     private ExpressionBuilder $expressionBuilder;
     private ?int $uid = null;
@@ -76,210 +58,11 @@ class Client
         return new self(Connection::create($config), $transport, $logger);
     }
 
-    /**
-     * Creates a new record and returns the new ID.
-     *
-     * @return int the ID of the new record
-     *
-     * @throws \InvalidArgumentException when $data is empty
-     * @throws RequestException          when request failed
-     */
-    public function insert(string $modelName, array $data): int
-    {
-        if (!$data) {
-            throw new \InvalidArgumentException('Data cannot be empty');
-        }
-
-        /** @var int[] $result */
-        $result = (array) $this->execute($modelName, self::CREATE, [[$data]]);
-
-        return (int) array_shift($result);
-    }
-
-    /**
-     * Read records.
-     *
-     * @throws RequestException when request failed
-     */
-    public function read(string $modelName, int|array $ids, array $options = []): array
-    {
-        $ids = \is_int($ids) ? [$ids] : $ids;
-
-        return (array) $this->execute($modelName, self::READ, [$ids], $options);
-    }
-
-    /**
-     * Update a record(s).
-     *
-     * @throws RequestException when request failed
-     */
-    public function update(string $modelName, int|array $ids, array $data = []): void
-    {
-        if (!$data) {
-            return;
-        }
-
-        $ids = \is_array($ids) ? $ids : [$ids];
-        $this->execute($modelName, self::WRITE, [$ids, $data]);
-    }
-
-    /**
-     * Delete record(s).
-     *
-     * @throws RequestException when request failed
-     */
-    public function delete(string $modelName, int|array $ids): void
-    {
-        $ids = \is_array($ids) ? $ids : [(int) $ids];
-        $this->execute($modelName, self::UNLINK, [$ids]);
-    }
-
-    /**
-     * Search one ID of record by criteria and options.
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function searchOne(string $modelName, iterable $criteria = null, array $options = []): ?int
-    {
-        $options['limit'] = 1;
-        $result = $this->search($modelName, $criteria, $options);
-
-        return array_shift($result);
-    }
-
-    /**
-     * Search all ID of record(s) with options.
-     *
-     * @return array<int>
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function searchAll(string $modelName, array $options = []): array
-    {
-        $options['fields'] = ['id'];
-
-        return array_column($this->findBy($modelName, null, $options), 'id');
-    }
-
-    /**
-     * Find ID of record(s) by criteria and options.
-     *
-     * @return array<int>
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function search(string $modelName, iterable $criteria = null, array $options = []): array
-    {
-        if (\array_key_exists('fields', $options)) {
-            unset($options['fields']);
-        }
-
-        return (array) $this->execute($modelName, self::SEARCH, [$this->expressionBuilder->normalizeDomains($criteria)], $options);
-    }
-
-    /**
-     * Find ONE record by ID and options.
-     *
-     * @throws RequestException when request failed
-     */
-    public function find(string $modelName, int $id, array $options = []): ?array
-    {
-        return $this->findOneBy($modelName, [
-            'id' => $id,
-        ], $options);
-    }
-
-    /**
-     * Find ONE record by criteria and options.
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function findOneBy(string $modelName, iterable $criteria = null, array $options = []): ?array
-    {
-        $result = $this->findBy($modelName, $criteria, $options);
-
-        return array_pop($result);
-    }
-
-    /**
-     * Find all record(s) with options.
-     *
-     * @return array<int, array>
-     *
-     * @throws RequestException when request failed
-     */
-    public function findAll(string $modelName, array $options = []): array
-    {
-        return $this->findBy($modelName, null, $options);
-    }
-
-    /**
-     * Find record(s) by criteria and options.
-     *
-     * @return array[]
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
-    {
-        return (array) $this->execute($modelName, self::SEARCH_READ, [$this->expressionBuilder->normalizeDomains($criteria)], $options);
-    }
-
-    /**
-     * Check if a record exists.
-     *
-     * @throws RequestException when request failed
-     */
-    public function exists(string $modelName, int $id): bool
-    {
-        return 1 === $this->count($modelName, [
-            'id' => $id,
-        ]);
-    }
-
-    /**
-     * Count all records for a model.
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function countAll(string $modelName): int
-    {
-        return $this->count($modelName);
-    }
-
-    /**
-     * Count number of records for a model and criteria.
-     *
-     * @throws \InvalidArgumentException when $criteria value is not valid
-     * @throws RequestException          when request failed
-     */
-    public function count(string $modelName, iterable $criteria = null): int
-    {
-        return (int) $this->execute($modelName, self::SEARCH_COUNT, [$this->expressionBuilder->normalizeDomains($criteria)]);
-    }
-
-    /**
-     * List model fields.
-     */
-    public function listFields(string $modelName, array $options = []): array
-    {
-        return (array) $this->execute($modelName, self::LIST_FIELDS, [], $options);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function execute(string $name, string $method, array $parameters = [], array $options = [])
+    public function execute(string $name, string $method, array $parameters = [], array $options = []): mixed
     {
         return $this->request(
-            self::SERVICE_OBJECT,
-            'execute_kw',
+            OdooService::Object->value,
+            OdooMethod::ExecuteKw->value,
             $this->connection->getDatabase(),
             $this->authenticate(),
             $this->connection->getPassword(),
@@ -290,9 +73,9 @@ class Client
         );
     }
 
-    public function version(): array
+    public function version(): Version
     {
-        return (array) $this->request(self::SERVICE_COMMON, 'version');
+        return Version::create((array) $this->request(OdooService::Common->value, OdooMethod::Version->value));
     }
 
     /**
@@ -302,8 +85,8 @@ class Client
     {
         if (null === $this->uid) {
             $this->uid = (int) $this->request(
-                self::SERVICE_COMMON,
-                'login',
+                OdooService::Common->value,
+                OdooMethod::Login->value,
                 $this->connection->getDatabase(),
                 $this->connection->getUsername(),
                 $this->connection->getPassword()
@@ -320,9 +103,10 @@ class Client
     /**
      * @param mixed ...$arguments
      *
-     * @return mixed
+     * @throws RequestException   on request errors
+     * @throws TransportException on transport errors
      */
-    public function request(string $service, string $method, ...$arguments)
+    public function request(string $service, string $method, ...$arguments): mixed
     {
         $context = [
             'service' => $service,
@@ -332,25 +116,17 @@ class Client
             'request_id' => uniqid('rpc', true),
         ];
 
-        if ($this->logger) {
-            $this->logger->info('JSON RPC request #{request_id} started - {service}::{method}({arguments}) (uid: #{uid})', $context);
-        }
+        $this->logger?->info('Odoo request #{request_id} - {service}::{method}({arguments}) (uid: #{uid})', $context);
 
         $runtime = microtime(true);
         $payload = $this->transport->request($service, $method, $arguments);
         $runtime = microtime(true) - $runtime;
 
-        if ($this->logger) {
-            $this->logger->info('JSON RPC request #{request_id} finished - Runtime: {runtime}s.', [
-                'request_id' => $context['request_id'],
-                'runtime' => number_format($runtime, 3, '.', ' '),
-            ]);
-
-            $this->logger->debug('JSON RPC payload debug.', [
-                'request_id' => $context['request_id'],
-                'payload' => $payload,
-            ]);
-        }
+        $this->logger?->debug('Odoo request #{request_id} finished - Runtime: {runtime}s.', [
+            'request_id' => $context['request_id'],
+            'runtime' => number_format($runtime, 3, '.', ' '),
+            'payload' => $payload,
+        ]);
 
         if (\is_array($payload['error'] ?? null)) {
             throw RemoteException::create($payload);

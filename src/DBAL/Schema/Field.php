@@ -11,36 +11,15 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\DBAL\Schema;
 
+use Ang3\Component\Odoo\DBAL\Schema\Enum\DateTimeFormat;
+use Ang3\Component\Odoo\DBAL\Schema\Enum\FieldType;
+
 class Field
 {
-    /**
-     * List of Odoo field types constants.
-     */
-    public const T_BINARY = 'binary';
-    public const T_BOOLEAN = 'boolean';
-    public const T_CHAR = 'char';
-    public const T_DATE = 'date';
-    public const T_DATETIME = 'datetime';
-    public const T_FLOAT = 'float';
-    public const T_HTML = 'html';
-    public const T_INTEGER = 'integer';
-    public const T_MONETARY = 'monetary';
-    public const T_SELECTION = 'selection';
-    public const T_TEXT = 'text';
-    public const T_MANY_TO_ONE = 'many2one';
-    public const T_MANY_TO_MANY = 'many2many';
-    public const T_ONE_TO_MANY = 'one2many';
-
-    /**
-     * Date formats.
-     */
-    public const DATE_FORMAT = 'Y-m-d';
-    public const DATETIME_FORMAT = 'Y-m-d H:i:s';
-
     private Model $model;
     private int $id;
     private string $name;
-    private string $type;
+    private FieldType $type;
     private bool $required;
     private bool $readOnly;
     private ?string $displayName;
@@ -53,7 +32,7 @@ class Field
     {
         $this->id = (int) $data['id'];
         $this->name = (string) $data['name'];
-        $this->type = (string) $data['ttype'];
+        $this->type = FieldType::from((string) $data['ttype']);
         $this->required = (bool) $data['required'];
         $this->readOnly = (bool) $data['readonly'];
         $this->displayName = $data['display_name'] ?? null;
@@ -85,7 +64,7 @@ class Field
         return $this->name;
     }
 
-    public function getType(): string
+    public function getType(): FieldType
     {
         return $this->type;
     }
@@ -132,22 +111,22 @@ class Field
 
     public function isBinary(): bool
     {
-        return self::T_BINARY === $this->type;
+        return FieldType::Binary === $this->type;
     }
 
     public function isBoolean(): bool
     {
-        return self::T_BOOLEAN === $this->type;
+        return FieldType::Boolean === $this->type;
     }
 
     public function isInteger(): bool
     {
-        return self::T_INTEGER === $this->type;
+        return FieldType::Integer === $this->type;
     }
 
     public function isFloat(): bool
     {
-        return \in_array($this->type, [self::T_FLOAT, self::T_MONETARY], true);
+        return \in_array($this->type, [FieldType::Float, FieldType::Monetary], true);
     }
 
     public function isNumber(): bool
@@ -157,22 +136,22 @@ class Field
 
     public function isString(): bool
     {
-        return \in_array($this->type, [self::T_CHAR, self::T_TEXT, self::T_HTML], true);
+        return \in_array($this->type, [FieldType::Char, FieldType::Text, FieldType::Html], true);
     }
 
     public function isDate(): bool
     {
-        return \in_array($this->type, [self::T_DATE, self::T_DATETIME], true);
+        return \in_array($this->type, [FieldType::Date, FieldType::DateTime], true);
     }
 
-    public function getDateFormat(): string
+    public function getDateFormat(): DateTimeFormat
     {
-        return self::T_DATETIME === $this->type ? self::DATETIME_FORMAT : self::DATE_FORMAT;
+        return FieldType::DateTime === $this->type ? DateTimeFormat::Long : DateTimeFormat::Short;
     }
 
     public function isSelection(): bool
     {
-        return self::T_SELECTION === $this->type;
+        return FieldType::Selection === $this->type;
     }
 
     public function isSelectable(): bool
@@ -182,23 +161,19 @@ class Field
 
     public function isAssociation(): bool
     {
-        return \in_array($this->type, [
-            self::T_MANY_TO_ONE,
-            self::T_MANY_TO_MANY,
-            self::T_ONE_TO_MANY,
-        ], true);
+        return $this->isSingleAssociation() || $this->isMultipleAssociation();
     }
 
     public function isSingleAssociation(): bool
     {
-        return self::T_MANY_TO_ONE === $this->type;
+        return FieldType::ManyToOne === $this->type;
     }
 
     public function isMultipleAssociation(): bool
     {
         return \in_array($this->type, [
-            self::T_MANY_TO_MANY,
-            self::T_ONE_TO_MANY,
+            FieldType::ManyToMany,
+            FieldType::OneToMany,
         ], true);
     }
 }

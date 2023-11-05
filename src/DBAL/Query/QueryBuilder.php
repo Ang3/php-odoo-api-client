@@ -60,7 +60,7 @@ class QueryBuilder
         $this->values = [];
         $this->ids = [];
 
-        $fields = $fields ? (array) $fields : [];
+        $fields = array_filter(\is_array($fields) ? $fields : [$fields]);
 
         foreach ($fields as $fieldName) {
             $this->addSelect($fieldName);
@@ -217,11 +217,9 @@ class QueryBuilder
     /**
      * Set a field value in case of query of type "INSERT" or "UPDATE".
      *
-     * @param mixed $value
-     *
      * @throws QueryException when the type of the query is not "INSERT" nor "UPDATE"
      */
-    public function set(string $fieldName, $value): self
+    public function set(string $fieldName, mixed $value): self
     {
         if (!\in_array($this->type, [self::INSERT, self::UPDATE], true)) {
             throw new QueryException('You can set values in query of type "INSERT" or "UPDATE" only.');
@@ -423,6 +421,8 @@ class QueryBuilder
                 }
 
                 $parameters = [$this->ids, $parameters];
+            } else {
+                $parameters = [$parameters];
             }
         }
 

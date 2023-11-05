@@ -15,10 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class TestDecorator
 {
-    /**
-     * @var TestCase
-     */
-    protected $testCase;
+    protected TestCase $testCase;
 
     public function __construct(TestCase $testCase)
     {

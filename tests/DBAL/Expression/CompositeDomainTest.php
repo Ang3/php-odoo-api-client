@@ -68,7 +68,7 @@ final class CompositeDomainTest extends AbstractDomainTest
             ],
             [ // 1
                 CompositeDomain::AND, [$domainA],
-                $domainA->toArray(),
+                [$domainA->toArray()],
             ],
             [ // 2
                 CompositeDomain::AND, [$domainA, $domainB],
@@ -83,7 +83,7 @@ final class CompositeDomainTest extends AbstractDomainTest
             ],
             [ // 5
                 CompositeDomain::OR, [$domainA],
-                $domainA->toArray(),
+                [ $domainA->toArray() ],
             ],
             [ // 6
                 CompositeDomain::OR, [$domainA, $domainB],

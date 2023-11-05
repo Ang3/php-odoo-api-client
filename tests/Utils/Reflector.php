@@ -14,21 +14,17 @@ namespace Ang3\Component\Odoo\Tests\Utils;
 class Reflector
 {
     /**
-     * @return mixed
-     *
      * @throws \ReflectionException
      */
-    public function getObjectValue(object $object, string $propertyName)
+    public function getObjectValue(object $object, string $propertyName): mixed
     {
         return $this->getProperty($object, $propertyName)->getValue($object);
     }
 
     /**
-     * @param mixed $value
-     *
      * @throws \ReflectionException
      */
-    public function setObjectValue(object $object, string $propertyName, $value): \ReflectionProperty
+    public function setObjectValue(object $object, string $propertyName, mixed $value): \ReflectionProperty
     {
         $property = $this->getProperty($object, $propertyName);
 
@@ -38,51 +34,36 @@ class Reflector
     }
 
     /**
-     * @param object|string $objectOrClass
-     *
      * @throws \ReflectionException
      */
-    public function getMethod($objectOrClass, string $methodName, bool $setAccessible = true): ?\ReflectionMethod
+    public function getMethod(object|string $objectOrClass, string $methodName, bool $setAccessible = true): ?\ReflectionMethod
     {
         $class = $this->getClass($objectOrClass);
-        $method = $class->getMethod($methodName);
 
-        if ($setAccessible) {
-            $method->setAccessible(true);
-        }
-
-        return $method;
+	    return $class->getMethod($methodName);
     }
 
     /**
-     * @param object|string $objectOrClass
-     *
      * @throws \ReflectionException
      */
-    public function getProperty($objectOrClass, string $propertyName, bool $setAccessible = true): ?\ReflectionProperty
+    public function getProperty(object|string $objectOrClass, string $propertyName, bool $setAccessible = true): ?\ReflectionProperty
     {
         $class = $this->getClass($objectOrClass);
-        $property = $class->getProperty($propertyName);
 
-        if ($setAccessible) {
-            $property->setAccessible(true);
-        }
-
-        return $property;
+	    return $class->getProperty($propertyName);
     }
 
     /**
-     * @param object|string $objectOrClass
-     *
      * @throws \ReflectionException
      */
-    public function getClass($objectOrClass): \ReflectionClass
+    public function getClass(object|string $objectOrClass): \ReflectionClass
     {
         if (\is_string($objectOrClass)) {
-            /** @var class-string $class */
-            $class = $objectOrClass;
+			if (!class_exists($objectOrClass)) {
+				throw new \RuntimeException(sprintf('The class "%s" was not found.', $objectOrClass));
+			}
 
-            return new \ReflectionClass($class);
+            return new \ReflectionClass($objectOrClass);
         }
 
         return $objectOrClass instanceof \ReflectionClass ? $objectOrClass : new \ReflectionClass($objectOrClass);

@@ -35,30 +35,11 @@ class ObjectTester extends TestDecorator
     public const IS_FLUENT = 'is_fluent';
     public const IS_COLLECTION = 'is_collection';
 
-    /**
-     * @var object
-     */
-    private $object;
+    private object $object;
+    private \ReflectionClass $class;
+    private Reflector $reflector;
 
-    /**
-     * @var \ReflectionClass
-     */
-    private $class;
-
-    /**
-     * @var Reflector
-     */
-    private $reflector;
-
-    /**
-     * @var Debugger
-     */
-    private $debugger;
-
-    /**
-     * @var array
-     */
-    private $defaultContext = [
+    private array $defaultContext = [
         self::NAME => null,
         self::VALUE => null,
         self::RESULT => null,
@@ -75,7 +56,6 @@ class ObjectTester extends TestDecorator
         parent::__construct($testCase);
 
         $this->reflector = new Reflector();
-        $this->debugger = new Debugger();
         $this->setObject($object);
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -83,10 +63,8 @@ class ObjectTester extends TestDecorator
     /**
      * Test the accessors of a property (setter and getter).
      * This test also checks if the return value of the getter is equal to the value registered with the setter.
-     *
-     * @param mixed $value
      */
-    public function assertPropertyAccessorsAndMutators(string $propertyName, $value, array $context = []): self
+    public function assertPropertyAccessorsAndMutators(string $propertyName, mixed $value, array $context = []): self
     {
         $context = $this->getContext($context);
         $context[self::VALUE] = $value;
@@ -112,10 +90,7 @@ class ObjectTester extends TestDecorator
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function assertHasser(string $propertyName, $value, array $context = []): ?\ReflectionMethod
+    public function assertHasser(string $propertyName, mixed $value, array $context = []): ?\ReflectionMethod
     {
         $context[self::VALUE] = $value;
         $context[self::IS_FLUENT] = false;
@@ -140,10 +115,7 @@ class ObjectTester extends TestDecorator
         return $this->assertPropertyMethod($propertyName, self::ACCESSOR_GET, $context);
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function assertAdder(string $propertyName, $value, array $context = []): ?\ReflectionMethod
+    public function assertAdder(string $propertyName, mixed $value, array $context = []): ?\ReflectionMethod
     {
         $context[self::VALUE] = $value;
         $context[self::IS_FLUENT] ??= true;
@@ -156,10 +128,7 @@ class ObjectTester extends TestDecorator
         return $this->assertPropertyMethod($propertyName, self::MUTATOR_ADD, $context);
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function assertRemover(string $propertyName, $value, array $context = []): ?\ReflectionMethod
+    public function assertRemover(string $propertyName, mixed $value, array $context = []): ?\ReflectionMethod
     {
         $context[self::VALUE] = $value;
         $context[self::IS_FLUENT] ??= true;
@@ -174,10 +143,8 @@ class ObjectTester extends TestDecorator
 
     /**
      * Test and return the setter of a property.
-     *
-     * @param mixed $value
      */
-    public function assertSetter(string $propertyName, $value = null, array $context = []): ?\ReflectionMethod
+    public function assertSetter(string $propertyName, mixed $value = null, array $context = []): ?\ReflectionMethod
     {
         $context[self::VALUE] = $value;
         $context[self::IS_FLUENT] ??= true;
@@ -201,8 +168,6 @@ class ObjectTester extends TestDecorator
             $property = $this->reflector->getProperty($this->class, $propertyName);
         } catch (\ReflectionException $e) {
             $this->testCase::fail($this->getContextErrorMessage('The property was not found', $context));
-
-            return null;
         }
 
         $context[self::NAME] = (string) ($context[self::NAME] ?? null);
@@ -230,8 +195,6 @@ class ObjectTester extends TestDecorator
         } catch (\ReflectionException $e) {
             $errorMessage = sprintf('None of methods "%s()" was found', implode('"(), "', $tested));
             $this->testCase::fail($this->getContextErrorMessage($errorMessage, $context));
-
-            return null;
         }
 
         $this->testCase->addToAssertionCount(1);
@@ -270,10 +233,8 @@ class ObjectTester extends TestDecorator
                 if (!is_iterable($propertyValue)) {
                     $this->testCase::fail($this->getContextErrorMessage(sprintf(
                         'The property collection should be iterable, %s declared',
-                        $this->debugger->debugType($propertyValue)
+                        get_debug_type($propertyValue)
                     ), $context));
-
-                    return null;
                 }
 
                 $hasValue = false;
@@ -291,7 +252,7 @@ class ObjectTester extends TestDecorator
                             sprintf(
                                 'The property collection %s the value but the hasser returns %s',
                                 $hasValue ? 'contains' : 'does not contain',
-                                $this->debugger->debugBool($result)
+	                            $result ? 'TRUE' : 'FALSE'
                             ),
                             $context
                         ));
@@ -377,18 +338,6 @@ class ObjectTester extends TestDecorator
     public function setReflector(Reflector $reflector): self
     {
         $this->reflector = $reflector;
-
-        return $this;
-    }
-
-    public function getDebugger(): Debugger
-    {
-        return $this->debugger;
-    }
-
-    public function setDebugger(Debugger $debugger): self
-    {
-        $this->debugger = $debugger;
 
         return $this;
     }
