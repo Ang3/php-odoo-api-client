@@ -113,8 +113,8 @@ dump($version);
 
 ### Custom transport
 
-By default, the library provides a JSON-RPC transport and the client create it by default 
-if no transport is explicitly provided on constructor. 
+By default, the library provides a JSON-RPC transport and the client creates it by default 
+if no transport is explicitly provided. 
 
 You can provide your own transport when you create your client as second argument. By this way, the JSON-RPC transport 
 will not be created and the client will use yours instead.
