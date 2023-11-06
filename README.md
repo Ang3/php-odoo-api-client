@@ -29,15 +29,12 @@ Odoo version support
 Getting started
 ===============
 
-Requirements
+Installation
 ------------
 
 PHP version 8.1 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
 composer. See the `require` section of [composer.json file](../composer.json)
 for details.
-
-Installation
-------------
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of the client:
