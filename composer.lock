@@ -18,7 +18,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/php-fig/log/zipball/fe5ea303b0887d5caefd3d431c3e61ad47037001",
                 "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=8.0.0"
@@ -34,7 +40,7 @@
                     "Psr\\Log\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -70,7 +76,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/doctrine/instantiator/zipball/c6222283fa3f4ac679f8b9ced9a4e23f163e80d0",
                 "reference": "c6222283fa3f4ac679f8b9ced9a4e23f163e80d0",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": "^8.1"
@@ -91,7 +103,7 @@
                     "Doctrine\\Instantiator\\": "src/Doctrine/Instantiator/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -140,7 +152,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/f47dcf3c70c584de14f21143c55d9939631bc6cf",
                 "reference": "f47dcf3c70c584de14f21143c55d9939631bc6cf",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-dom": "*",
@@ -160,7 +178,7 @@
                     "Masterminds\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -207,7 +225,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/7284c22080590fb39f2ffa3e9057f10a4ddd0e0c",
                 "reference": "7284c22080590fb39f2ffa3e9057f10a4ddd0e0c",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": "^7.1 || ^8.0"
@@ -230,7 +254,7 @@
                     "DeepCopy\\": "src/DeepCopy/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -266,7 +290,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/a6303e50c90c355c7eeee2c4a8b27fe8dc8fef1d",
                 "reference": "a6303e50c90c355c7eeee2c4a8b27fe8dc8fef1d",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-tokenizer": "*",
@@ -290,7 +320,7 @@
                     "PhpParser\\": "lib/PhpParser"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -322,7 +352,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phar-io/manifest/zipball/97803eca37d319dfa7826cc2437fc020857acb53",
                 "reference": "97803eca37d319dfa7826cc2437fc020857acb53",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-dom": "*",
@@ -342,7 +378,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -382,7 +418,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phar-io/version/zipball/4f7fd7836c6f332bb2933569e566a0d6c4cbed74",
                 "reference": "4f7fd7836c6f332bb2933569e566a0d6c4cbed74",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": "^7.2 || ^8.0"
@@ -393,7 +435,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -433,7 +475,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6a3a87ac2bbe33b25042753df8195ba4aa534c76",
                 "reference": "6a3a87ac2bbe33b25042753df8195ba4aa534c76",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-dom": "*",
@@ -468,7 +516,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -511,7 +559,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/cf1c2e7c203ac650e352f4cc675a7021e7d1b3cf",
                 "reference": "cf1c2e7c203ac650e352f4cc675a7021e7d1b3cf",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -530,7 +584,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -571,7 +625,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-invoker/zipball/5a10147d0aaf65b58940a0b72f71c9ac0423cc67",
                 "reference": "5a10147d0aaf65b58940a0b72f71c9ac0423cc67",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -594,7 +654,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -634,7 +694,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-text-template/zipball/5da5f67fc95621df9ff4c4e5a84d6a8a2acf7c28",
                 "reference": "5da5f67fc95621df9ff4c4e5a84d6a8a2acf7c28",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -653,7 +719,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -693,7 +759,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/5a63ce20ed1b5bf577850e2c4e87f4aa902afbd2",
                 "reference": "5a63ce20ed1b5bf577850e2c4e87f4aa902afbd2",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -712,7 +784,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -752,7 +824,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f3d767f7f9e191eab4189abe41ab37797e30b1be",
                 "reference": "f3d767f7f9e191eab4189abe41ab37797e30b1be",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "doctrine/instantiator": "^1.3.1 || ^2",
@@ -804,7 +882,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -855,7 +933,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/442e7c7e687e42adc03470c7b668bc4b2402c0b2",
                 "reference": "442e7c7e687e42adc03470c7b668bc4b2402c0b2",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -874,7 +958,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -911,7 +995,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/1fc9f64c0927627ef78ba436c9b17d967e68e120",
                 "reference": "1fc9f64c0927627ef78ba436c9b17d967e68e120",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -930,7 +1020,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -967,7 +1057,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/code-unit-reverse-lookup/zipball/ac91f01ccec49fb77bdc6fd1e548bc70f7faa3e5",
                 "reference": "ac91f01ccec49fb77bdc6fd1e548bc70f7faa3e5",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -986,7 +1082,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1022,7 +1118,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/fa0f136dd2334583309d32b62544682ee972b51a",
                 "reference": "fa0f136dd2334583309d32b62544682ee972b51a",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3",
@@ -1043,7 +1145,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1096,7 +1198,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/739b35e53379900cc9ac327b2147867b8b6efd88",
                 "reference": "739b35e53379900cc9ac327b2147867b8b6efd88",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "nikic/php-parser": "^4.7",
@@ -1116,7 +1224,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1153,7 +1261,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/74be17022044ebaaecfdf0c5cd504fc9cd5a7131",
                 "reference": "74be17022044ebaaecfdf0c5cd504fc9cd5a7131",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1173,7 +1287,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1219,7 +1333,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/830c43a844f1f8d5b7a1f6d6076b784454d8b7ed",
                 "reference": "830c43a844f1f8d5b7a1f6d6076b784454d8b7ed",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1241,7 +1361,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1282,7 +1402,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/ac230ed27f0f98f597c8a2b6eb7ac563af5e5b9d",
                 "reference": "ac230ed27f0f98f597c8a2b6eb7ac563af5e5b9d",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3",
@@ -1303,7 +1429,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1359,7 +1485,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/bde739e7565280bda77be70044ac1047bc007e34",
                 "reference": "bde739e7565280bda77be70044ac1047bc007e34",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3",
@@ -1384,7 +1516,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1423,7 +1555,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/c1c2e997aa3146983ed888ad08b15470a2e22ecc",
                 "reference": "c1c2e997aa3146983ed888ad08b15470a2e22ecc",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "nikic/php-parser": "^4.6",
@@ -1443,7 +1581,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1480,7 +1618,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/object-enumerator/zipball/5c9eeac41b290a3712d88851518825ad78f45c71",
                 "reference": "5c9eeac41b290a3712d88851518825ad78f45c71",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3",
@@ -1501,7 +1645,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1537,7 +1681,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/object-reflector/zipball/b4f479ebdbf63ac605d183ece17d8d7fe49c15c7",
                 "reference": "b4f479ebdbf63ac605d183ece17d8d7fe49c15c7",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1556,7 +1706,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1592,7 +1742,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/e75bd0f07204fec2a0af9b0f3cfe97d05f92efc1",
                 "reference": "e75bd0f07204fec2a0af9b0f3cfe97d05f92efc1",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1611,7 +1767,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1655,7 +1811,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/resource-operations/zipball/0f4443cb3a1d92ce809899753bc0d5d5a8dd19a8",
                 "reference": "0f4443cb3a1d92ce809899753bc0d5d5a8dd19a8",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1674,7 +1836,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1710,7 +1872,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/75e2c2a32f5e0b3aef905b9ed0b179b953b3d7c7",
                 "reference": "75e2c2a32f5e0b3aef905b9ed0b179b953b3d7c7",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1729,7 +1897,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1766,7 +1934,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/c6c1022351a901512170118436c764e473f6de8c",
                 "reference": "c6c1022351a901512170118436c764e473f6de8c",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.3"
@@ -1782,7 +1956,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1819,7 +1993,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/browser-kit/zipball/ca4a988488f61ac18f8f845445eabdd36f89aa8d",
                 "reference": "ca4a988488f61ac18f8f845445eabdd36f89aa8d",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=8.1",
@@ -1840,7 +2020,7 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1887,7 +2067,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/css-selector/zipball/883d961421ab1709877c10ac99451632a3d6fa57",
                 "reference": "883d961421ab1709877c10ac99451632a3d6fa57",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=8.1"
@@ -1901,7 +2087,7 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1952,7 +2138,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/7c3aff79d10325257a001fcf92d991f24fc967cf",
                 "reference": "7c3aff79d10325257a001fcf92d991f24fc967cf",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=8.1"
@@ -1972,7 +2164,7 @@
                     "function.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2019,7 +2211,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/3fdd2a3d5fdc363b2e8dbf817f9726a4d013cbd1",
                 "reference": "3fdd2a3d5fdc363b2e8dbf817f9726a4d013cbd1",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "masterminds/html5": "^2.6",
@@ -2039,7 +2237,7 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2086,7 +2284,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/c6f1df6a76c2c12bd14a0a5bf7c556dd935efe1d",
                 "reference": "c6f1df6a76c2c12bd14a0a5bf7c556dd935efe1d",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.1.3"
@@ -2120,7 +2324,7 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2167,7 +2371,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/ea208ce43cbb04af6867b4fdddb1bdbf84cc28cb",
                 "reference": "ea208ce43cbb04af6867b4fdddb1bdbf84cc28cb",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.1"
@@ -2196,7 +2406,7 @@
                     "Symfony\\Polyfill\\Ctype\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2249,7 +2459,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/42292d99c55abe617799667f454222c54c60e229",
                 "reference": "42292d99c55abe617799667f454222c54c60e229",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=7.1"
@@ -2278,7 +2494,7 @@
                     "Symfony\\Polyfill\\Mbstring\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2332,7 +2548,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/test-pack/zipball/7b708c588cb3e1c8f0281889f273b920cbddff9b",
                 "reference": "7b708c588cb3e1c8f0281889f273b920cbddff9b",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "phpunit/phpunit": "^9.5",
@@ -2347,7 +2569,7 @@
                 "symfony/phpunit-bridge": "*"
             },
             "type": "symfony-pack",
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2384,7 +2606,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/var-dumper/zipball/999ede244507c32b8e43aebaa10e9fce20de7c97",
                 "reference": "999ede244507c32b8e43aebaa10e9fce20de7c97",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=8.1",
@@ -2417,7 +2645,7 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2468,7 +2696,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/theseer/tokenizer/zipball/34a41e998c2183e22995f158c581e7b5e755ab9e",
                 "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/neosolva/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-dom": "*",
@@ -2482,7 +2716,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "https://repo.packagist.com/neosolva/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],

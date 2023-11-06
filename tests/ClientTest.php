@@ -35,10 +35,41 @@ class ClientTest extends TestCase
 		$client = new Client($this->connection);
 
 		// Asserting default transport
-		self::assertInstanceOf(JsonRpcPhpStreamTransport::class, $client->getTransport());
+        $clientTransport = $client->getTransport();
+        self::assertInstanceOf(JsonRpcPhpStreamTransport::class, $clientTransport);
+
+		// Asserting optional logger
+        $clientLogger = $client->getLogger();
+		self::assertNull($clientLogger);
+	}
+
+	public function testConstructWithCustomTransport(): void
+	{
+        $customTransport = $this->createMock(TransportInterface::class);
+		$client = new Client($this->connection, $customTransport);
+
+		// Asserting custom transport
+        $clientTransport = $client->getTransport();
+        self::assertInstanceOf(TransportInterface::class, $clientTransport);
+        self::assertEquals($customTransport, $clientTransport);
 
 		// Asserting optional logger
 		self::assertNull($client->getLogger());
+	}
+
+	public function testConstructWithLogger(): void
+	{
+        $logger = $this->createMock(LoggerInterface::class);
+		$client = new Client($this->connection, null, $logger);
+
+        // Asserting default transport
+        $clientTransport = $client->getTransport();
+        self::assertInstanceOf(JsonRpcPhpStreamTransport::class, $clientTransport);
+
+		// Asserting logger
+        $clientLogger = $client->getLogger();
+        self::assertInstanceOf(LoggerInterface::class, $clientLogger);
+        self::assertEquals($logger, $clientLogger);
 	}
 
 	public function provideRequestData(): array
@@ -95,7 +126,38 @@ class ClientTest extends TestCase
 	 */
 	public function testExecuteKw(): void
 	{
-		// ...
+        list($database, $username, $password) = ['foo', 'bar', 'qux'];
+        $this->connection->expects($this->exactly(2))->method('getDatabase')->willReturn($database);
+        $this->connection->expects($this->once())->method('getUsername')->willReturn($username);
+        $this->connection->expects($this->exactly(2))->method('getPassword')->willReturn($password);
+        $expectedUid = 1337;
+        $expectedResult = 'foo';
+
+        $authenticationArguments = [OdooService::Common->value, OdooMethod::Login->value, [$database, $username, $password]];
+        $requestArguments = [OdooService::Object->value, OdooMethod::ExecuteKw->value, [
+            $database,
+            $expectedUid,
+            $password,
+            $name = 'object_name',
+            $method = 'object_method',
+            $parameters = [1, 2, 3],
+            $options = [4, 5, 6]
+        ]];
+
+        $this->transport
+            ->expects($this->exactly(2))
+            ->method('request')
+            ->withConsecutive($authenticationArguments, $requestArguments)
+            ->willReturn($this->returnCallback(function ($service) use ($authenticationArguments, $expectedUid) {
+                return match($service) {
+                    OdooService::Common->value => $expectedUid,
+                    default => 'foo'
+                };
+            }))
+        ;
+
+        $result = $this->client->executeKw($name, $method, $parameters, $options);
+        self::assertEquals($expectedResult, $result);
 	}
 
 	/**
