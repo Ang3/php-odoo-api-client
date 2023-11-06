@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\Enum;
 
-enum OdooService: string
+enum OdooRpcService: string
 {
     case Common = 'common';
     case Object = 'object';

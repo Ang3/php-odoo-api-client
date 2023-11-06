@@ -13,8 +13,8 @@ namespace Ang3\Component\Odoo\Tests;
 
 use Ang3\Component\Odoo\Client;
 use Ang3\Component\Odoo\Connection;
-use Ang3\Component\Odoo\Enum\OdooMethod;
-use Ang3\Component\Odoo\Enum\OdooService;
+use Ang3\Component\Odoo\Enum\OdooRpcMethod;
+use Ang3\Component\Odoo\Enum\OdooRpcService;
 use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Metadata\Version;
 use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
@@ -98,9 +98,9 @@ final class ClientTest extends TestCase
     public static function provideRequestData(): array
     {
         return [
-            [OdooService::Common, OdooMethod::Login],
-            [OdooService::Common, OdooMethod::Version],
-            [OdooService::Object, OdooMethod::ExecuteKw],
+            [OdooRpcService::Common, OdooRpcMethod::Login],
+            [OdooRpcService::Common, OdooRpcMethod::Version],
+            [OdooRpcService::Object, OdooRpcMethod::ExecuteKw],
         ];
     }
 
@@ -109,7 +109,7 @@ final class ClientTest extends TestCase
      *
      * @dataProvider provideRequestData
      */
-    public function testRequest(OdooService $service, OdooMethod $method): void
+    public function testRequest(OdooRpcService $service, OdooRpcMethod $method): void
     {
         $this->transport
             ->expects(static::once())
@@ -127,7 +127,7 @@ final class ClientTest extends TestCase
      *
      * @dataProvider provideRequestData
      */
-    public function testRequestRemoteError(OdooService $service, OdooMethod $method): void
+    public function testRequestRemoteError(OdooRpcService $service, OdooRpcMethod $method): void
     {
         self::expectException(RemoteException::class);
         $this->transport
@@ -162,8 +162,8 @@ final class ClientTest extends TestCase
         $expectedUid = 1337;
         $expectedResult = 'foo';
 
-        $authenticationArguments = [OdooService::Common->value, OdooMethod::Login->value, [$database, $username, $password]];
-        $requestArguments = [OdooService::Object->value, OdooMethod::ExecuteKw->value, [
+        $authenticationArguments = [OdooRpcService::Common->value, OdooRpcMethod::Login->value, [$database, $username, $password]];
+        $requestArguments = [OdooRpcService::Object->value, OdooRpcMethod::ExecuteKw->value, [
             $database,
             $expectedUid,
             $password,
@@ -179,7 +179,7 @@ final class ClientTest extends TestCase
             ->withConsecutive($authenticationArguments, $requestArguments)
             ->willReturn(static::returnCallback(function ($service) use ($expectedUid) {
                 return match ($service) {
-                    OdooService::Common->value => $expectedUid,
+                    OdooRpcService::Common->value => $expectedUid,
                     default => 'foo'
                 };
             }))
@@ -199,7 +199,7 @@ final class ClientTest extends TestCase
         $this->transport
             ->expects(static::once())
             ->method('request')
-            ->with(OdooService::Common->value, OdooMethod::Version->value)
+            ->with(OdooRpcService::Common->value, OdooRpcMethod::Version->value)
             ->willReturn([
                 'server_version_info' => [13, 3, 7, 'a', 'b', 'c'],
                 'protocol_version' => 1,
@@ -226,7 +226,7 @@ final class ClientTest extends TestCase
         $this->transport
             ->expects(static::once())
             ->method('request')
-            ->with(OdooService::Common->value, OdooMethod::Login->value, [$database, $username, $password])
+            ->with(OdooRpcService::Common->value, OdooRpcMethod::Login->value, [$database, $username, $password])
             ->willReturn($expectedUid)
         ;
 

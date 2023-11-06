@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\Enum;
 
-enum OdooMethod: string
+enum OdooRpcMethod: string
 {
     case Login = 'login';
     case ExecuteKw = 'execute_kw';

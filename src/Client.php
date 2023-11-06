@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\Enum\OdooMethod;
-use Ang3\Component\Odoo\Enum\OdooService;
+use Ang3\Component\Odoo\Enum\OdooRpcMethod;
+use Ang3\Component\Odoo\Enum\OdooRpcService;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
 use Ang3\Component\Odoo\Exception\RequestException;
@@ -57,8 +57,8 @@ class Client
     public function executeKw(string $name, string $method, array $parameters = [], array $options = []): mixed
     {
         return $this->request(
-            OdooService::Object->value,
-            OdooMethod::ExecuteKw->value,
+            OdooRpcService::Object->value,
+            OdooRpcMethod::ExecuteKw->value,
             $this->connection->getDatabase(),
             $this->authenticate(),
             $this->connection->getPassword(),
@@ -71,7 +71,7 @@ class Client
 
     public function version(): Version
     {
-        return Version::create((array) $this->request(OdooService::Common->value, OdooMethod::Version->value));
+        return Version::create((array) $this->request(OdooRpcService::Common->value, OdooRpcMethod::Version->value));
     }
 
     /**
@@ -81,8 +81,8 @@ class Client
     {
         if (null === $this->uid) {
             $this->uid = (int) $this->request(
-                OdooService::Common->value,
-                OdooMethod::Login->value,
+                OdooRpcService::Common->value,
+                OdooRpcMethod::Login->value,
                 $this->connection->getDatabase(),
                 $this->connection->getUsername(),
                 $this->connection->getPassword()
