@@ -32,7 +32,7 @@ class Client
 
     public function __construct(
         private readonly Connection $connection,
-        ?TransportInterface $transport = null,
+        TransportInterface $transport = null,
         private ?LoggerInterface $logger = null
     ) {
         $this->transport = $transport ?: new JsonRpcPhpStreamTransport($this->connection);
@@ -48,8 +48,8 @@ class Client
      */
     public static function create(
         array $config,
-        ?TransportInterface $transport = null,
-        ?LoggerInterface $logger = null
+        TransportInterface $transport = null,
+        LoggerInterface $logger = null
     ): self {
         return new self(Connection::create($config), $transport, $logger);
     }
@@ -97,8 +97,6 @@ class Client
     }
 
     /**
-     * @param mixed ...$arguments
-     *
      * @throws RequestException   on request errors
      * @throws TransportException on transport errors
      */
