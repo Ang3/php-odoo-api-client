@@ -1,29 +1,18 @@
-PHP Odoo API client documentation
-=================================
+PHP Odoo API client
+===================
 
-This package is a PHP library to connect and interact with an Odoo database.
+This package is a PHP library to connect and interact with an Odoo instance via JSON-RPC by default.
 It follows [the official Odoo documentation](https://www.odoo.com/documentation/13.0/developer/misc/api/odoo.html).
-
-Main features
-=============
-
-- Built-in ORM methods
-- Expression builder for domains and collection operations
-- Query builder to build your queries easily
-- Repositories to work on a specific model or create reusable queries
 
 Getting started
 ===============
 
-Software requirements
----------------------
+Requirements
+------------
 
-PHP version 7.2 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
+PHP version 8.1 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
 composer. See the `require` section of [composer.json file](../composer.json)
 for details.
-
-The installation of the PHP extension `php-curl` is recommended
-for HTTP requests. If missing, PHP native streams are used.
 
 Odoo database support
 ---------------------

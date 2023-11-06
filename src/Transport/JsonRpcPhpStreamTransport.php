@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace Ang3\Component\Odoo\Transport;
 
 use Ang3\Component\Odoo\Connection;
+use Ang3\Component\Odoo\Exception\RemoteException;
+use Ang3\Component\Odoo\Exception\TransportException;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
  * @author Jules Sayer <https://github.com/Wilders>
  */
-class JsonRpcPhpStreamTransport extends AbstractRpcTransport
+class JsonRpcPhpStreamTransport implements TransportInterface
 {
     /**
      * JSON-RPC endpoint.
@@ -30,9 +32,18 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
     ) {
     }
 
-    public function request(string $service, string $method, array $arguments = []): array
+    public function request(string $service, string $method, array $arguments = []): mixed
     {
-        $payload = json_encode($this->normalizeRpcData($service, $method, $arguments));
+        $payload = json_encode([
+            'jsonrpc' => '2.0',
+            'method' => 'call',
+            'params' => [
+                'service' => $service,
+                'method' => $method,
+                'args' => $arguments,
+            ],
+            'id' => uniqid('odoo_jsonrpc'),
+        ]);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new TransportException(sprintf('Failed to encode data to JSON: %s', json_last_error_msg()));
@@ -54,12 +65,16 @@ class JsonRpcPhpStreamTransport extends AbstractRpcTransport
             throw new TransportException('JSON RPC request failed - Unable to get stream contents.');
         }
 
-        $data = json_decode($request, true);
+        $data = (array) json_decode($request, true);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new TransportException(sprintf('Failed to decode JSON data: %s', json_last_error_msg()));
         }
 
-        return (array) $data;
+        if (\is_array($data['error'] ?? null)) {
+            throw RemoteException::create($data);
+        }
+
+        return $data['result'] ?? null;
     }
 }

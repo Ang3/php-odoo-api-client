@@ -9,10 +9,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\DBAL\Schema\Enum;
+namespace Ang3\Component\Odoo\Exception;
 
-enum DateTimeFormat: string
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
+class TransportException extends \RuntimeException implements ExceptionInterface
 {
-    case Short = 'Y-m-d';
-    case Long = 'Y-m-d H:i:s';
 }

@@ -20,8 +20,8 @@ class RemoteException extends RequestException
 
     public static function create(array $payload): self
     {
-        $errorCode = $payload['error']['code'];
-        $errorMessage = $payload['error']['message'];
+        $errorCode = $payload['error']['code'] ?? 0;
+        $errorMessage = $payload['error']['message'] ?? 'Unknown error.';
         $remoteTrace = trim($payload['error']['data']['debug']);
 
         if (preg_match('#'.preg_quote('Traceback (most recent call last):').'#', $remoteTrace)) {

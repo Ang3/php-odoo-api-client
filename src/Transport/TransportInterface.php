@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\Transport;
 
+use Ang3\Component\Odoo\Exception\RequestException;
+use Ang3\Component\Odoo\Exception\TransportException;
+
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
  */
@@ -21,7 +24,8 @@ interface TransportInterface
     /**
      * Make a request to Odoo database.
      *
+     * @throws RequestException   on bad request
      * @throws TransportException on transport errors
      */
-    public function request(string $service, string $method, array $arguments = []): array;
+    public function request(string $service, string $method, array $arguments = []): mixed;
 }

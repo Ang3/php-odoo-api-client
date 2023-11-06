@@ -11,16 +11,14 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\DBAL\Expression\ExpressionBuilder;
 use Ang3\Component\Odoo\Enum\OdooMethod;
 use Ang3\Component\Odoo\Enum\OdooService;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
-use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
+use Ang3\Component\Odoo\Exception\TransportException;
 use Ang3\Component\Odoo\Metadata\Version;
 use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
-use Ang3\Component\Odoo\Transport\TransportException;
 use Ang3\Component\Odoo\Transport\TransportInterface;
 use Psr\Log\LoggerInterface;
 
@@ -30,7 +28,6 @@ use Psr\Log\LoggerInterface;
 class Client
 {
     private TransportInterface $transport;
-    private ExpressionBuilder $expressionBuilder;
     private ?int $uid = null;
 
     public function __construct(
@@ -38,7 +35,6 @@ class Client
         ?TransportInterface $transport = null,
         private ?LoggerInterface $logger = null
     ) {
-        $this->expressionBuilder = new ExpressionBuilder();
         $this->transport = $transport ?: new JsonRpcPhpStreamTransport($this->connection);
     }
 
@@ -58,7 +54,7 @@ class Client
         return new self(Connection::create($config), $transport, $logger);
     }
 
-    public function execute(string $name, string $method, array $parameters = [], array $options = []): mixed
+    public function executeKw(string $name, string $method, array $parameters = [], array $options = []): mixed
     {
         return $this->request(
             OdooService::Object->value,
@@ -119,20 +115,16 @@ class Client
         $this->logger?->info('Odoo request #{request_id} - {service}::{method}({arguments}) (uid: #{uid})', $context);
 
         $runtime = microtime(true);
-        $payload = $this->transport->request($service, $method, $arguments);
+        $result = $this->transport->request($service, $method, $arguments);
         $runtime = microtime(true) - $runtime;
 
         $this->logger?->debug('Odoo request #{request_id} finished - Runtime: {runtime}s.', [
             'request_id' => $context['request_id'],
             'runtime' => number_format($runtime, 3, '.', ' '),
-            'payload' => $payload,
+            'payload' => $result,
         ]);
 
-        if (\is_array($payload['error'] ?? null)) {
-            throw RemoteException::create($payload);
-        }
-
-        return $payload['result'];
+        return $result;
     }
 
     public function getConnection(): Connection
@@ -156,11 +148,6 @@ class Client
         return $this;
     }
 
-    public function getExpressionBuilder(): ExpressionBuilder
-    {
-        return $this->expressionBuilder;
-    }
-
     public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
@@ -171,5 +158,10 @@ class Client
         $this->logger = $logger;
 
         return $this;
+    }
+
+    public function getUid(): ?int
+    {
+        return $this->uid;
     }
 }
