@@ -16,9 +16,6 @@ It follows [the official Odoo documentation](https://www.odoo.com/documentation/
 >
 > - For older versions of PHP, please use the version 7.x.
 
-Odoo version support
---------------------
-
 | Odoo series | Compatibility | Comment         |
 |-------------|---------------|-----------------|
 | v13.0+      | Unknown       | Needs feedbacks |
