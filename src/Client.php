@@ -100,7 +100,7 @@ class Client
      * @throws RequestException   on request errors
      * @throws TransportException on transport errors
      */
-    public function request(string $service, string $method, ...$arguments): mixed
+    public function request(string $service, string $method, mixed ...$arguments): mixed
     {
         $context = [
             'service' => $service,

@@ -24,12 +24,13 @@ class JsonRpcPhpStreamTransport implements TransportInterface
     /**
      * JSON-RPC endpoint.
      */
-    public const ENDPOINT_JSON_RPC = 'jsonrpc';
+    public const DEFAULT_ENDPOINT = '/jsonrpc';
 
     public function __construct(
         private readonly Connection $connection,
         private readonly int $timeOut = TransportInterface::DEFAULT_TIMEOUT
-    ) {}
+    ) {
+    }
 
     public function request(string $service, string $method, array $arguments = []): mixed
     {
@@ -57,8 +58,8 @@ class JsonRpcPhpStreamTransport implements TransportInterface
             ],
         ]);
 
-        $url = sprintf('%s/%s', $this->connection->getUrl(), self::ENDPOINT_JSON_RPC);
-        $request = file_get_contents($url, false, $context);
+        $endpointUrl = $this->connection->getUrl().self::DEFAULT_ENDPOINT;
+        $request = file_get_contents($endpointUrl, false, $context);
 
         if (false === $request) {
             throw new TransportException('JSON RPC request failed - Unable to get stream contents.');
@@ -75,5 +76,15 @@ class JsonRpcPhpStreamTransport implements TransportInterface
         }
 
         return $data['result'] ?? null;
+    }
+
+    public function getConnection(): Connection
+    {
+        return $this->connection;
+    }
+
+    public function getTimeOut(): int
+    {
+        return $this->timeOut;
     }
 }
