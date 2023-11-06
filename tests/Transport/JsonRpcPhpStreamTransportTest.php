@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-odoo-api-client
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\Odoo\Tests\Transport;
 
 use Ang3\Component\Odoo\Connection;
@@ -10,9 +19,14 @@ use Ang3\Component\Odoo\Transport\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class JsonRpcPhpStreamTransportTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class JsonRpcPhpStreamTransportTest extends TestCase
 {
-    public const TEST_URL = __DIR__ . '/../Resources/jsonrpc_endpoints';
+    public const TEST_URL = __DIR__.'/../Resources/jsonrpc_endpoints';
     public const SUCCESS_ENDPOINT = '/success';
     public const JSON_ERROR_ENDPOINT = '/json_error';
     public const REMOTE_ERROR_ENDPOINT = '/remote_error';
@@ -29,17 +43,17 @@ class JsonRpcPhpStreamTransportTest extends TestCase
 
     public function testRequest(): void
     {
-        list($service, $method, $arguments) = ['foo', 'bar', [1, 2, 3]];
-        $this->connection->expects($this->once())->method('getUrl')->willReturn(self::TEST_URL.self::SUCCESS_ENDPOINT);
+        [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
+        $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::SUCCESS_ENDPOINT);
 
         $result = $this->transport->request($service, $method, $arguments);
-        self::assertEquals(['success' => true], $result);
+        static::assertSame(['success' => true], $result);
     }
 
     public function testRequestDecodingError(): void
     {
-        list($service, $method, $arguments) = ['foo', 'bar', [1, 2, 3]];
-        $this->connection->expects($this->once())->method('getUrl')->willReturn(self::TEST_URL.self::JSON_ERROR_ENDPOINT);
+        [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
+        $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::JSON_ERROR_ENDPOINT);
 
         $this->expectException(TransportException::class);
         $this->transport->request($service, $method, $arguments);
@@ -47,8 +61,8 @@ class JsonRpcPhpStreamTransportTest extends TestCase
 
     public function testRequestRemoteError(): void
     {
-        list($service, $method, $arguments) = ['foo', 'bar', [1, 2, 3]];
-        $this->connection->expects($this->once())->method('getUrl')->willReturn(self::TEST_URL.self::REMOTE_ERROR_ENDPOINT);
+        [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
+        $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::REMOTE_ERROR_ENDPOINT);
 
         $this->expectException(RemoteException::class);
         $this->transport->request($service, $method, $arguments);

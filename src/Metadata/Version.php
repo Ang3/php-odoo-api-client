@@ -21,7 +21,8 @@ class Version
         private readonly string $buildIdentifier,
         private readonly string $buildVersion,
         private readonly int $protocolVersion
-    ) {}
+    ) {
+    }
 
     /**
      * Creates the instance from Odoo response payload.
