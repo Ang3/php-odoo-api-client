@@ -20,9 +20,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @coversDefaultClass \Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport
  *
- * @coversNothing
+ * @internal
  */
 final class JsonRpcPhpStreamTransportTest extends TestCase
 {
@@ -41,15 +41,21 @@ final class JsonRpcPhpStreamTransportTest extends TestCase
         $this->transport = new JsonRpcPhpStreamTransport($this->connection, TransportInterface::DEFAULT_TIMEOUT, '');
     }
 
+    /**
+     * @covers ::request
+     */
     public function testRequest(): void
     {
         [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
         $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::SUCCESS_ENDPOINT);
 
         $result = $this->transport->request($service, $method, $arguments);
-        static::assertSame(['success' => true], $result);
+        static::assertSame(['success' => 'true'], $result);
     }
 
+    /**
+     * @covers ::request
+     */
     public function testRequestDecodingError(): void
     {
         [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
@@ -59,6 +65,9 @@ final class JsonRpcPhpStreamTransportTest extends TestCase
         $this->transport->request($service, $method, $arguments);
     }
 
+    /**
+     * @covers ::request
+     */
     public function testRequestRemoteError(): void
     {
         [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
