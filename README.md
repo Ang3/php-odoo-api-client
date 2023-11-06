@@ -69,7 +69,7 @@ $client = Client::create([
     'database' => '<name_of_database>',
     'username' => '<your_username>',
     'password' => '<your_password>',
-], $logger = null);
+], $transport = null, $logger = null);
 ```
 
 Exceptions:
@@ -110,6 +110,16 @@ $uid = $client->getUid(); // int|null
 $version = $client->version(); // \Ang3\Component\Odoo\Metadata\Version
 dump($version);
 ```
+
+### Custom transport
+
+By default, the library provides a JSON-RPC transport and the client create it by default 
+if no transport is explicitly provided on constructor. 
+
+You can provide your own transport when you create your client as second argument. By this way, the JSON-RPC transport 
+will not be created and the client will use yours instead.
+
+Your custom transport must implement the interface `Ang3\Component\Odoo\Transport\TransportInterface`.
 
 ### Database Abstraction Layer (DBAL)
 
