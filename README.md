@@ -118,8 +118,8 @@ Your custom transport must implement the interface `Ang3\Component\Odoo\Transpor
 More features
 -------------
 
-- Database Abstraction Layer (DBAL): You need to manage your Odoo database models? 
-Please see the package [Odoo DBAL](https://github.com/ang3/php-odoo-dbal) to execute queries like Doctrine.
+- [Odoo Database Abstraction Layer (DBAL)](https://github.com/ang3/php-odoo-dbal): Execute queries like Doctrine to 
+your Odoo database.
 
 Tests
 -----
