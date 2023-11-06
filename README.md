@@ -26,9 +26,6 @@ Odoo version support
 | v12.0       | Yes           |                 |
 | Older       | Unknown       | Needs feedbacks |
 
-Getting started
-===============
-
 Installation
 ------------
 
@@ -118,9 +115,24 @@ will not be created and the client will use yours instead.
 
 Your custom transport must implement the interface `Ang3\Component\Odoo\Transport\TransportInterface`.
 
-### Database Abstraction Layer (DBAL)
+More features
+-------------
 
-You need to manage your Odoo database models? 
+- Database Abstraction Layer (DBAL): You need to manage your Odoo database models? 
 Please see the package [Odoo DBAL](https://github.com/ang3/php-odoo-dbal) to execute queries like Doctrine.
 
-That's it!
+Tests
+-----
+
+To run tests:
+
+```console
+$ git clone git@github.com:Ang3/php-odoo-api-client.git
+$ composer install
+$ vendor/bin/simple-phpunit
+```
+
+License
+-------
+
+This software is published under the [MIT License](./LICENCE).
