@@ -91,7 +91,7 @@ These previous exception can be thrown by all methods of the client.
 
 ### ExecuteKw
 
-The client has a shortcut for the Odoo method `executeKw` of Odoo service `object`.
+The client has a shortcut for the Odoo method `execute_kw` of Odoo service `object`.
 By calling the method `executeKw`, the client tries to authenticate then makes the request and returns result.
 
 ```php
