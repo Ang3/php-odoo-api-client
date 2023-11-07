@@ -10,7 +10,8 @@ PHP Odoo API client
 This package is a PHP library to connect and interact with an Odoo instance via JSON-RPC by default.
 It follows [the official Odoo documentation](https://www.odoo.com/documentation/13.0/developer/misc/api/odoo.html).
 
-> From v8.x, this package is dedicated to the client only and PHP 8.1+.
+> From v8.x, this package is dedicated to the client only and PHP 8.1+. 
+> The PHP extension `xmlrpc` is not required anymore.
 > 
 > - For DBAL features, please report to the package [PHP Odoo DBAL](https://github.com/ang3/php-odoo-dbal).
 >
