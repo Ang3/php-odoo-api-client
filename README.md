@@ -50,7 +50,7 @@ Basic usage
 You can create a client with DSN or array configuration. 
 Both methods will create a connection to construct the client.
 
-#### By DSN
+#### DSN
 
 First, create your DSN from your connection settings. The DSN must look like this:
 
