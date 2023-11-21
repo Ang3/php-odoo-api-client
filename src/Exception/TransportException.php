@@ -14,6 +14,4 @@ namespace Ang3\Component\Odoo\Exception;
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
  */
-class TransportException extends \RuntimeException implements ExceptionInterface
-{
-}
+class TransportException extends \RuntimeException implements ExceptionInterface {}
