@@ -82,8 +82,7 @@ final class ConnectionTest extends TestCase
         ?string $username = null,
         ?string $password = null,
         ?string $database = null
-    ): void
-    {
+    ): void {
         $this->expectException(ConnectionException::class);
 
         Connection::create([
