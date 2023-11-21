@@ -77,7 +77,7 @@ To create a client from an array configuration:
 
 ```php
 $client = Client::create([
-    'url' => '<url_of_instance>', // required
+    'host' => '<url_of_instance>', // required (without scheme!)
     'database' => '<name_of_database>', // required
     'username' => '<your_username>', // required
     'password' => '<your_password>', // required
