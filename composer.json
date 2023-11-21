@@ -23,6 +23,7 @@
     },
     "require-dev": {
         "symfony/test-pack": "^1.0",
-        "symfony/var-dumper": "^6.3"
+        "symfony/var-dumper": "^6.3",
+        "fakerphp/faker": "^1.23"
     }
 }

@@ -29,7 +29,8 @@ class JsonRpcPhpStreamTransport implements TransportInterface
     public function __construct(
         private readonly Connection $connection,
         private readonly int $timeOut = TransportInterface::DEFAULT_TIMEOUT
-    ) {}
+    ) {
+    }
 
     public function request(string $service, string $method, array $arguments = []): mixed
     {
@@ -57,7 +58,7 @@ class JsonRpcPhpStreamTransport implements TransportInterface
             ],
         ]);
 
-        $endpointUrl = $this->connection->getUrl().self::DEFAULT_ENDPOINT;
+        $endpointUrl = $this->connection->getHost().self::DEFAULT_ENDPOINT;
         $request = file_get_contents($endpointUrl, false, $context);
 
         if (false === $request) {

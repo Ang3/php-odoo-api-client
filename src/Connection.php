@@ -11,24 +11,21 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
+use Ang3\Component\Odoo\Exception\ConnectionException;
 
-/**
- * @author Joanis ROUANET <https://github.com/Ang3>
- */
 class Connection
 {
-    private string $url;
-    private string $database;
-    private string $username;
-    private string $password;
+    public function __construct(
+        private readonly string $host,
+        private readonly string $username,
+        private readonly string $password,
+        private readonly string $database
+    ) {
+    }
 
-    public function __construct(string $url, string $database, string $username, string $password)
+    public function __toString(): string
     {
-        $this->url = $url;
-        $this->database = $database;
-        $this->username = $username;
-        $this->password = $password;
+        return sprintf('odoo://%s:%s@%s/%s', $this->username, urlencode($this->password), $this->host, $this->database);
     }
 
     public static function create(array $config): self
@@ -37,28 +34,80 @@ class Connection
             $value = $config[$paramName] ?? null;
 
             if (null === $value) {
-                throw new MissingConfigParameterException(sprintf('Missing config parameter name "%s".', $paramName));
+                throw new ConnectionException(sprintf('Missing configuration parameter "%s".', $paramName));
             }
 
             return $value;
         };
 
         return new self(
-            $getParam($config, 'url'),
-            $getParam($config, 'database'),
+            $getParam($config, 'host'),
             $getParam($config, 'username'),
-            $getParam($config, 'password')
+            $getParam($config, 'password'),
+            $getParam($config, 'database')
         );
     }
 
-    public function getUrl(): string
+    /**
+     * @throws ConnectionException on invalid DSN
+     */
+    public static function parseDsn(string $dsn): self
     {
-        return $this->url;
+        /** @var array|false $parsedUrl */
+        $parsedUrl = parse_url($dsn);
+
+        if (!\is_array($parsedUrl) && $parsedUrl) {
+            throw ConnectionException::invalidDsn($dsn);
+        }
+
+        [$scheme, $host, $user, $password, $path] = [
+            $parsedUrl['scheme'] ?? null,
+            $parsedUrl['host'] ?? null,
+            $parsedUrl['user'] ?? null,
+            $parsedUrl['pass'] ?? null,
+            $parsedUrl['path'] ?? null,
+        ];
+
+        if (!$scheme) {
+            throw ConnectionException::invalidDsn($dsn, 'Missing scheme.');
+        }
+
+        if ('odoo' !== $scheme) {
+            throw ConnectionException::invalidDsn($dsn, sprintf('The scheme "%s" is not supported (expecting "odoo").', $scheme));
+        }
+
+        if (!$host) {
+            throw ConnectionException::invalidDsn($dsn, 'Missing host.');
+        }
+
+        if (!$user) {
+            throw ConnectionException::invalidDsn($dsn, 'Missing username.');
+        }
+
+        if (!$password) {
+            throw ConnectionException::invalidDsn($dsn, 'Missing user password.');
+        }
+
+        if (!$path) {
+            throw ConnectionException::invalidDsn($dsn, 'Missing path.');
+        }
+
+        $database = str_starts_with($path, '/') ? substr($path, 1) : $path;
+
+        return new self($host, $user, urldecode($password), $database);
     }
 
-    public function getDatabase(): string
+    /**
+     * Gets the unique name of this connection.
+     */
+    public function getIdentifier(): string
     {
-        return $this->database;
+        return sha1(sprintf('%s.%s.%s', $this->host, $this->database, $this->username));
+    }
+
+    public function getHost(): string
+    {
+        return $this->host;
     }
 
     public function getUsername(): string
@@ -71,14 +120,8 @@ class Connection
         return $this->password;
     }
 
-    /**
-     * Gets the unique name of this connection.
-     */
-    public function getIdentifier(): string
+    public function getDatabase(): string
     {
-        $database = preg_replace('([^a-zA-Z0-9_])', '_', $this->database);
-        $user = preg_replace('([^a-zA-Z0-9_])', '_', $this->username);
-
-        return sprintf('%s.%s.%s', sha1($this->url), $database, $user);
+        return $this->database;
     }
 }

@@ -14,7 +14,7 @@ namespace Ang3\Component\Odoo;
 use Ang3\Component\Odoo\Enum\OdooRpcMethod;
 use Ang3\Component\Odoo\Enum\OdooRpcService;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
-use Ang3\Component\Odoo\Exception\MissingConfigParameterException;
+use Ang3\Component\Odoo\Exception\ConnectionException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Exception\TransportException;
 use Ang3\Component\Odoo\Metadata\Version;
@@ -39,19 +39,16 @@ class Client
     }
 
     /**
-     * Create a new client instance from array configuration.
-     * The configuration array must have keys "url", "database", "username" and "password".
+     * Create a new client instance from a DSN.
+     * DSN format: odoo://<user>:<password>@<host>/<database_name>.
      *
      * @static
      *
-     * @throws MissingConfigParameterException when a required parameter is missing
+     * @throws ConnectionException on invalid DSN
      */
-    public static function create(
-        array $config,
-        TransportInterface $transport = null,
-        LoggerInterface $logger = null
-    ): self {
-        return new self(Connection::create($config), $transport, $logger);
+    public static function create(string $dsn, TransportInterface $transport = null, LoggerInterface $logger = null): self
+    {
+        return new self(Connection::parseDsn($dsn), $transport, $logger);
     }
 
     public function executeKw(string $name, string $method, array $parameters = [], array $options = []): mixed
