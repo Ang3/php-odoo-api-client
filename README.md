@@ -47,23 +47,28 @@ Basic usage
 
 ### Create a client
 
-You can create a client via DSN or array configuration.
+You can create a client with DSN or array configuration. 
+Both methods will create a connection to construct the client.
 
 #### By DSN
 
-First, create a client instance statically with your config:
+First, create your DSN from your connection settings. The DSN must look like this:
+
+`odoo://<username>:<password>@<host>/<database_name>`
+
+The scheme must be `odoo`. 
+If your password contains special characters, encode it with the native function `urlencode()`:
+
+```php
+$myEncodedPassword = urlencode('high_password_with_special_charaters');
+```
+
+Then, use the DSN to create the client:
 
 ```php
 use Ang3\Component\Odoo\Client;
 
-$dsn = `odoo://<username>:<password>@<host>/<database_name>`;
 $client = Client::create($dsn, $transport = null, $logger = null);
-```
-
-If your password contains special characters, encode it with the native function `urlencode()`:
-
-```php
-$myEncodedPassword = urlencode('high_password');
 ```
 
 #### Array configuration
@@ -71,8 +76,6 @@ $myEncodedPassword = urlencode('high_password');
 To create a client from an array configuration:
 
 ```php
-use Ang3\Component\Odoo\Client;
-
 $client = Client::create([
     'url' => '<url_of_instance>',
     'database' => '<name_of_database>',
@@ -80,6 +83,8 @@ $client = Client::create([
     'password' => '<your_password>',
 ], $transport = null, $logger = null);
 ```
+
+All parameters in this example are required.
 
 #### Error handling
 
