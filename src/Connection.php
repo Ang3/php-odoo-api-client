@@ -20,8 +20,7 @@ class Connection
         private readonly string $username,
         private readonly string $password,
         private readonly string $database
-    ) {
-    }
+    ) {}
 
     public function __toString(): string
     {

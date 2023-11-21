@@ -16,7 +16,7 @@ namespace Ang3\Component\Odoo\Exception;
  */
 class ConnectionException extends \InvalidArgumentException implements ExceptionInterface
 {
-    public static function invalidDsn(string $dsn, ?string $message = null, ?\Throwable $previous = null): self
+    public static function invalidDsn(string $dsn, string $message = null, \Throwable $previous = null): self
     {
         return new self(sprintf('The DSN "%s" is not valid - %s', $dsn, $message ?: 'Unknown error'), 0, $previous);
     }
