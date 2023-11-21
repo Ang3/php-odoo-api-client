@@ -47,7 +47,7 @@ final class JsonRpcPhpStreamTransportTest extends TestCase
     public function testRequest(): void
     {
         [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
-        $this->connection->expects(static::once())->method('getHost')->willReturn(self::TEST_URL.self::SUCCESS_ENDPOINT);
+        $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::SUCCESS_ENDPOINT);
 
         $result = $this->transport->request($service, $method, $arguments);
         static::assertSame(['success' => 'true'], $result);
@@ -59,7 +59,7 @@ final class JsonRpcPhpStreamTransportTest extends TestCase
     public function testRequestDecodingError(): void
     {
         [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
-        $this->connection->expects(static::once())->method('getHost')->willReturn(self::TEST_URL.self::JSON_ERROR_ENDPOINT);
+        $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::JSON_ERROR_ENDPOINT);
 
         $this->expectException(TransportException::class);
         $this->transport->request($service, $method, $arguments);
@@ -71,7 +71,7 @@ final class JsonRpcPhpStreamTransportTest extends TestCase
     public function testRequestRemoteError(): void
     {
         [$service, $method, $arguments] = ['foo', 'bar', [1, 2, 3]];
-        $this->connection->expects(static::once())->method('getHost')->willReturn(self::TEST_URL.self::REMOTE_ERROR_ENDPOINT);
+        $this->connection->expects(static::once())->method('getUrl')->willReturn(self::TEST_URL.self::REMOTE_ERROR_ENDPOINT);
 
         $this->expectException(RemoteException::class);
         $this->transport->request($service, $method, $arguments);

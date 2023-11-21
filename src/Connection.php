@@ -19,12 +19,14 @@ class Connection
         private readonly string $host,
         private readonly string $username,
         private readonly string $password,
-        private readonly string $database
-    ) {}
+        private readonly string $database,
+        private readonly string $scheme = 'https'
+    ) {
+    }
 
     public function __toString(): string
     {
-        return sprintf('odoo://%s:%s@%s/%s', $this->username, urlencode($this->password), $this->host, $this->database);
+        return sprintf('%s://%s:%s@%s/%s', $this->scheme, $this->username, urlencode($this->password), $this->host, $this->database);
     }
 
     public static function create(array $config): self
@@ -43,7 +45,8 @@ class Connection
             $getParam($config, 'host'),
             $getParam($config, 'username'),
             $getParam($config, 'password'),
-            $getParam($config, 'database')
+            $getParam($config, 'database'),
+            $config['scheme'] ?? 'https',
         );
     }
 
@@ -71,8 +74,8 @@ class Connection
             throw ConnectionException::invalidDsn($dsn, 'Missing scheme.');
         }
 
-        if ('odoo' !== $scheme) {
-            throw ConnectionException::invalidDsn($dsn, sprintf('The scheme "%s" is not supported (expecting "odoo").', $scheme));
+        if (!\in_array($scheme, ['http', 'https'], true)) {
+            throw ConnectionException::invalidDsn($dsn, sprintf('The scheme "%s" is not supported (supported: "http" or "https").', $scheme));
         }
 
         if (!$host) {
@@ -122,5 +125,15 @@ class Connection
     public function getDatabase(): string
     {
         return $this->database;
+    }
+
+    public function getScheme(): string
+    {
+        return $this->scheme;
+    }
+
+    public function getUrl(): string
+    {
+        return sprintf('%s://%s', $this->scheme, $this->host);
     }
 }

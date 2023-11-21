@@ -39,7 +39,7 @@ final class ConnectionTest extends TestCase
         $this->password = self::faker()->password(8);
         $this->database = 'my-database-3548373';
         $this->connection = new Connection($this->host, $this->username, $this->password, $this->database);
-        $this->dsn = sprintf('odoo://%s:%s@%s/%s', $this->username, urlencode($this->password), $this->host, $this->database);
+        $this->dsn = sprintf('https://%s:%s@%s/%s', $this->username, urlencode($this->password), $this->host, $this->database);
     }
 
     /**

@@ -54,9 +54,9 @@ Both methods will create a connection to construct the client.
 
 First, create your DSN from your connection settings. The DSN must look like this:
 
-`odoo://<username>:<password>@<host>/<database_name>`
+`https://<username>:<password>@<host>/<database_name>`
 
-The scheme must be `odoo`. 
+The scheme must be `http` or `https` (by default). 
 If your password contains special characters, encode it with the native function `urlencode()`:
 
 ```php
@@ -77,14 +77,13 @@ To create a client from an array configuration:
 
 ```php
 $client = Client::create([
-    'url' => '<url_of_instance>',
-    'database' => '<name_of_database>',
-    'username' => '<your_username>',
-    'password' => '<your_password>',
+    'url' => '<url_of_instance>', // required
+    'database' => '<name_of_database>', // required
+    'username' => '<your_username>', // required
+    'password' => '<your_password>', // required
+    'scheme' => 'https', // optional
 ], $transport = null, $logger = null);
 ```
-
-All parameters in this example are required.
 
 #### Error handling
 

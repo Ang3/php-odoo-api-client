@@ -29,7 +29,8 @@ class JsonRpcPhpStreamTransport implements TransportInterface
     public function __construct(
         private readonly Connection $connection,
         private readonly int $timeOut = TransportInterface::DEFAULT_TIMEOUT
-    ) {}
+    ) {
+    }
 
     public function request(string $service, string $method, array $arguments = []): mixed
     {
@@ -57,14 +58,14 @@ class JsonRpcPhpStreamTransport implements TransportInterface
             ],
         ]);
 
-        $endpointUrl = $this->connection->getHost().self::DEFAULT_ENDPOINT;
-        $request = file_get_contents($endpointUrl, false, $context);
+        $endpointUrl = $this->connection->getUrl().self::DEFAULT_ENDPOINT;
+        $response = file_get_contents($endpointUrl, false, $context);
 
-        if (false === $request) {
+        if (false === $response) {
             throw new TransportException('JSON RPC request failed - Unable to get stream contents.');
         }
 
-        $data = (array) json_decode($request, true);
+        $data = (array) json_decode($response, true);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new TransportException(sprintf('Failed to decode JSON data: %s', json_last_error_msg()));
