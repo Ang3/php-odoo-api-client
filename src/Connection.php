@@ -21,8 +21,7 @@ class Connection
         private readonly string $password,
         private readonly string $database,
         private readonly string $scheme = 'https'
-    ) {
-    }
+    ) {}
 
     public function __toString(): string
     {
