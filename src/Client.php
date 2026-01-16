@@ -14,11 +14,10 @@ namespace Ang3\Component\Odoo;
 use Ang3\Component\Odoo\Enum\OdooRpcMethod;
 use Ang3\Component\Odoo\Enum\OdooRpcService;
 use Ang3\Component\Odoo\Exception\AuthenticationException;
-use Ang3\Component\Odoo\Exception\ConnectionException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\Odoo\Exception\TransportException;
 use Ang3\Component\Odoo\Metadata\Version;
-use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
+use Ang3\Component\Odoo\Transport\JsonRpcTransport;
 use Ang3\Component\Odoo\Transport\TransportInterface;
 use Psr\Log\LoggerInterface;
 
@@ -32,25 +31,16 @@ class Client
 
     public function __construct(
         private readonly Connection $connection,
-        TransportInterface $transport = null,
-        private ?LoggerInterface $logger = null
+        ?TransportInterface $transport = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
-        $this->transport = $transport ?: new JsonRpcPhpStreamTransport($this->connection);
+        $this->transport = $transport ?: new JsonRpcTransport($this->connection);
     }
 
     /**
-     * Create a new client instance from a DSN.
-     * DSN format: odoo://<user>:<password>@<host>/<database_name>.
-     *
-     * @static
-     *
-     * @throws ConnectionException on invalid DSN
+     * @param mixed[] $parameters
+     * @param mixed[] $options
      */
-    public static function create(string $dsn, TransportInterface $transport = null, LoggerInterface $logger = null): self
-    {
-        return new self(Connection::parseDsn($dsn), $transport, $logger);
-    }
-
     public function executeKw(string $name, string $method, array $parameters = [], array $options = []): mixed
     {
         return $this->request(
@@ -77,7 +67,8 @@ class Client
     public function authenticate(): int
     {
         if (null === $this->uid) {
-            $this->uid = (int) $this->request(
+            /** @var int|null $uid */
+            $uid = $this->request(
                 OdooRpcService::Common->value,
                 OdooRpcMethod::Login->value,
                 $this->connection->getDatabase(),
@@ -85,9 +76,11 @@ class Client
                 $this->connection->getPassword()
             );
 
-            if (!$this->uid) {
+            if (!$uid) {
                 throw new AuthenticationException();
             }
+
+            $this->uid = $uid;
         }
 
         return $this->uid;
@@ -132,15 +125,9 @@ class Client
         return $this->transport;
     }
 
-    public function setTransport(TransportInterface $transport): self
+    public function withTransport(TransportInterface $transport): self
     {
-        if ($transport !== $this->transport) {
-            $this->uid = null;
-        }
-
-        $this->transport = $transport;
-
-        return $this;
+        return new self($this->connection, $transport, $this->logger);
     }
 
     public function getLogger(): ?LoggerInterface
@@ -148,11 +135,9 @@ class Client
         return $this->logger;
     }
 
-    public function setLogger(?LoggerInterface $logger): self
+    public function withLogger(LoggerInterface $logger): self
     {
-        $this->logger = $logger;
-
-        return $this;
+        return new self($this->connection, $this->transport, $logger);
     }
 
     public function getUid(): ?int

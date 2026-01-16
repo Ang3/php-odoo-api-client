@@ -9,11 +9,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Exception;
+namespace Ang3\Component\Odoo\Transport\Client;
 
 /**
- * @author Joanis ROUANET <https://github.com/Ang3>
+ * @codeCoverageIgnore
  */
-class RequestException extends \RuntimeException implements ExceptionInterface
+interface JsonRpcHttpClientInterface
 {
+    public function post(string $url, string $payload, int $timeout): string|false;
 }

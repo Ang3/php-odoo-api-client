@@ -1,0 +1,5 @@
+#!/bin/bash
+set -uoe pipefail
+
+echo -e "\033[33;1mChecking logs for PHP container\033[0m"
+docker compose -f compose.yaml logs php

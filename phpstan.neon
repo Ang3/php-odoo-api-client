@@ -1,9 +1,5 @@
 parameters:
-  inferPrivatePropertyTypeFromConstructor: true
-  checkGenericClassInNonGenericObjectType: false
-  checkMissingIterableValueType: false
-  treatPhpDocTypesAsCertain: false
-  paths:
-    - %currentWorkingDirectory%/src
-  ignoreErrors:
-  	- '#Cannot cast mixed to int\.#'
+    level: max
+    paths:
+        - src/
+    treatPhpDocTypesAsCertain: false

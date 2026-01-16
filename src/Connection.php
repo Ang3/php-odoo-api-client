@@ -11,86 +11,99 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo;
 
-use Ang3\Component\Odoo\Exception\ConnectionException;
+use Nyholm\Dsn\DsnParser;
+use Nyholm\Dsn\Exception\InvalidDsnException;
 
-class Connection
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
+readonly class Connection
 {
     public function __construct(
-        private readonly string $host,
-        private readonly string $username,
-        private readonly string $password,
-        private readonly string $database,
-        private readonly string $scheme = 'https'
-    ) {}
+        private string $host,
+        private string $username,
+        private string $password,
+        private string $database,
+        private string $scheme = 'https',
+    ) {
+    }
 
     public function __toString(): string
     {
-        return sprintf('%s://%s:%s@%s/%s', $this->scheme, $this->username, urlencode($this->password), $this->host, $this->database);
+        return \sprintf('%s://%s:%s@%s/%s', $this->scheme, $this->username, urlencode($this->password), $this->host, $this->database);
     }
 
+    /**
+     * @param array<string, string> $config
+     *
+     * @throws \InvalidArgumentException on invalid config
+     */
     public static function create(array $config): self
     {
-        $getParam = static function ($config, $paramName) {
+        $getParam = static function (string $paramName) use ($config): string {
             $value = $config[$paramName] ?? null;
 
             if (null === $value) {
-                throw new ConnectionException(sprintf('Missing configuration parameter "%s".', $paramName));
+                throw new \InvalidArgumentException(\sprintf('Missing configuration parameter "%s".', $paramName));
+            }
+
+            if (!\is_string($value)) {
+                throw new \InvalidArgumentException(\sprintf('The parameter "%s" should be a string, got "%s".', $paramName, \gettype($value)));
             }
 
             return $value;
         };
 
         return new self(
-            $getParam($config, 'host'),
-            $getParam($config, 'username'),
-            $getParam($config, 'password'),
-            $getParam($config, 'database'),
+            $getParam('host'),
+            $getParam('username'),
+            $getParam('password'),
+            $getParam('database'),
             $config['scheme'] ?? 'https',
         );
     }
 
     /**
-     * @throws ConnectionException on invalid DSN
+     * @throws \InvalidArgumentException on invalid config
      */
     public static function parseDsn(string $dsn): self
     {
-        /** @var array|false $parsedUrl */
-        $parsedUrl = parse_url($dsn);
-
-        if (!\is_array($parsedUrl) && $parsedUrl) {
-            throw ConnectionException::invalidDsn($dsn);
+        try {
+            $dsn = DsnParser::parse($dsn);
+        } catch (InvalidDsnException $e) {
+            throw new \InvalidArgumentException('Invalid DSN', 0, $e);
         }
 
         [$scheme, $host, $user, $password, $path] = [
-            $parsedUrl['scheme'] ?? null,
-            $parsedUrl['host'] ?? null,
-            $parsedUrl['user'] ?? null,
-            $parsedUrl['pass'] ?? null,
-            $parsedUrl['path'] ?? null,
+            $dsn->getScheme(),
+            $dsn->getHost(),
+            $dsn->getUser(),
+            $dsn->getPassword(),
+            $dsn->getPath(),
         ];
 
         if (!$scheme) {
-            throw ConnectionException::invalidDsn($dsn, 'Missing scheme.');
+            throw new \InvalidArgumentException('Missing DSN scheme.');
         }
 
         if (!\in_array($scheme, ['http', 'https'], true)) {
-            throw ConnectionException::invalidDsn($dsn, sprintf('The scheme "%s" is not supported (supported: "http" or "https").', $scheme));
+            throw new \InvalidArgumentException(\sprintf('The DSN scheme "%s" is not supported (supported: "http" or "https").', $scheme));
         }
 
         if (!$host) {
-            throw ConnectionException::invalidDsn($dsn, 'Missing host.');
+            throw new \InvalidArgumentException('Missing DSN host.');
         }
 
         if (!$user) {
-            throw ConnectionException::invalidDsn($dsn, 'Missing username.');
+            throw new \InvalidArgumentException('Missing DSN username.');
         }
 
         if (!$password) {
-            throw ConnectionException::invalidDsn($dsn, 'Missing user password.');
+            throw new \InvalidArgumentException('Missing DSN user password.');
         }
 
         if (!$path) {
-            throw ConnectionException::invalidDsn($dsn, 'Missing path.');
+            throw new \InvalidArgumentException('Missing DSN path.');
         }
 
         $database = str_starts_with($path, '/') ? substr($path, 1) : $path;
@@ -103,7 +116,7 @@ class Connection
      */
     public function getIdentifier(): string
     {
-        return sha1(sprintf('%s.%s.%s', $this->host, $this->database, $this->username));
+        return sha1(\sprintf('%s.%s.%s', $this->host, $this->database, $this->username));
     }
 
     public function getHost(): string
@@ -133,6 +146,6 @@ class Connection
 
     public function getUrl(): string
     {
-        return sprintf('%s://%s', $this->scheme, $this->host);
+        return \sprintf('%s://%s', $this->scheme, $this->host);
     }
 }

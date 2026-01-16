@@ -17,13 +17,15 @@
         }
     },
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "ext-json": "*",
-        "psr/log": "^1.1|^2.0|^3.0"
+        "psr/log": "^1.1|^2.0|^3.0",
+        "nyholm/dsn": "^2.0"
     },
     "require-dev": {
         "symfony/test-pack": "^1.0",
         "symfony/var-dumper": "^6.3",
-        "fakerphp/faker": "^1.23"
+        "phpstan/phpstan": "^2.1",
+        "friendsofphp/php-cs-fixer": "^3.92"
     }
 }

@@ -13,13 +13,24 @@ namespace Ang3\Component\Odoo\Exception;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
+ *
+ * @phpstan-type ErrorArray array{code: int, message: string, data: array{debug: string}}
+ * @phpstan-type Payload array{error: ErrorArray}
+ * @phpstan-type RemoteTraceArray array<int<0, max>, array{file: string, line: int, method: string, statement: string}>
  */
 class RemoteException extends RequestException
 {
+    /**
+     * @var RemoteTraceArray
+     */
     protected array $remoteTrace = [];
 
+    /**
+     * @param mixed[] $payload
+     */
     public static function create(array $payload): self
     {
+        /** @var Payload $payload */
         $errorCode = $payload['error']['code'] ?? 0;
         $errorMessage = $payload['error']['message'] ?? 'Unknown error.';
         $remoteTrace = trim($payload['error']['data']['debug']);
@@ -62,6 +73,9 @@ class RemoteException extends RequestException
         return new self($errorMessage, $errorCode);
     }
 
+    /**
+     * @return RemoteTraceArray
+     */
     public function getRemoteTrace(): array
     {
         return $this->remoteTrace;

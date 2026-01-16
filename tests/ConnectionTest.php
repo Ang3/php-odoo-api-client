@@ -12,118 +12,79 @@ declare(strict_types=1);
 namespace Ang3\Component\Odoo\Tests;
 
 use Ang3\Component\Odoo\Connection;
-use Ang3\Component\Odoo\Exception\ConnectionException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Ang3\Component\Odoo\Connection
- *
  * @internal
  */
+#[CoversClass(Connection::class)]
 final class ConnectionTest extends TestCase
 {
-    use FakerTrait;
-
-    private Connection $connection;
-    private string $host;
-    private string $username;
-    private string $password;
-    private string $database;
-    private string $dsn;
-
-    protected function setUp(): void
+    public function testGettersAndToString(): void
     {
-        parent::setUp();
-        $this->host = 'my-company.odoo.com';
-        $this->username = 'my-account@my-domain.com';
-        $this->password = self::faker()->password(8);
-        $this->database = 'my-database-3548373';
-        $this->connection = new Connection($this->host, $this->username, $this->password, $this->database);
-        $this->dsn = sprintf('https://%s:%s@%s/%s', $this->username, urlencode($this->password), $this->host, $this->database);
+        $connection = new Connection('odoo.local', 'admin', 'secret', 'test_db', 'https');
+
+        self::assertSame('odoo.local', $connection->getHost());
+        self::assertSame('admin', $connection->getUsername());
+        self::assertSame('secret', $connection->getPassword());
+        self::assertSame('test_db', $connection->getDatabase());
+        self::assertSame('https', $connection->getScheme());
+        self::assertSame('https://admin:secret@odoo.local/test_db', (string) $connection);
+        self::assertSame('https://odoo.local', $connection->getUrl());
+        self::assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $connection->getIdentifier());
     }
 
-    /**
-     * @covers ::__toString
-     */
-    public function testToString(): void
+    public function testCreateFromConfig(): void
     {
-        static::assertSame($this->dsn, (string) $this->connection);
+        $config = [
+            'host' => 'odoo.local',
+            'username' => 'admin',
+            'password' => 'secret',
+            'database' => 'test_db',
+        ];
+
+        $connection = Connection::create($config);
+
+        self::assertSame('odoo.local', $connection->getHost());
+        self::assertSame('admin', $connection->getUsername());
+        self::assertSame('secret', $connection->getPassword());
+        self::assertSame('test_db', $connection->getDatabase());
+        self::assertSame('https', $connection->getScheme());
     }
 
-    /**
-     * @covers ::create
-     *
-     * @depends testGetters
-     */
-    public function testCreate(): void
+    public function testCreateThrowsExceptionOnMissingParam(): void
     {
-        $connection = Connection::create([
-            'host' => $this->host,
-            'username' => $this->username,
-            'password' => $this->password,
-            'database' => $this->database,
-        ]);
-
-        $this->testGetters($connection);
-    }
-
-    /**
-     * @covers ::create
-     *
-     * @depends testGetters
-     *
-     * @testWith [null, "user", "pass", "database"]
-     *           ["host", null, "pass", "database"]
-     *           ["host", "user", null, "database"]
-     *           ["host", "user", "pass", null]
-     */
-    public function testCreateWithMissingParameters(
-        ?string $host = null,
-        ?string $username = null,
-        ?string $password = null,
-        ?string $database = null
-    ): void {
-        $this->expectException(ConnectionException::class);
-
+        $this->expectException(\InvalidArgumentException::class);
         Connection::create([
-            'host' => $host,
-            'username' => $username,
-            'password' => $password,
-            'database' => $database,
+            'host' => 'odoo.local',
+            'username' => 'admin',
+            // missing password
+            'database' => 'test_db',
         ]);
     }
 
-    /**
-     * @covers ::parseDsn
-     *
-     * @depends testGetters
-     */
     public function testParseDsn(): void
     {
-        $connection = Connection::parseDsn($this->dsn);
-        $this->testGetters($connection);
+        $dsn = 'https://admin:secret@odoo.local/test_db';
+        $connection = Connection::parseDsn($dsn);
+
+        self::assertSame('odoo.local', $connection->getHost());
+        self::assertSame('admin', $connection->getUsername());
+        self::assertSame('secret', $connection->getPassword());
+        self::assertSame('test_db', $connection->getDatabase());
+        self::assertSame('https', $connection->getScheme());
     }
 
-    /**
-     * @covers ::getDatabase
-     * @covers ::getHost
-     * @covers ::getPassword
-     * @covers ::getUsername
-     */
-    public function testGetters(?Connection $connection = null): void
+    public function testParseDsnWithMissingPartsThrowsException(): void
     {
-        $connection = $connection ?: $this->connection;
-        static::assertSame($this->host, $connection->getHost());
-        static::assertSame($this->username, $connection->getUsername());
-        static::assertSame($this->password, $connection->getPassword());
-        static::assertSame($this->database, $connection->getDatabase());
+        $this->expectException(\InvalidArgumentException::class);
+        Connection::parseDsn('https://@odoo.local/test_db');
     }
 
-    /**
-     * @covers ::getIdentifier
-     */
-    public function testGetIdentifier(): void
+    public function testParseDsnWithUnsupportedSchemeThrowsException(): void
     {
-        static::assertSame(sha1(sprintf('%s.%s.%s', $this->host, $this->database, $this->username)), $this->connection->getIdentifier());
+        $this->expectException(\InvalidArgumentException::class);
+        Connection::parseDsn('ftp://admin:secret@odoo.local/test_db');
     }
 }

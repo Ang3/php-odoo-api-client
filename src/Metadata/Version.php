@@ -11,26 +11,43 @@ declare(strict_types=1);
 
 namespace Ang3\Component\Odoo\Metadata;
 
-class Version
+/**
+ * @author Joanis ROUANET <https://github.com/Ang3>
+ */
+readonly class Version
 {
     public function __construct(
-        private readonly int $majorVersion,
-        private readonly int $minorVersion,
-        private readonly int $patchVersion,
-        private readonly string $buildName,
-        private readonly string $buildIdentifier,
-        private readonly string $buildVersion,
-        private readonly int $protocolVersion
-    ) {}
+        private int $majorVersion,
+        private int $minorVersion,
+        private int $patchVersion,
+        private string $buildName,
+        private string $buildIdentifier,
+        private string $buildVersion,
+        private int $protocolVersion,
+    ) {
+    }
 
     /**
      * Creates the instance from Odoo response payload.
+     *
+     * @param mixed[] $payload
      */
     public static function create(array $payload): self
     {
+        /** @var int|string $protocolVersion */
+        $protocolVersion = $payload['protocol_version'];
+        /** @var array{int, int, int, string, string, string} $infos */
         $infos = $payload['server_version_info'];
 
-        return new self($infos[0], $infos[1], $infos[2], (string) $infos[3], (string) $infos[4], (string) $infos[5], $payload['protocol_version']);
+        return new self(
+            (int) $infos[0],
+            (int) $infos[1],
+            (int) $infos[2],
+            (string) $infos[3],
+            (string) $infos[4],
+            (string) $infos[5],
+            (int) $protocolVersion
+        );
     }
 
     public function __toString(): string
@@ -40,7 +57,7 @@ class Version
 
     public function getName(): string
     {
-        return sprintf('%s.%s.%s+%s', $this->majorVersion, $this->minorVersion, $this->patchVersion, $this->buildVersion);
+        return \sprintf('%s.%s.%s+%s', $this->majorVersion, $this->minorVersion, $this->patchVersion, $this->buildName);
     }
 
     public function getMajorVersion(): int

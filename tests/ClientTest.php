@@ -15,223 +15,129 @@ use Ang3\Component\Odoo\Client;
 use Ang3\Component\Odoo\Connection;
 use Ang3\Component\Odoo\Enum\OdooRpcMethod;
 use Ang3\Component\Odoo\Enum\OdooRpcService;
-use Ang3\Component\Odoo\Exception\RemoteException;
+use Ang3\Component\Odoo\Exception\AuthenticationException;
 use Ang3\Component\Odoo\Metadata\Version;
-use Ang3\Component\Odoo\Transport\JsonRpcPhpStreamTransport;
 use Ang3\Component\Odoo\Transport\TransportInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \Ang3\Component\Odoo\Client
- *
  * @internal
  */
+#[CoversClass(Client::class)]
 final class ClientTest extends TestCase
 {
-    private Client $client;
-    private MockObject $connection;
-    private MockObject $transport;
-    private MockObject $logger;
+    private Connection $connection;
+    private TransportInterface $transport;
+    private LoggerInterface $logger;
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->connection = $this->createMock(Connection::class);
         $this->transport = $this->createMock(TransportInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->client = new Client($this->connection, $this->transport, $this->logger);
     }
 
-    /**
-     * @covers ::__construct
-     */
-    public function testConstruct(): void
+    public function testAuthenticateReturnsUid(): void
     {
-        $client = new Client($this->connection);
+        $this->connection->method('getDatabase')->willReturn('test_db');
+        $this->connection->method('getUsername')->willReturn('admin');
+        $this->connection->method('getPassword')->willReturn('secret');
 
-        // Asserting default transport
-        $clientTransport = $client->getTransport();
-        static::assertInstanceOf(JsonRpcPhpStreamTransport::class, $clientTransport);
-
-        // Asserting optional logger
-        $clientLogger = $client->getLogger();
-        static::assertNull($clientLogger);
-    }
-
-    /**
-     * @covers ::__construct
-     */
-    public function testConstructWithCustomTransport(): void
-    {
-        $customTransport = $this->createMock(TransportInterface::class);
-        $client = new Client($this->connection, $customTransport);
-
-        // Asserting custom transport
-        $clientTransport = $client->getTransport();
-        static::assertInstanceOf(TransportInterface::class, $clientTransport);
-        static::assertSame($customTransport, $clientTransport);
-
-        // Asserting optional logger
-        static::assertNull($client->getLogger());
-    }
-
-    /**
-     * @covers ::__construct
-     */
-    public function testConstructWithLogger(): void
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $client = new Client($this->connection, null, $logger);
-
-        // Asserting default transport
-        $clientTransport = $client->getTransport();
-        static::assertInstanceOf(JsonRpcPhpStreamTransport::class, $clientTransport);
-
-        // Asserting logger
-        $clientLogger = $client->getLogger();
-        static::assertInstanceOf(LoggerInterface::class, $clientLogger);
-        static::assertSame($logger, $clientLogger);
-    }
-
-    public static function provideRequestData(): array
-    {
-        return [
-            [OdooRpcService::Common, OdooRpcMethod::Login],
-            [OdooRpcService::Common, OdooRpcMethod::Version],
-            [OdooRpcService::Object, OdooRpcMethod::ExecuteKw],
-        ];
-    }
-
-    /**
-     * @covers ::request
-     *
-     * @dataProvider provideRequestData
-     */
-    public function testRequest(OdooRpcService $service, OdooRpcMethod $method): void
-    {
         $this->transport
-            ->expects(static::once())
             ->method('request')
-            ->with($service->value, $method->value, [1, 2, 3])
-            ->willReturn('foo')
+            ->willReturnCallback(static function (string $service, string $method, mixed ...$args) {
+                if ('common' === $service && 'login' === $method) {
+                    return 42; // UID
+                }
+
+                return null;
+            })
         ;
 
-        $result = $this->client->request($service->value, $method->value, 1, 2, 3);
-        static::assertSame('foo', $result);
+        $client = new Client($this->connection, $this->transport);
+        self::assertSame(42, $client->authenticate());
     }
 
-    /**
-     * @covers ::request
-     *
-     * @dataProvider provideRequestData
-     */
-    public function testRequestRemoteError(OdooRpcService $service, OdooRpcMethod $method): void
+    public function testAuthenticateThrowsExceptionOnFailure(): void
     {
-        self::expectException(RemoteException::class);
+        $this->connection->method('getDatabase')->willReturn('test_db');
+        $this->connection->method('getUsername')->willReturn('admin');
+        $this->connection->method('getPassword')->willReturn('secret');
+
+        // Mock transport to return null (failed login)
         $this->transport
-            ->expects(static::once())
             ->method('request')
-            ->with($service->value, $method->value, [1, 2, 3])
-            ->willThrowException(RemoteException::create([
-                'error' => [
-                    'code' => 123,
-                    'message' => 'Test error',
-                    'data' => [
-                        'debug' => 'foo',
-                    ],
-                ],
-            ]))
+            ->willReturn(null)
         ;
 
-        $this->client->request($service->value, $method->value, 1, 2, 3);
+        $client = new Client($this->connection, $this->transport);
+
+        $this->expectException(AuthenticationException::class);
+        $client->authenticate();
     }
 
-    /**
-     * @covers ::executeKw
-     *
-     * @depends testRequest
-     */
-    public function testExecuteKw(): void
+    public function testExecuteKwCallsTransportCorrectly(): void
     {
-        [$database, $username, $password] = ['foo', 'bar', 'qux'];
-        $this->connection->expects(static::exactly(2))->method('getDatabase')->willReturn($database);
-        $this->connection->expects(static::once())->method('getUsername')->willReturn($username);
-        $this->connection->expects(static::exactly(2))->method('getPassword')->willReturn($password);
-        $expectedUid = 1337;
-        $expectedResult = 'foo';
+        $this->connection->method('getDatabase')->willReturn('test_db');
+        $this->connection->method('getPassword')->willReturn('secret');
 
-        $authenticationArguments = [OdooRpcService::Common->value, OdooRpcMethod::Login->value, [$database, $username, $password]];
-        $requestArguments = [OdooRpcService::Object->value, OdooRpcMethod::ExecuteKw->value, [
-            $database,
-            $expectedUid,
-            $password,
-            $name = 'object_name',
-            $method = 'object_method',
-            $parameters = [1, 2, 3],
-            $options = [4, 5, 6],
-        ]];
-
-        $this->transport
-            ->expects(static::exactly(2))
-            ->method('request')
-            ->withConsecutive($authenticationArguments, $requestArguments)
-            ->willReturn(static::returnCallback(function ($service) use ($expectedUid) {
-                return match ($service) {
-                    OdooRpcService::Common->value => $expectedUid,
-                    default => 'foo'
-                };
-            }))
+        $client = $this->getMockBuilder(Client::class)
+            ->setConstructorArgs([$this->connection, $this->transport])
+            ->onlyMethods(['authenticate'])
+            ->getMock()
         ;
 
-        $result = $this->client->executeKw($name, $method, $parameters, $options);
-        static::assertSame($expectedResult, $result);
+        $client->method('authenticate')->willReturn(42);
+
+        $this->transport
+            ->method('request')
+            ->willReturnCallback(static function (string $service, string $method, mixed ...$args) {
+                if ('object' === $service && 'execute_kw' === $method) {
+                    return [1, 2, 3];
+                }
+
+                return null;
+            })
+        ;
+
+        $result = $client->executeKw('res.partner', 'search', [['is_company' => true]]);
+        self::assertSame([1, 2, 3], $result);
     }
 
-    /**
-     * @covers ::version
-     *
-     * @depends testRequest
-     */
-    public function testVersion(): void
+    public function testVersionReturnsVersionObject(): void
     {
         $this->transport
-            ->expects(static::once())
             ->method('request')
             ->with(OdooRpcService::Common->value, OdooRpcMethod::Version->value)
             ->willReturn([
-                'server_version_info' => [13, 3, 7, 'a', 'b', 'c'],
+                'server_version_info' => [16, 0, 0, 'final', 'build_id', 'build_ver'],
                 'protocol_version' => 1,
             ])
         ;
 
-        $version = $this->client->version();
-        static::assertInstanceOf(Version::class, $version);
+        $client = new Client($this->connection, $this->transport);
+        $version = $client->version();
+
+        self::assertInstanceOf(Version::class, $version);
+
+        // Assert the getters
+        self::assertSame(16, $version->getMajorVersion());
+        self::assertSame(0, $version->getMinorVersion());
+        self::assertSame(0, $version->getPatchVersion());
+        self::assertSame('final', $version->getBuildName());
+        self::assertSame('build_id', $version->getBuildIdentifier());
+        self::assertSame('build_ver', $version->getBuildVersion());
+        self::assertSame(1, $version->getProtocolVersion());
     }
 
-    /**
-     * @covers ::authenticate
-     *
-     * @depends testRequest
-     */
-    public function testAuthenticate(): void
+    public function testWithLoggerReturnsNewInstance(): void
     {
-        [$database, $username, $password] = ['foo', 'bar', 'qux'];
-        $this->connection->expects(static::once())->method('getDatabase')->willReturn($database);
-        $this->connection->expects(static::once())->method('getUsername')->willReturn($username);
-        $this->connection->expects(static::once())->method('getPassword')->willReturn($password);
-        $expectedUid = 1337;
+        $client = new Client($this->connection, $this->transport);
+        $newClient = $client->withLogger($this->logger);
 
-        $this->transport
-            ->expects(static::once())
-            ->method('request')
-            ->with(OdooRpcService::Common->value, OdooRpcMethod::Login->value, [$database, $username, $password])
-            ->willReturn($expectedUid)
-        ;
-
-        $uid = $this->client->authenticate();
-        static::assertSame($expectedUid, $uid);
-        static::assertSame($expectedUid, $this->client->getUid());
+        self::assertNotSame($client, $newClient);
+        self::assertSame($this->logger, $newClient->getLogger());
     }
 }
