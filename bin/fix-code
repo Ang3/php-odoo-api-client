@@ -1,0 +1,9 @@
+#!/bin/bash
+set -uoe pipefail
+
+echo -e "\033[33;1mFixing code in '/src'\033[0m"
+vendor/bin/php-cs-fixer fix src "$@"
+
+echo
+echo -e "\033[33;1mFixing code in '/tests'\033[0m"
+vendor/bin/php-cs-fixer fix tests "$@"

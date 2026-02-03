@@ -9,11 +9,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Component\Odoo\Exception;
+namespace Ang3\Component\Odoo\Enum;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
+ *
+ * @codeCoverageIgnore
  */
-class RequestException extends \RuntimeException implements ExceptionInterface
+enum OdooRpcMethod: string
 {
+    case Login = 'login';
+    case ExecuteKw = 'execute_kw';
+    case Version = 'version';
 }

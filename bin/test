@@ -1,0 +1,5 @@
+#!/bin/bash
+set -uoe pipefail
+
+echo -e "\033[33;1mRunning PHPUnit\033[0m"
+vendor/bin/phpunit "$@"

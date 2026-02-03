@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+* Support for PHP >= 8.1 only - The PHP extension `php-xmlrpc` is not used anymore.
+* Transport layer - XMLRPC replaced by JSONRPC.
+* Code review
+
 7.0
 ---
 

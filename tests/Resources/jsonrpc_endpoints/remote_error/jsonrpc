@@ -1,0 +1,9 @@
+{
+  "error": {
+      "code": 123,
+      "message": "Odoo error",
+      "data": {
+        "debug": "foo"
+      }
+    }
+}

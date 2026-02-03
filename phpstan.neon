@@ -1,8 +1,5 @@
 parameters:
-  inferPrivatePropertyTypeFromConstructor: true
-  checkGenericClassInNonGenericObjectType: false
-  checkMissingIterableValueType: false
-  paths:
-    - %currentWorkingDirectory%/src
-  ignoreErrors:
-  	#- '#(.*) expects class-string\<T of object\>\|T of object, (.*) given$#'
+    level: max
+    paths:
+        - src/
+    treatPhpDocTypesAsCertain: false

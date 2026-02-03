@@ -1,0 +1,5 @@
+#!/bin/bash
+set -uoe pipefail
+
+echo -e "\033[33;1mChecking source code\033[0m"
+vendor/bin/phpstan analyse src --memory-limit=2G "$@"

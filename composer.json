@@ -2,12 +2,11 @@
     "name": "ang3/php-odoo-api-client",
     "type": "component",
     "description": "Odoo API client",
-    "keywords": ["odoo", "api", "client", "domain", "operation", "dbal", "query", "builder", "repository", "builder", "12", "13"],
+    "keywords": ["odoo", "api", "client", "transport", "json"],
     "license": "MIT",
     "authors": [
         {
             "name": "Joanis ROUANET",
-            "email": "joanis.ang3@gmail.com",
             "homepage": "https://github.com/Ang3"
         }
     ],
@@ -18,18 +17,16 @@
         }
     },
     "require": {
-        "php": ">=7.2",
+        "php": ">=8.2",
         "ext-json": "*",
-        "ang3/php-xmlrpc-client": "^1.0.2",
-        "psr/log": "^1.1|^2.0|^3.0"
+        "psr/log": "^1.1|^2.0|^3.0",
+        "nyholm/dsn": "^2.0",
+        "webmozart/assert": "^2.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "roave/security-advisories": "dev-master",
-        "phpstan/phpstan": "^0.12.94",
-        "symfony/var-dumper": "^3.4 || ^4.0 || ^5.0",
-        "symfony/phpunit-bridge": "^3.4 || ^4.0 || ^5.0",
-        "symfony/property-info": "^3.4 || ^4.0 || ^5.0",
-        "symfony/inflector": "^3.4 || ^4.0 || ^5.0"
+        "symfony/test-pack": "^1.0",
+        "symfony/var-dumper": "^6.3",
+        "phpstan/phpstan": "^2.1",
+        "friendsofphp/php-cs-fixer": "^3.92"
     }
 }

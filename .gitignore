@@ -1,5 +1,9 @@
+/.phpunit.cache/
 /vendor/
 /.idea/
+/var/
 .php_cs.cache
+.php_cs-fixer.cache
+.php-cs-fixer.cache
 .phpunit.result.cache
 test.php

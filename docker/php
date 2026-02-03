@@ -1,0 +1,5 @@
+#!/bin/bash
+set -uoe pipefail
+
+echo -e "\033[33;1mExecuting bash inside PHP container ('exit' to quit)\033[0m"
+docker compose -f compose.yaml exec php bash

@@ -1,0 +1,34 @@
+name: PHP Linting
+
+on:
+  push:
+    branches-ignore:
+      - 'master'
+      - 'main'
+  pull_request:
+    branches-ignore:
+      - 'master'
+      - 'main'
+
+jobs:
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Install PHP-CS-Fixer
+        run: |
+          wget https://cs.symfony.com/download/php-cs-fixer-v3.phar -O php-cs-fixer
+          sudo chmod a+x php-cs-fixer
+          sudo mv php-cs-fixer /usr/local/bin/php-cs-fixer
+      - name: Checkout source code
+        uses: actions/checkout@master
+      - name: Run PHP-CS-Fixer - Fix
+        run: php-cs-fixer fix src -vvv --diff --config=.php-cs-fixer.php-highest.php
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Fix PHP code via php-cs-fixer (auto) [no ci]
