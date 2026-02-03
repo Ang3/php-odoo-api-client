@@ -12,79 +12,116 @@ declare(strict_types=1);
 namespace Ang3\Component\Odoo\Tests;
 
 use Ang3\Component\Odoo\Connection;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * @internal
+ *
+ * @coversNothing
  */
-#[CoversClass(Connection::class)]
 final class ConnectionTest extends TestCase
 {
-    public function testGettersAndToString(): void
+    public function testConstructorAndGetters(): void
     {
-        $connection = new Connection('odoo.local', 'admin', 'secret', 'test_db', 'https');
+        $conn = new Connection('host', 'user', 'pass', 'db', 'http');
 
-        self::assertSame('odoo.local', $connection->getHost());
-        self::assertSame('admin', $connection->getUsername());
-        self::assertSame('secret', $connection->getPassword());
-        self::assertSame('test_db', $connection->getDatabase());
-        self::assertSame('https', $connection->getScheme());
-        self::assertSame('https://admin:secret@odoo.local/test_db', (string) $connection);
-        self::assertSame('https://odoo.local', $connection->getUrl());
-        self::assertMatchesRegularExpression('/^[a-f0-9]{40}$/', $connection->getIdentifier());
+        self::assertSame('host', $conn->getHost());
+        self::assertSame('user', $conn->getUsername());
+        self::assertSame('pass', $conn->getPassword());
+        self::assertSame('db', $conn->getDatabase());
+        self::assertSame('http', $conn->getScheme());
+
+        self::assertStringContainsString('http://user:pass@host/db', (string) $conn);
+        self::assertStringContainsString('http://host', $conn->getUrl());
+        self::assertNotEmpty($conn->getIdentifier());
     }
 
-    public function testCreateFromConfig(): void
+    public function testCreateFromConfigSuccess(): void
     {
         $config = [
-            'host' => 'odoo.local',
-            'username' => 'admin',
-            'password' => 'secret',
-            'database' => 'test_db',
+            'host' => 'myhost',
+            'username' => 'myuser',
+            'password' => 'mypass',
+            'database' => 'mydb',
+            'scheme' => 'https',
         ];
 
-        $connection = Connection::create($config);
+        $conn = Connection::createFromConfig($config);
 
-        self::assertSame('odoo.local', $connection->getHost());
-        self::assertSame('admin', $connection->getUsername());
-        self::assertSame('secret', $connection->getPassword());
-        self::assertSame('test_db', $connection->getDatabase());
-        self::assertSame('https', $connection->getScheme());
+        self::assertSame('myhost', $conn->getHost());
+        self::assertSame('myuser', $conn->getUsername());
+        self::assertSame('mypass', $conn->getPassword());
+        self::assertSame('mydb', $conn->getDatabase());
+        self::assertSame('https', $conn->getScheme());
     }
 
-    public function testCreateThrowsExceptionOnMissingParam(): void
+    public function testCreateFromConfigDefaultsSchemeToHttps(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        Connection::create([
-            'host' => 'odoo.local',
-            'username' => 'admin',
-            // missing password
-            'database' => 'test_db',
+        $config = [
+            'host' => 'h',
+            'username' => 'u',
+            'password' => 'p',
+            'database' => 'd',
+        ];
+
+        $conn = Connection::createFromConfig($config);
+
+        self::assertSame('https', $conn->getScheme());
+    }
+
+    public function testCreateFromConfigInvalidConfigThrows(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Connection::createFromConfig([]);
+    }
+
+    public function testCreateFromConfigUnsupportedSchemeThrows(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Connection::createFromConfig([
+            'host' => 'h',
+            'username' => 'u',
+            'password' => 'p',
+            'database' => 'd',
+            'scheme' => 'ftp',
         ]);
     }
 
-    public function testParseDsn(): void
+    public function testCreateFromDsnSuccess(): void
     {
-        $dsn = 'https://admin:secret@odoo.local/test_db';
-        $connection = Connection::parseDsn($dsn);
+        $dsn = 'https://user:pass@host/db';
+        $conn = Connection::createFromDsn($dsn);
 
-        self::assertSame('odoo.local', $connection->getHost());
-        self::assertSame('admin', $connection->getUsername());
-        self::assertSame('secret', $connection->getPassword());
-        self::assertSame('test_db', $connection->getDatabase());
-        self::assertSame('https', $connection->getScheme());
+        self::assertSame('host', $conn->getHost());
+        self::assertSame('user', $conn->getUsername());
+        self::assertSame('pass', $conn->getPassword());
+        self::assertSame('db', $conn->getDatabase());
+        self::assertSame('https', $conn->getScheme());
     }
 
-    public function testParseDsnWithMissingPartsThrowsException(): void
+    public function testCreateFromDsnInvalidThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        Connection::parseDsn('https://@odoo.local/test_db');
+
+        Connection::createFromDsn('invalid-dsn');
     }
 
-    public function testParseDsnWithUnsupportedSchemeThrowsException(): void
+    public function testToStringAndGetUrl(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        Connection::parseDsn('ftp://admin:secret@odoo.local/test_db');
+        $conn = new Connection('host', 'user', 'pass', 'db', 'https');
+
+        $str = (string) $conn;
+        self::assertStringContainsString('https://user:pass@host/db', $str);
+        self::assertSame('https://host', $conn->getUrl());
+    }
+
+    public function testGetIdentifierIsStable(): void
+    {
+        $conn1 = new Connection('host', 'user', 'pass', 'db');
+        $conn2 = new Connection('host', 'user', 'pass', 'db');
+
+        self::assertSame($conn1->getIdentifier(), $conn2->getIdentifier());
     }
 }

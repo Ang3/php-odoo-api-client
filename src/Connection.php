@@ -13,6 +13,8 @@ namespace Ang3\Component\Odoo;
 
 use Nyholm\Dsn\DsnParser;
 use Nyholm\Dsn\Exception\InvalidDsnException;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * @author Joanis ROUANET <https://github.com/Ang3>
@@ -34,39 +36,9 @@ readonly class Connection
     }
 
     /**
-     * @param array<string, string> $config
-     *
      * @throws \InvalidArgumentException on invalid config
      */
-    public static function create(array $config): self
-    {
-        $getParam = static function (string $paramName) use ($config): string {
-            $value = $config[$paramName] ?? null;
-
-            if (null === $value) {
-                throw new \InvalidArgumentException(\sprintf('Missing configuration parameter "%s".', $paramName));
-            }
-
-            if (!\is_string($value)) {
-                throw new \InvalidArgumentException(\sprintf('The parameter "%s" should be a string, got "%s".', $paramName, \gettype($value)));
-            }
-
-            return $value;
-        };
-
-        return new self(
-            $getParam('host'),
-            $getParam('username'),
-            $getParam('password'),
-            $getParam('database'),
-            $config['scheme'] ?? 'https',
-        );
-    }
-
-    /**
-     * @throws \InvalidArgumentException on invalid config
-     */
-    public static function parseDsn(string $dsn): self
+    public static function createFromDsn(string $dsn): self
     {
         try {
             $dsn = DsnParser::parse($dsn);
@@ -74,41 +46,40 @@ readonly class Connection
             throw new \InvalidArgumentException('Invalid DSN', 0, $e);
         }
 
-        [$scheme, $host, $user, $password, $path] = [
-            $dsn->getScheme(),
-            $dsn->getHost(),
-            $dsn->getUser(),
-            $dsn->getPassword(),
-            $dsn->getPath(),
-        ];
+        $path = (string) $dsn->getPath();
 
-        if (!$scheme) {
-            throw new \InvalidArgumentException('Missing DSN scheme.');
-        }
+        return self::createFromConfig([
+            'host' => (string) $dsn->getHost(),
+            'username' => (string) $dsn->getUser(),
+            'password' => urldecode((string) $dsn->getPassword()),
+            'database' => str_starts_with($path, '/') ? substr($path, 1) : $path,
+            'scheme' => (string) $dsn->getScheme(),
+        ]);
+    }
 
-        if (!\in_array($scheme, ['http', 'https'], true)) {
-            throw new \InvalidArgumentException(\sprintf('The DSN scheme "%s" is not supported (supported: "http" or "https").', $scheme));
-        }
+    /**
+     * @param array{host: string, username: string, password: string, database: string, scheme: string|null} $config
+     *
+     * @throws InvalidArgumentException on invalid configuration
+     */
+    public static function createFromConfig(array $config): self
+    {
+        $host = $config['host'] ?? null;
+        Assert::stringNotEmpty($host, 'The host cannot be empty.');
 
-        if (!$host) {
-            throw new \InvalidArgumentException('Missing DSN host.');
-        }
+        $username = $config['username'] ?? null;
+        Assert::stringNotEmpty($username, 'The username cannot be empty.');
 
-        if (!$user) {
-            throw new \InvalidArgumentException('Missing DSN username.');
-        }
+        $password = $config['password'] ?? null;
+        Assert::stringNotEmpty($password, 'The password cannot be empty.');
 
-        if (!$password) {
-            throw new \InvalidArgumentException('Missing DSN user password.');
-        }
+        $database = $config['database'] ?? null;
+        Assert::stringNotEmpty($database, 'The database cannot be empty.');
 
-        if (!$path) {
-            throw new \InvalidArgumentException('Missing DSN path.');
-        }
+        $scheme = $config['scheme'] ?? 'https';
+        Assert::inArray($scheme, ['http', 'https'], \sprintf('The DSN scheme "%s" is not supported (supported: "http" or "https").', $scheme));
 
-        $database = str_starts_with($path, '/') ? substr($path, 1) : $path;
-
-        return new self($host, $user, urldecode($password), $database);
+        return new self($host, $username, $password, $database, $scheme);
     }
 
     /**

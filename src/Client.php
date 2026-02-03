@@ -62,26 +62,24 @@ class Client
     }
 
     /**
-     * @throws AuthenticationException when authentication failed
+     * @throws AuthenticationException on authentication error
      */
     public function authenticate(): int
     {
-        if (null === $this->uid) {
-            /** @var int|null $uid */
-            $uid = $this->request(
-                OdooRpcService::Common->value,
-                OdooRpcMethod::Login->value,
-                $this->connection->getDatabase(),
-                $this->connection->getUsername(),
-                $this->connection->getPassword()
-            );
+        /** @var int|null $uid */
+        $uid = $this->request(
+            OdooRpcService::Common->value,
+            OdooRpcMethod::Login->value,
+            $this->connection->getDatabase(),
+            $this->connection->getUsername(),
+            $this->connection->getPassword()
+        );
 
-            if (!$uid) {
-                throw new AuthenticationException();
-            }
-
-            $this->uid = $uid;
+        if (!$uid) {
+            throw new AuthenticationException();
         }
+
+        $this->uid = $uid;
 
         return $this->uid;
     }
@@ -92,10 +90,16 @@ class Client
      */
     public function request(string $service, string $method, mixed ...$arguments): mixed
     {
+        $uid = $this->uid;
+
+        if ($service !== OdooRpcService::Common->value || $method !== OdooRpcMethod::Login->value) {
+            $uid ?: throw new RequestException('You must authenticate before making requests.');
+        }
+
         $context = [
             'service' => $service,
             'method' => $method,
-            'uid' => (int) $this->uid,
+            'uid' => $uid,
             'arguments' => \array_slice($arguments, 3),
             'request_id' => uniqid('rpc', true),
         ];

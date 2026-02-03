@@ -27,7 +27,7 @@ It follows [the official Odoo documentation](https://www.odoo.com/documentation/
 Installation
 ------------
 
-PHP version 8.1 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
+PHP version 8.2 or newer to develop using the client. Other requirements, such as PHP extensions, are enforced by
 composer. See the `require` section of [composer.json file](../composer.json)
 for details.
 
@@ -63,17 +63,25 @@ If your password contains special characters, encode it with the native function
 $myEncodedPassword = urlencode('high_password_with_special_charaters');
 ```
 
-Then, use the DSN to create the client:
+Then, use the DSN to create a connection:
+
+```php
+use Ang3\Component\Odoo\Connection;
+
+$connection = Connection::createFromDsn($dsn, $transport = null, $logger = null);
+```
+
+Finally, create your client with the connection:
 
 ```php
 use Ang3\Component\Odoo\Client;
 
-$client = Client::create($dsn, $transport = null, $logger = null);
+$client = new Client($connection, $transport = null, $logger = null);
 ```
 
 #### Array configuration
 
-To create a client from an array configuration:
+To create a connection from a configuration as array:
 
 ```php
 $client = Client::create([

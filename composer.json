@@ -20,7 +20,8 @@
         "php": ">=8.2",
         "ext-json": "*",
         "psr/log": "^1.1|^2.0|^3.0",
-        "nyholm/dsn": "^2.0"
+        "nyholm/dsn": "^2.0",
+        "webmozart/assert": "^2.1"
     },
     "require-dev": {
         "symfony/test-pack": "^1.0",
